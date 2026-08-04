@@ -1,0 +1,46 @@
+name: CI Checks
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  lint-and-format:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # --- FRONTEND CHECKS ---
+      - name: Install Frontend Dependencies
+        working-directory: ./frontend
+        run: npm install
+
+      - name: Check Frontend Formatting
+        working-directory: ./frontend
+        run: npx prettier --check .
+
+      - name: Run Frontend Linter
+        working-directory: ./frontend
+        run: npm run lint
+
+      # --- BACKEND CHECKS ---
+      - name: Install Backend Dependencies
+        working-directory: ./backend
+        run: npm install
+
+      - name: Check Backend Formatting
+        working-directory: ./backend
+        run: npx prettier --check .
+
+      - name: Run Backend Linter
+        working-directory: ./backend
+        run: npm run lint
