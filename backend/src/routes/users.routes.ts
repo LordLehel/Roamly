@@ -3,11 +3,8 @@ import * as usersRoutes from "../controllers/users.controller";
 
 const router = Router();
 
-// the / will get the rout from the server.ts
 router.get('/', usersRoutes.getAllUsers);
-
 router.post('/register', usersRoutes.registerUser);
-
-
+router.post('/login', usersRoutes.loginUser);
 
 export default router;
