@@ -13,10 +13,12 @@ export const getAllUsers = async (req: Request, res: Response): Promise<void> =>
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({
-      status: 'error',
-      message: 'Error! There was an issue with the server during the listing of the users!',
-    });
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        message: 'Error! There was an issue with the server during the listing of the users!',
+      });
   }
 };
 
@@ -47,10 +49,12 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
       .json({ status: 'success', message: `${user.username} logged in successfully!` });
   } catch (error) {
     console.error(error);
-    res.status(500).json({
-      status: 'error',
-      message: 'Error! There was an issue with the server during the login process!',
-    });
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        message: 'Error! There was an issue with the server during the login process!',
+      });
   }
 };
 
@@ -77,9 +81,11 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
       .status(201)
       .json({ status: 'success', message: `User created with username: ${newUser.username}!` });
   } catch (error) {
-    res.status(500).json({
-      status: 'error',
-      message: `Error! There was a problem creating the new User: ${error}`,
-    });
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        message: `Error! There was a problem creating the new User: ${error}`,
+      });
   }
 };
