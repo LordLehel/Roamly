@@ -1,13 +1,9 @@
 import { Router } from "express";
-import * as usersRoutes from "../controllers/users.controller";
+import { getAllUsers } from "../controllers/users.controller";
 
 const router = Router();
 
 // the / will get the rout from the server.ts
-router.get('/', usersRoutes.getAllUsers);
-
-router.post('/register', usersRoutes.registerUser);
-
-
+router.get('/', getAllUsers);
 
 export default router;
