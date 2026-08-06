@@ -23,70 +23,40 @@ model events {
   description        String?              @db.VarChar(255)
   start_time         DateTime             @db.Timestamp(6)
   end_time           DateTime             @db.Timestamp(6)
-  visibility         String               @default("'GROUP WIDE'") @db.VarChar(64)
+  visibility         String               @default("GROUP WIDE") @db.VarChar(64)
   event_participants event_participants[]
   users              users                @relation(fields: [creator_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
   groups             groups               @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: NoAction)
 }
 
-model group_documents {
-  document_id   Int      @id @default(autoincrement())
-  group_id      Int
-  document_type String   @db.VarChar(128)
-  document_name String?  @db.VarChar(255)
-  file_url      String
-  uploaded_at   DateTime @default(now()) @db.Timestamp(6)
-  groups        groups   @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: NoAction)
-}
-
-model group_member_documents {
-  document_id    Int            @id @default(autoincrement())
-  user_id        Int
-  group_id       Int
-  document_type  String         @db.VarChar(128)
-  document_name  String?        @db.VarChar(255)
-  file_url       String
-  uploaded_at    DateTime       @default(now()) @db.Timestamp(6)
-  group_profiles group_profiles @relation(fields: [user_id, group_id], references: [user_id, group_id], onDelete: Cascade, onUpdate: NoAction)
-}
-
 model group_profiles {
-  user_id                Int
-  group_id               Int
-  role_id                Int
-  nickname               String?                  @unique @db.VarChar(64)
-  description            String?                  @db.VarChar(255)
-  group_member_documents group_member_documents[]
-  groups                 groups                   @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: NoAction)
-  roles                  roles                    @relation(fields: [role_id], references: [role_id], onUpdate: NoAction)
-  users                  users                    @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
+  user_id     Int
+  group_id    Int
+  role_id     Int
+  nickname    String? @unique @db.VarChar(64)
+  description String? @db.VarChar(255)
+  files       files[]
+  groups      groups  @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: NoAction)
+  roles       roles   @relation(fields: [role_id], references: [role_id], onUpdate: NoAction)
+  users       users   @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
 
   @@id([user_id, group_id])
 }
 
 model groups {
-  group_id        Int               @id @default(autoincrement())
-  uuid            String            @db.Uuid
-  name            String            @db.VarChar(255)
-  current_size    Int               @db.SmallInt
-  events          events[]
-  group_documents group_documents[]
-  group_profiles  group_profiles[]
-  media_files     media_files[]
+  group_id       Int              @id @default(autoincrement())
+  uuid           String           @db.Uuid
+  name           String           @db.VarChar(255)
+  current_size   Int              @db.SmallInt
+  events         events[]
+  files          files[]
+  group_profiles group_profiles[]
 }
 
 model media_files {
-  media_id    Int      @id @default(autoincrement())
-  group_id    Int
-  user_id     Int?
-  media_type  String   @db.VarChar(128)
-  media_name  String?  @db.VarChar(255)
-  media_url   String
-  description String?  @db.VarChar(255)
-  uploaded_at DateTime @default(now()) @db.Timestamp(6)
-  media_size  BigInt
-  groups      groups   @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: NoAction)
-  users       users?   @relation(fields: [user_id], references: [user_id], onUpdate: NoAction)
+  file_id     Int     @id
+  description String? @db.VarChar(255)
+  files       files   @relation(fields: [file_id], references: [file_id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 model roles {
@@ -95,29 +65,44 @@ model roles {
   group_profiles group_profiles[]
 }
 
-model user_documents {
-  document_id   Int       @id @default(autoincrement())
-  user_id       Int
-  document_type String    @db.VarChar(128)
-  document_name String?   @db.VarChar(255)
-  file_url      String
-  issue_date    DateTime? @db.Date
-  expiry_date   DateTime? @db.Date
-  uploaded_at   DateTime  @default(now()) @db.Timestamp(6)
-  users         users     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
+model users {
+  user_id                        Int                  @id @default(autoincrement())
+  uuid                           String               @unique @db.Uuid
+  username                       String               @db.VarChar(64)
+  email                          String               @unique @db.VarChar(254)
+  tel                            String?              @unique @db.VarChar(20)
+  password                       String               @db.VarChar(255)
+  profile_image_url              String?
+  event_participants             event_participants[]
+  events                         events[]
+  files_files_uploaded_byTousers files[]              @relation("files_uploaded_byTousers")
+  files_files_user_idTousers     files[]              @relation("files_user_idTousers")
+  group_profiles                 group_profiles[]
 }
 
-model users {
-  user_id            Int                  @id @default(autoincrement())
-  uuid               String               @unique @db.Uuid
-  username           String               @db.VarChar(64)
-  email              String               @unique @db.VarChar(254)
-  tel                String?              @unique @db.VarChar(20)
-  password           String               @db.VarChar(255)
-  profile_image_url  String?
-  event_participants event_participants[]
-  events             events[]
-  group_profiles     group_profiles[]
-  media_files        media_files[]
-  user_documents     user_documents[]
+model documents {
+  file_id     Int       @id
+  file_type   String?   @db.VarChar(64)
+  issue_date  DateTime? @db.Date
+  expiry_date DateTime? @db.Date
+  files       files     @relation(fields: [file_id], references: [file_id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model files {
+  file_id                        Int             @id @default(autoincrement())
+  file_name                      String?         @db.VarChar(255)
+  file_url                       String
+  file_size                      BigInt?
+  mime_type                      String?         @db.VarChar(32)
+  upload_datetime                DateTime?       @default(now()) @db.Timestamp(6)
+  uploaded_by                    Int?
+  ownership_type                 String          @db.VarChar(255)
+  user_id                        Int?
+  group_id                       Int?
+  documents                      documents?
+  groups                         groups?         @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: NoAction)
+  users_files_uploaded_byTousers users?          @relation("files_uploaded_byTousers", fields: [uploaded_by], references: [user_id], onUpdate: NoAction)
+  users_files_user_idTousers     users?          @relation("files_user_idTousers", fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
+  group_profiles                 group_profiles? @relation(fields: [user_id, group_id], references: [user_id, group_id], onDelete: Cascade, onUpdate: NoAction)
+  media_files                    media_files?
 }

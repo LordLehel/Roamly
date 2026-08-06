@@ -8,7 +8,8 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "lint": "npx eslint .",
-    "format": "prettier --write \"**/*.{js,ts,vue,json,css,scss}\""
+    "format": "prettier --write \"**/*.{js,ts,vue,json,css,scss}\"",
+    "pretty": "prettier --check \"**/*.{js,ts,vue,json,css,scss}\""
   },
   "keywords": [],
   "author": "",
