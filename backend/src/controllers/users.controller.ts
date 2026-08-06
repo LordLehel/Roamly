@@ -17,17 +17,6 @@ export const getAllUsers = async (req: Request, res: Response): Promise<void> =>
     }
 };
 
-export const loginUser = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const { email, password } = req.body;
-
-        
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ status: 'error', message: 'Error! There was an issue with the server during the login process!' });
-    }
-}
-
 export const registerUser = async (req: Request, res: Response): Promise<void> => {
     try {
         const { username, email, password } = req.body;
