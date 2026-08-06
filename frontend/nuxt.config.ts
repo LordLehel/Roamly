@@ -2,9 +2,14 @@
 export default defineNuxtConfig({
   compatibilityDate: '2023-10-10',
   modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt', '@nuxt/eslint'],
+
+  devServer: {
+    port: 5000
+  },
+
   runtimeConfig: {
     public: {
-      apiBaseUrl: 'http://localhost:5000/api',
+      apiBaseUrl: 'http://localhost:3000/api',
     },
   },
 });

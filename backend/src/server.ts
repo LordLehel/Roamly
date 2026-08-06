@@ -1,9 +1,20 @@
 import express, { Request, Response } from 'express';
+import userRoutes from './routes/userRoutes';
+import cors from 'cors';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+
+app.use(
+  cors({
+    origin: 'http://localhost:5000',
+    credentials: true,
+  }),
+);
+
+app.use('/api/users', userRoutes);
 
 app.get('/api/health', (req: Request, res: Response) => {
   res.status(200).json({
