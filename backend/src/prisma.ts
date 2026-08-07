@@ -5,15 +5,15 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// postgres kapcsolat .env mappabol
+// postgres connection url from the .env file
 const connectionString = process.env.DATABASE_URL;
 const pool = new Pool({ connectionString });
 
-// kapcsolat becsomagolasa a Prisma adapterebe
+// wrapping the connection into the Prisma adapter
 const adapter = new PrismaPg(pool);
 
-// peldanyositas -> singleton Prisma kliens
+// instatntiating -> singleton Prisma klient
 const prisma = new PrismaClient({ adapter });
 
-// exportalas -> a szerver tobbi resze is hasznalhassa
+// exporting -> other parts of the server will be able to use it too
 export default prisma;
