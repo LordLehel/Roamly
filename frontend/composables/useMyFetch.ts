@@ -25,8 +25,11 @@ export function useMyFetch<T>(request: string, opts: UseFetchOptions<T> = {}) {
     },
   };
 
+  /*
+  We had to disable the TypeScript rule for no-explicit-any because the useFetch function expects a specific type for its options,
+  but we are passing a custom options object that may not match that type exactly.
+  The type will be inferred correctly based on the generic type T provided to the useMyFetch function.
+  */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return useFetch<T>(request, customOptions as any);
 }
-
-// Keep in mind to replace any with a specific type if you have an interface defined!

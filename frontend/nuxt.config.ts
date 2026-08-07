@@ -4,7 +4,7 @@ export default defineNuxtConfig({
   modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt', '@nuxt/eslint'],
 
   devServer: {
-    port: 5000
+    port: 5000,
   },
 
   runtimeConfig: {

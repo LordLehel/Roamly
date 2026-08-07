@@ -1,17 +1,16 @@
 import { useMyFetch } from '~/composables/useMyFetch';
+import type { UserOutDto, UserInDto } from '~/types/user.type';
+import type { ApiResponse } from '~/types/api.type';
 
 export const userService = {
   async getUsers() {
-    return await useMyFetch('/users');
+    return await useMyFetch<ApiResponse<UserOutDto[]>>('/users');
   },
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async createUser(userData: any) {
-    return await useMyFetch('/users', {
+  async createUser(userData: UserInDto) {
+    return await useMyFetch<UserOutDto>('/users', {
       method: 'POST',
       body: userData,
     });
   },
-
-  // Keep in mind to change any to a specific type if you have a User interface defined!
 };
