@@ -1,21 +1,9 @@
 import { Request, Response } from 'express';
 import * as authService from './auth.service';
-import * as validationSchemas from './auth.validation';
 
 export const registerUser = async (req: Request, res: Response): Promise<void> => {
   try {
-    const validation = validationSchemas.registerSchema.safeParse(req.body);
-
-    if (!validation.success) {
-      res.status(400).json({
-        status: 'error',
-        errors: validation.error.flatten().fieldErrors,
-      });
-
-      return;
-    }
-
-    const { username, email, password } = validation.data;
+    const { username, email, password } = req.body;
 
     const newUser = await authService.registerUser(username, email, password);
 
@@ -34,18 +22,7 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
 
 export const loginUser = async (req: Request, res: Response): Promise<void> => {
   try {
-    const validation = validationSchemas.loginSchema.safeParse(req.body);
-
-    if (!validation.success) {
-      res.status(400).json({
-        status: 'error',
-        message: 'Invalid email or password!',
-      });
-
-      return;
-    }
-
-    const { email, password } = validation.data;
+    const { email, password } = req.body;
 
     const validLogin = await authService.loginUser(email, password);
 
