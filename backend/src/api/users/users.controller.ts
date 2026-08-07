@@ -30,13 +30,13 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
 
     res.status(200).json({
       status: 'success',
-      data: profile
+      data: profile,
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({
       status: 'error',
-      message: 'Error! There was an issue with the server during the listing of the asked user!'
+      message: 'Error! There was an issue with the server during the listing of the asked user!',
     });
   }
-}
+};

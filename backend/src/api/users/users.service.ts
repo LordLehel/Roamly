@@ -15,4 +15,4 @@ export const getProfile = async (uuid: string): Promise<users | null> => {
   });
 
   return profile;
-}
+};
