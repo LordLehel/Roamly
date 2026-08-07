@@ -93,11 +93,11 @@ model users {
 }
 
 model documents {
-  file_id     Int       @id
-  file_type   String?   @db.VarChar(64)
-  issue_date  DateTime? @db.Date
-  expiry_date DateTime? @db.Date
-  files       files     @relation(fields: [file_id], references: [file_id], onDelete: Cascade, onUpdate: NoAction)
+  file_id       Int       @id
+  document_type String?   @db.VarChar(64)
+  issue_date    DateTime? @db.Date
+  expiry_date   DateTime? @db.Date
+  files         files     @relation(fields: [file_id], references: [file_id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 model files {
