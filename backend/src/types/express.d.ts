@@ -1,11 +1,11 @@
 export interface UserPayload {
-    uuid: string;
+  uuid: string;
 }
 
 declare global {
-    namespace Express {
-        export interface Request {
-            user?: UserPayload;
-        }
+  namespace Express {
+    export interface Request {
+      user?: UserPayload;
     }
+  }
 }

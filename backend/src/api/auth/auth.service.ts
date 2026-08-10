@@ -1,13 +1,12 @@
 import prisma from '../../prisma';
 import { users } from '@prisma/client';
-import { pwdHasher, pwdValidator } from '../../utils/pwdhandling.utils'
+import { pwdHasher, pwdValidator } from '../../utils/pwdhandling.utils';
 
 export const registerUser = async (
   username: string,
   email: string,
   password: string,
 ): Promise<users> => {
-
   const hashedPasswd = await pwdHasher(password);
 
   const newUser = await prisma.users.create({
