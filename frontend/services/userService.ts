@@ -1,14 +1,16 @@
-import { useMyFetch } from '~/composables/useMyFetch';
+import { useApi } from '~/composables/useApi';
 import type { UserOutDto, UserInDto } from '~/types/user.type';
 import type { ApiResponse } from '~/types/api.type';
 
 export const userService = {
-  async getUsers() {
-    return await useMyFetch<ApiResponse<UserOutDto[]>>('/users');
+  getUsers() {
+    const api = useApi();
+    return api<ApiResponse<UserOutDto[]>>('/users');
   },
 
-  async createUser(userData: UserInDto) {
-    return await useMyFetch<UserOutDto>('/users', {
+  createUser(userData: UserInDto) {
+    const api = useApi();
+    return api<UserOutDto>('/users', {
       method: 'POST',
       body: userData,
     });
