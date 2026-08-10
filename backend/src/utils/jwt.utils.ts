@@ -2,8 +2,6 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 
 export interface CustomTokenPayload extends JwtPayload {
   uuid: string;
-  // leader/member in a group
-  role: 'leader' | 'member';
 }
 
 export const generateToken = (payload: { uuid: string }): string => {
