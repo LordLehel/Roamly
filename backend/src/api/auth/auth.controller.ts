@@ -30,13 +30,11 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     if (validLogin) {
       const token = generateToken({ uuid: validLogin.uuid });
 
-      res
-        .status(200)
-        .json({
-          status: 'success',
-          message: `Logged in succesfully as: ${validLogin.username}!`,
-          token: token,
-        });
+      res.status(200).json({
+        status: 'success',
+        message: `Logged in succesfully as: ${validLogin.username}!`,
+        token: token,
+      });
     } else {
       res.status(500).json({ status: 'error', message: 'Incorrect email or password!' });
     }

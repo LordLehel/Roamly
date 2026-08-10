@@ -9,7 +9,7 @@ export interface CustomTokenPayload extends JwtPayload {
 export const generateToken = (payload: { uuid: string }): string => {
   return jwt.sign(payload, process.env.JWT_SECRET as string, {
     expiresIn: '1d',
-    algorithm: 'RS256',
+    algorithm: 'HS256',
   });
 };
 
