@@ -1,32 +1,14 @@
 import { Request, Response } from 'express';
 import * as userService from './users.service';
-import { JwtPayload } from 'jsonwebtoken';
-
-export const getAllUsers = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const users = await userService.getAllUsers();
-
-    res.status(200).json({
-      status: 200,
-      data: users,
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      status: 'error',
-      message: 'Error! There was an issue with the server during the listing of the users!',
-    });
-  }
-};
 
 export const getProfile = async (req: Request, res: Response): Promise<void> => {
   try {
-    const user = res.locals.user as JwtPayload;
+    if (!req.user?.uuid) {
+      res.status(401).json({ message: 'Authorization needed!' });
+      return;
+    }
 
-    const userUuid = user.uuid;
-    // const userRole = user.role;
-
-    const profile = await userService.getProfile(userUuid);
+    const profile = await userService.getProfile(req.user.uuid);
 
     res.status(200).json({
       status: 'success',

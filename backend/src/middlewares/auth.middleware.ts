@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyToken } from '../utils/jwt.utils';
-import { JwtPayload } from 'jsonwebtoken';
 
 export const requireAuth = (req: Request, res: Response, next: NextFunction): void => {
   const authHeader = req.headers.authorization;
@@ -17,12 +16,10 @@ export const requireAuth = (req: Request, res: Response, next: NextFunction): vo
   const token = authHeader.split(' ')[1];
 
   try {
-    const decoded: JwtPayload = verifyToken(token);
+    const decoded = verifyToken(token);
 
-    // we give the decoded token on the res.locals
-    // it is always on the res object
-    // this way we don't need to modify the req object
-    res.locals.user = decoded;
+    // module augmentation in types/express.d.ts
+    req.user = decoded;
 
     next();
   } catch (error) {

@@ -1,22 +1,17 @@
 import prisma from '../../prisma';
-import bcrypt from 'bcrypt';
-import crypto from 'crypto';
 import { users } from '@prisma/client';
+import { pwdHasher, pwdValidator } from '../../utils/pwdhandling.utils'
 
 export const registerUser = async (
   username: string,
   email: string,
   password: string,
 ): Promise<users> => {
-  const saltRounds = 10;
 
-  const hashedPasswd = await bcrypt.hash(password, saltRounds);
-
-  const generatedUuid = crypto.randomUUID();
+  const hashedPasswd = await pwdHasher(password);
 
   const newUser = await prisma.users.create({
     data: {
-      uuid: generatedUuid,
       username,
       email,
       password: hashedPasswd,
@@ -37,7 +32,7 @@ export const loginUser = async (email: string, password: string): Promise<users 
     return null;
   }
 
-  const isMatch = await bcrypt.compare(password, user.password);
+  const isMatch = await pwdValidator(password, user.password);
 
   if (!isMatch) {
     return null;

@@ -1,4 +1,5 @@
 import jwt, { JwtPayload } from 'jsonwebtoken';
+import { UserPayload } from '../types/express';
 
 export interface CustomTokenPayload extends JwtPayload {
   uuid: string;
@@ -11,6 +12,6 @@ export const generateToken = (payload: { uuid: string }): string => {
   });
 };
 
-export const verifyToken = (token: string): CustomTokenPayload => {
-  return jwt.verify(token, process.env.JWT_SECRET as string) as CustomTokenPayload;
+export const verifyToken = (token: string): UserPayload => {
+  return jwt.verify(token, process.env.JWT_SECRET!) as UserPayload;
 };
