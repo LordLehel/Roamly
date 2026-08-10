@@ -17,12 +17,9 @@ export const createGroup = async ( creatorUuid: string, name: string ): Promise<
     if (!leaderRole) {
         throw new Error("ROLE_NOT_FOUND");
     }
-    
-    const generatedUuid = crypto.randomUUID();
 
     const newGroup = prisma.groups.create({
         data: {
-            uuid: generatedUuid,
             name,
             current_size: 1,
             group_profiles: {
@@ -42,4 +39,8 @@ export const createGroup = async ( creatorUuid: string, name: string ): Promise<
     });
 
     return newGroup;
+};
+
+export const listAllGroups = async (): Promise<groups[]> => {
+    return prisma.groups.findMany();
 }

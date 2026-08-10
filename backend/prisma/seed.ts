@@ -23,7 +23,7 @@ async function main(): Promise<void> {
         create: { type: 'member' },
     })
 
-    console.log(`Seeding finished successfully! Roles created: ${leaderRole}, ${memberRole}`);
+    console.log(`Seeding finished successfully! Roles created: ${leaderRole.type}, ${memberRole.type}`);
 }
 
 main()
