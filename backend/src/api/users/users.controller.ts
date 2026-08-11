@@ -3,12 +3,13 @@ import * as userService from './users.service';
 
 export const getProfile = async (req: Request, res: Response): Promise<void> => {
   try {
-    if (!req.user?.uuid) {
+    const user = res.locals.user;
+    if (!user?.uuid) {
       res.status(401).json({ message: 'Authorization needed!' });
       return;
     }
 
-    const profile = await userService.getProfile(req.user.uuid);
+    const profile = await userService.getProfile(user.uuid);
 
     res.status(200).json({
       status: 'success',

@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 
-export const pwdHasher = async (password: string): Promise<string> => {
+export const hashPassword = async (password: string): Promise<string> => {
   const saltRounds = 10;
 
   const hashedPasswd = await bcrypt.hash(password, saltRounds);
@@ -8,7 +8,7 @@ export const pwdHasher = async (password: string): Promise<string> => {
   return hashedPasswd;
 };
 
-export const pwdValidator = async (
+export const passwordValidator = async (
   passwordToValidate: string,
   realPassword: string,
 ): Promise<boolean> => {

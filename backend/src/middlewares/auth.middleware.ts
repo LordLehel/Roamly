@@ -19,7 +19,10 @@ export const requireAuth = (req: Request, res: Response, next: NextFunction): vo
     const decoded = verifyToken(token);
 
     // module augmentation in types/express.d.ts
-    req.user = decoded;
+
+    res.locals.user = decoded;
+
+    // req.user = decoded;
 
     next();
   } catch (error) {

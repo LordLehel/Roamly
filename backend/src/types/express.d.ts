@@ -4,7 +4,7 @@ export interface UserPayload {
 
 declare global {
   namespace Express {
-    export interface Request {
+    export interface Locals {
       user?: UserPayload;
     }
   }
