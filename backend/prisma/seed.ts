@@ -1,6 +1,6 @@
-import "dotenv/config";
-import { Pool } from "pg";
-import { PrismaPg } from "@prisma/adapter-pg";
+import 'dotenv/config';
+import { Pool } from 'pg';
+import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
 
 const connectionString = `${process.env.DATABASE_URL}`;
@@ -9,35 +9,50 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main(): Promise<void> {
-    console.log('Seeding database...');
+  console.log('Seeding database...');
 
-    const leaderRole = await prisma.roles.upsert({
-        where: { type: 'leader' },
-        update: {},
-        create: { type: 'leader' },
-    })
+  const leaderRole = await prisma.roles.upsert({
+    where: { type: 'leader' },
+    update: {},
+    create: { type: 'leader' },
+  });
 
-    const memberRole = await prisma.roles.upsert({
-        where: { type: 'member' },
-        update: {},
-        create: { type: 'member' },
-    })
+  const memberRole = await prisma.roles.upsert({
+    where: { type: 'member' },
+    update: {},
+    create: { type: 'member' },
+  });
 
-    console.log(`Seeding finished successfully! Roles created: ${leaderRole.type}, ${memberRole.type}`);
+  const invitedLeaderRole = await prisma.roles.upsert({
+    where: { type: 'invitedLeader' },
+    update: {},
+    create: { type: 'invitedLeader' },
+  });
+
+  const invitedMemberRole = await prisma.roles.upsert({
+    where: { type: 'invitedMember' },
+    update: {},
+    create: { type: 'invitedMember' },
+  });
+
+  console.log(
+    `Seeding finished successfully! Roles created: ${leaderRole.type}, ${memberRole.type}, \
+${invitedLeaderRole.type}, ${invitedMemberRole.type}`,
+  );
 }
 
 main()
-    .then(async () => {
-        await prisma.$disconnect();
-        await pool.end();
-    })
-    .catch(async (error: unknown) => {
-        if(error instanceof Error) {
-            console.error(error.message);
-        } else {
-            console.log("Unknown error happend while seeding the database!");
-        }
-        await prisma.$disconnect();
-        await pool.end();
-        process.exit(1);
-    })
+  .then(async () => {
+    await prisma.$disconnect();
+    await pool.end();
+  })
+  .catch(async (error: unknown) => {
+    if (error instanceof Error) {
+      console.error(error.message);
+    } else {
+      console.log('Unknown error happend while seeding the database!');
+    }
+    await prisma.$disconnect();
+    await pool.end();
+    process.exit(1);
+  });
