@@ -5,12 +5,14 @@ export const createGroup = async (req: Request, res: Response): Promise<void> =>
   try {
     const body = req.body;
 
-    if (!req.user?.uuid) {
+    const user = res.locals.user;
+
+    if (!user?.uuid) {
       res.status(401).json({ status: 'error', message: 'Authorization needed!' });
       return;
     }
 
-    const newGroup = await groupsService.createGroup(req.user.uuid, body.name);
+    const newGroup = await groupsService.createGroup(user.uuid, body.name);
 
     res.status(201).json({
       status: 'success',
@@ -45,7 +47,9 @@ export const listAllGroupsTheUserIsPartOf = async (req: Request, res: Response):
       });
     }
 
-    if (!req.user?.uuid) {
+    const user = res.locals.user;
+
+    if (!user?.uuid) {
       res.status(401).json({
         status: 'error',
         message: 'Authorization needed!',
@@ -54,7 +58,7 @@ export const listAllGroupsTheUserIsPartOf = async (req: Request, res: Response):
       return;
     }
 
-    const groupList = await groupsService.listAllGroupsTheUserIsPartOf(req.user?.uuid, page, limit);
+    const groupList = await groupsService.listAllGroupsTheUserIsPartOf(user.uuid, page, limit);
 
     res.status(202).json({
       status: 'success',
@@ -75,7 +79,9 @@ export const joinAGroupByUuidIfUserIsInvited = async (
   res: Response,
 ): Promise<void> => {
   try {
-    if (!req.user?.uuid) {
+    const user = res.locals.user;
+
+    if (!user?.uuid) {
       res.status(401).json({
         status: 'error',
         message: 'Authorization needed!',
@@ -87,7 +93,7 @@ export const joinAGroupByUuidIfUserIsInvited = async (
     const { groupUuid } = req.params;
 
     const updatedProfile = await groupsService.joinAGroupByUuidIfUserIsInvited(
-      req.user?.uuid,
+      user.uuid,
       groupUuid as string,
     );
 
@@ -107,7 +113,9 @@ export const joinAGroupByUuidIfUserIsInvited = async (
 
 export const inviteUsersToYourGroup = async (req: Request, res: Response): Promise<void> => {
   try {
-    if (!req.user?.uuid) {
+    const user = res.locals.user;
+
+    if (!user?.uuid) {
       res.status(401).json({
         status: 'error',
         message: 'Authorization needed!',
@@ -130,7 +138,7 @@ export const inviteUsersToYourGroup = async (req: Request, res: Response): Promi
     }
 
     const createdInvite = await groupsService.inviteUsersToYourGroup(
-      req.user.uuid,
+      user.uuid,
       invitedUserUuid,
       groupUuid as string,
       inviteWithRole,
