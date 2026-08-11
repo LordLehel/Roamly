@@ -66,32 +66,20 @@
 </template>
 
 <script setup lang="ts">
-import { useQuery, useMutation } from '@pinia/colada';
-import { userService } from '../services/userService';
 import type { UserInDto } from '../types/user.type';
+import { useUserQuery } from '~/queries/user.query';
+import { useCreateUserMutation } from '~/queries/user.mutation';
 
-const {
-  data: usersData,
-  isLoading,
-  error,
-  refresh: refreshUsers,
-} = useQuery({
-  key: ['users', 'list'],
-  query: () => userService.getUsers(),
-});
+const { data: usersData, isLoading, error, refresh: refreshUsers } = useUserQuery();
 
 // Mutation
 const {
   mutate: createUserMutation,
   isLoading: isCreating,
   error: createError,
-} = useMutation({
-  mutation: (newUser: UserInDto) => userService.createUser(newUser),
-
-  onSuccess: () => {
-    alert('User created successfully!');
-    refreshUsers();
-  },
+} = useCreateUserMutation(() => {
+  alert('Successful registration');
+  refreshUsers();
 });
 
 // Pressing Button
