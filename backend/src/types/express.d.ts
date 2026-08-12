@@ -1,0 +1,11 @@
+export interface UserPayload {
+  uuid: string;
+}
+
+declare global {
+  namespace Express {
+    export interface Locals {
+      user?: UserPayload;
+    }
+  }
+}
