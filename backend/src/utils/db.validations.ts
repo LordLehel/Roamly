@@ -50,3 +50,38 @@ export const getUserByEmailOrThrow = async (userEmail: string): Promise<users> =
 
   return user;
 };
+
+export const userPartOfTheGroupOrThrow = async (user: users, group: groups): Promise<void> => {
+  const groupProfileForTheGroupTheUserIsPartOf = await prisma.group_profiles.findFirst({
+    where: {
+      user_id: user.user_id,
+      group_id: group.group_id,
+      roles: {
+        type: {
+          in: ['member', 'leader'],
+        },
+      },
+    },
+  });
+
+  if (!groupProfileForTheGroupTheUserIsPartOf) {
+    throw new Error('USER_NOT_PART_OF_THE_GROUP');
+  }
+};
+
+export const leaderOfTheGroupOrThrow = async (user: users, group: groups): Promise<void> => {
+  const isTheUserLeaderInTheGroup = await prisma.group_profiles.findFirst({
+    where: {
+      group_id: group.group_id,
+      user_id: user.user_id,
+
+      roles: {
+        type: 'leader',
+      },
+    },
+  });
+
+  if (!isTheUserLeaderInTheGroup) {
+    throw new Error('USER_IS_NOT_LEADER_IN_GROUP');
+  }
+};

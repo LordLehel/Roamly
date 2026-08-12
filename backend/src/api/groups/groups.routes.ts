@@ -12,7 +12,13 @@ router.post('/:groupUuid/join', requireAuth, groupsRoutes.joinAGroupByUuidIfUser
 router.post('/:groupUuid/invite', requireAuth, groupsRoutes.inviteUsersToYourGroup);
 router.get('/invites', requireAuth, groupsRoutes.pendingInvites);
 router.get('/:groupUuid/join/infos/', requireAuth, groupsRoutes.joinGroupInfos);
+router.get('/:groupUuid/infos', requireAuth, groupsRoutes.listAllInfosOfOneGroup);
+router.delete('/:groupUuid', requireAuth, groupsRoutes.deleteGroup);
+router.patch('/:groupUuid', requireAuth, groupsRoutes.updateGroup);
 
-// update es delete es group-on beluli user-ek es infok
+// adot user torlese a group-bol
+// zod-os validacio mindenhova
+// zod error-ok lekezelese
+// tobbi error rendes lekezelese
 
 export default router;

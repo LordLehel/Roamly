@@ -4,12 +4,15 @@ import {
   profileRelatedToTheGroup,
   PaginatedGroups,
   GroupProfilesInfos,
+  InfosOfTheGroupTheUserIsPartOf,
 } from '../../types/group.types';
 import {
   getGroupOrThrow,
   getRoleByTypeOrThrow,
   getUserByEmailOrThrow,
   getUserOrThrow,
+  leaderOfTheGroupOrThrow,
+  userPartOfTheGroupOrThrow,
 } from '../../utils/db.validations';
 
 export const createGroup = async (
@@ -399,4 +402,96 @@ export const joinGroupInfos = async (
   });
 
   return groupInfos;
+};
+
+export const listAllInfosOfOneGroup = async (
+  userUuid: string,
+  groupUuid: string,
+): Promise<InfosOfTheGroupTheUserIsPartOf> => {
+  const user = await getUserOrThrow(userUuid);
+
+  const group = await getGroupOrThrow(groupUuid);
+
+  await userPartOfTheGroupOrThrow(user, group);
+
+  const groupInfos = await prisma.groups.findUnique({
+    where: {
+      group_id: group.group_id,
+    },
+    select: {
+      name: true,
+      current_size: true,
+      created_at: true,
+
+      group_profiles: {
+        where: {
+          roles: {
+            type: {
+              in: ['member', 'leader'],
+            },
+          },
+        },
+        select: {
+          users: {
+            select: {
+              email: true,
+              username: true,
+            },
+          },
+
+          roles: {
+            select: {
+              type: true,
+            },
+          },
+
+          nickname: true,
+          description: true,
+        },
+      },
+    },
+  });
+
+  if (!groupInfos) {
+    throw new Error('GROUP_NOT_FOUND');
+  }
+
+  return groupInfos;
+};
+
+export const deleteGroup = async (userUuid: string, groupUuid: string): Promise<void> => {
+  const user = await getUserOrThrow(userUuid);
+
+  const group = await getGroupOrThrow(groupUuid);
+
+  await leaderOfTheGroupOrThrow(user, group);
+
+  await prisma.groups.delete({
+    where: {
+      group_id: group.group_id,
+    },
+  });
+};
+
+export const updateGroup = async (
+  userUuid: string,
+  groupUuid: string,
+  updateData: { name?: string },
+): Promise<groups> => {
+  const user = await getUserOrThrow(userUuid);
+
+  const group = await getGroupOrThrow(groupUuid);
+
+  await leaderOfTheGroupOrThrow(user, group);
+
+  const updatedGroup = await prisma.groups.update({
+    where: {
+      group_id: group.group_id,
+    },
+    data: {
+      name: updateData.name,
+    },
+  });
+
+  return updatedGroup;
 };

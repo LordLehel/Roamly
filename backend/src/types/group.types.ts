@@ -50,3 +50,29 @@ export type GroupProfilesInfos = Prisma.group_profilesGetPayload<{
     };
   };
 }>;
+
+export type InfosOfTheGroupTheUserIsPartOf = Prisma.groupsGetPayload<{
+  select: {
+    name: true;
+    current_size: true;
+    created_at: true;
+
+    group_profiles: {
+      select: {
+        users: {
+          select: {
+            email: true;
+            username: true;
+          };
+        };
+        roles: {
+          select: {
+            type: true;
+          };
+        };
+        nickname: true;
+        description: true;
+      };
+    };
+  };
+}>;

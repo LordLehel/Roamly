@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import * as groupsService from './groups.service';
+import { updatedGroupSchema } from './groups.validation';
+import { z } from 'zod';
 
 export const createGroup = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -373,6 +375,15 @@ export const joinGroupInfos = async (req: Request, res: Response): Promise<void>
     if (error instanceof Error) {
       const errorMessage = error.message;
 
+      if (errorMessage === 'USER_NOT_FOUND') {
+        res.status(403).json({
+          status: 'error',
+          message: 'You must have a registered user to join a group!',
+        });
+
+        return;
+      }
+
       if (errorMessage === 'USER_ALREADY_JOINED_THE_GROUP') {
         res.status(409).json({
           status: 'error',
@@ -386,6 +397,195 @@ export const joinGroupInfos = async (req: Request, res: Response): Promise<void>
     res.status(500).json({
       status: 'error',
       message: 'Error! There was an issue during the listing of the information about the group!',
+    });
+  }
+};
+
+export const listAllInfosOfOneGroup = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const user = res.locals.user;
+
+    const { groupUuid } = req.params;
+
+    if (!user?.uuid) {
+      res.status(401).json({
+        status: 'error',
+        message: 'Authorization needed!',
+      });
+
+      return;
+    }
+
+    const groupInfos = await groupsService.listAllInfosOfOneGroup(user.uuid, groupUuid as string);
+
+    res.status(200).json({
+      status: 'success',
+      message: 'All information about the group:',
+      data: groupInfos,
+    });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      const errorMessage = error.message;
+
+      if (errorMessage === 'USER_NOT_PART_OF_THE_GROUP') {
+        res.status(403).json({
+          status: 'error',
+          message: 'User must be part of the group to list all of the information about it!',
+        });
+
+        return;
+      }
+
+      if (errorMessage === 'GROUP_NOT_FOUND') {
+        res.status(404).json({
+          status: 'error',
+          message: 'This group does not exist!',
+        });
+
+        return;
+      }
+    }
+
+    console.log(error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Error! There was an issue during the listing of the information about the group!',
+    });
+  }
+};
+
+export const deleteGroup = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const user = res.locals.user;
+
+    const { groupUuid } = req.params;
+
+    if (!user?.uuid) {
+      res.status(401).json({
+        status: 'error',
+        message: 'Authorization needed!',
+      });
+
+      return;
+    }
+
+    await groupsService.deleteGroup(user.uuid, groupUuid as string);
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Group deleted successfully!',
+    });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      const errorMessage = error.message;
+
+      if (errorMessage === 'USER_NOT_FOUND') {
+        res.status(403).json({
+          status: 'error',
+          message: 'You must have a registered user to delete a group!',
+        });
+
+        return;
+      }
+
+      if (errorMessage === 'GROUP_NOT_FOUND') {
+        res.status(404).json({
+          status: 'error',
+          message: 'This group does not exist!',
+        });
+
+        return;
+      }
+
+      if (errorMessage === 'USER_IS_NOT_LEADER_IN_GROUP') {
+        res.status(403).json({
+          status: 'error',
+          message: 'User must have leader role to delete a group!',
+        });
+
+        return;
+      }
+    }
+
+    console.log(error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Error! There was an issue during the deletion of the group!',
+    });
+  }
+};
+
+export const updateGroup = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const user = res.locals.user;
+    const { groupUuid } = req.params;
+
+    if (!user?.uuid) {
+      res.status(401).json({
+        status: 'error',
+        message: 'Authorization needed!',
+      });
+
+      return;
+    }
+
+    const validatedData = updatedGroupSchema.parse(req.body);
+
+    const updatedGroupInfos = await groupsService.updateGroup(
+      user.uuid,
+      groupUuid as string,
+      validatedData,
+    );
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Group updated successfully!',
+      data: updatedGroupInfos,
+    });
+  } catch (error: unknown) {
+    if (error instanceof z.ZodError) {
+      res.status(400).json({
+        status: 'error',
+        message: 'Validation failed!',
+        errors: error.flatten().fieldErrors,
+      });
+
+      return;
+    }
+    if (error instanceof Error) {
+      const errorMessage = error.message;
+
+      if (errorMessage === 'USER_NOT_FOUND') {
+        res.status(403).json({
+          status: 'error',
+          message: 'You must have a registered user to update a group!',
+        });
+
+        return;
+      }
+
+      if (errorMessage === 'GROUP_NOT_FOUND') {
+        res.status(404).json({
+          status: 'error',
+          message: 'This group does not exist!',
+        });
+
+        return;
+      }
+
+      if (errorMessage === 'USER_IS_NOT_LEADER_IN_GROUP') {
+        res.status(403).json({
+          status: 'error',
+          message: 'User must have leader role to update a group!',
+        });
+
+        return;
+      }
+    }
+    console.log(error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Error! There was an issue while updating the group!',
     });
   }
 };
