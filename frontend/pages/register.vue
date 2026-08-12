@@ -20,12 +20,13 @@
       </div>
 
       <!-- Center: Logo -->
-      <div
+      <NuxtLink
+        to="/"
         class="flex items-center gap-2 border border-green-500/50 px-4 py-2 rounded-md bg-green-950/50 backdrop-blur-bg hover:bg-green-800 text-green-50 transition-colors"
       >
-        <UIcon name="i-heroicons-map" class="w-6 h-6 text-green-400-" />
+        <UIcon name="i-heroicons-map-pin" class="w-6 h-6 text-green-400-" />
         <span class="text-lg font-semibold tracking-wider text-green-50">ROAMLY</span>
-      </div>
+      </NuxtLink>
 
       <!-- Right side: Log in & Profile -->
       <div class="flex-1 flex justify-end items-center gap-4">
@@ -54,12 +55,12 @@
       >
         <!-- Form Header -->
         <div class="text-center mb-8">
-          <h1 class="text-2xl font-medium tracking-wide text-green-400">Register account</h1>
+          <h1 class="text-2xl font-medium tracking-wide text-green-50">Register account</h1>
         </div>
 
         <!-- Form Body -->
-        <form class="w-full flex flex-col gap-4" @submit.prevent="handleRegister">
-          <UFormGroup label="Email" name="email">
+        <form class="w-full flex flex-col gap-4" novalidate @submit.prevent="handleRegister">
+          <UFormField name="email">
             <p class="text-sm text-green-400">Email</p>
             <UInput
               v-model="form.email"
@@ -67,11 +68,15 @@
               color="neutral"
               variant="outline"
               placeholder="sir_real_99@roamly.com"
-              class="w-full bg-green-950 text-green-50 focus:ring-green-500"
+              class="w-full"
+              :ui="{ base: errors.email
+                ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors' 
+                : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors'
+                }"
             />
-          </UFormGroup>
+          </UFormField>
 
-          <UFormGroup label="Username" name="username">
+          <UFormField name="username">
             <p class="text-sm text-green-400">Username</p>
             <UInput
               v-model="form.username"
@@ -79,11 +84,14 @@
               color="neutral"
               variant="outline"
               placeholder="ex. sir_real_99"
-              class="w-full bg-green-950 text-green-50 focus:ring-green-500"
+              class="w-full"
+              :ui="{ base: 
+                'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors'
+                }"
             />
-          </UFormGroup>
+          </UFormField>
 
-          <UFormGroup label="Password" name="password">
+          <UFormField name="password">
             <p class="text-sm text-green-400">Password</p>
             <UInput
               v-model="form.password"
@@ -91,11 +99,15 @@
               color="neutral"
               variant="outline"
               placeholder="********"
-              class="w-full bg-green-950 text-green-50 focus:ring-green-500"
+              class="w-full"
+              :ui="{ base: errors.password
+                ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors' 
+                : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors'
+                }"
             />
-          </UFormGroup>
+          </UFormField>
 
-          <UFormGroup label="Repeat password" name="repeatPassword">
+          <UFormField name="repeatPassword">
             <p class="text-sm text-green-400">Repeat password</p>
             <UInput
               v-model="form.repeatPassword"
@@ -103,19 +115,29 @@
               color="neutral"
               variant="outline"
               placeholder="********"
-              class="w-full bg-green-950 text-green-50 focus:ring-green-500"
+              class="w-full"
+              :ui="{ base: errors.password
+                ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors' 
+                : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors'
+                }"
             />
-          </UFormGroup>
+          </UFormField>
+
+          <!-- Error message -->
+          <div v-if="generalErrorMessage" class="text-red-400 text-sm text-center font-medium">
+            {{ generalErrorMessage }}
+          </div>
 
           <!-- register buttons -->
           <div class="flex items-center justify-between pt-6">
+            <!-- cancel button -->
             <UButton
               label="Cancel"
               variant="outline"
               color="neutral"
-              to="/"
-              class="h-10 px-6 text-md border-green-500/50 bg-green-900 hover:bg-green-800 text-green-50 transition-colors"
-            />
+              class="h-10 px-6 text-md ring-1 ring-green-800 bg-green-950/50 hover:bg-green-800 hover:ring- hover:ring-green-500 text-green-50 transition-colors"
+              @click="clearForm"
+              />
 
             <!-- register button -->
             <UButton
@@ -123,7 +145,7 @@
               label="Register"
               color="neutral"
               variant="solid"
-              class="h-10 px-6 text-md ring-1 ring-green-800 bg-green-900 hover:bg-green-800 hover:ring-1 hover:ring-green-500 text-green-50 transition-colors"
+              class="h-10 px-6 text-md ring-1 ring-green-800 bg-green-950/50 hover:bg-green-800 hover:ring- hover:ring-green-500 text-green-50 transition-colors"
             />
           </div>
         </form>
@@ -150,14 +172,62 @@ const form = reactive({
   repeatPassword: '',
 });
 
+// The forms errors
+const errors = reactive({
+    email: false,
+    password: false,
+});
+
+// The forms error message
+const generalErrorMessage = ref('');
+
+//email validation
+const validateEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+// watchers
+watch(() => form.email, () => {
+  errors.email = false;
+  generalErrorMessage.value = '';
+});
+
+watch([() => form.password, () => form.repeatPassword], () => {
+  errors.password = false;
+  generalErrorMessage.value = '';
+});
+
+const clearForm = () => {
+  form.email = '';
+  form.username = '';
+  form.password = '';
+  form.repeatPassword = '';
+  errors.email = false;
+  errors.password = false;
+  generalErrorMessage.value = '';
+};
+
 // Registration form handler
 const handleRegister = () => {
-  if (form.password !== form.repeatPassword) {
-    alert('The passwords do not match!');
-    return;
+  errors.email = false;
+  errors.password = false;
+  generalErrorMessage.value = '';
+
+  let hasError = false;
+
+  if (!validateEmail(form.email)) {
+    errors.email = true;
+    generalErrorMessage.value = 'Invalid email format!';
+    hasError = true;
+  } 
+  else if (form.password !== form.repeatPassword) {
+    errors.password = true;
+    generalErrorMessage.value = 'The passwords do not match!';
+    hasError = true;
   }
 
-  // Here will be the Pinia Colada mutation (useCreateUserMutation)
-  console.log('Register form:', form);
+  if (hasError) return;
+
+  console.log('Sending request to register user with data:', form);
 };
 </script>
