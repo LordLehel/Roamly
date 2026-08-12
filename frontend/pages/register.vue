@@ -85,8 +85,9 @@
               variant="outline"
               placeholder="ex. sir_real_99"
               class="w-full"
-              :ui="{ base: 
-                'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors'
+              :ui="{ base: errors.username
+                ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors' 
+                : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors'
                 }"
             />
           </UFormField>
@@ -116,7 +117,7 @@
               variant="outline"
               placeholder="********"
               class="w-full"
-              :ui="{ base: errors.password
+              :ui="{ base: errors.repeatPassword
                 ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors' 
                 : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors'
                 }"
@@ -175,7 +176,9 @@ const form = reactive({
 // The forms errors
 const errors = reactive({
     email: false,
+    username: false,
     password: false,
+    repeatPassword: false,
 });
 
 // The forms error message
@@ -192,8 +195,18 @@ watch(() => form.email, () => {
   generalErrorMessage.value = '';
 });
 
-watch([() => form.password, () => form.repeatPassword], () => {
+watch(() => form.username, () => {
+  errors.username = false;
+  generalErrorMessage.value = '';
+});
+
+watch(() => form.password, () => {
   errors.password = false;
+  generalErrorMessage.value = '';
+});
+
+watch(() => form.repeatPassword, () => {
+  errors.repeatPassword = false;
   generalErrorMessage.value = '';
 });
 
@@ -203,27 +216,55 @@ const clearForm = () => {
   form.password = '';
   form.repeatPassword = '';
   errors.email = false;
+  errors.username = false;
   errors.password = false;
+  errors.repeatPassword = false;
   generalErrorMessage.value = '';
 };
 
 // Registration form handler
 const handleRegister = () => {
   errors.email = false;
+  errors.username = false;
   errors.password = false;
+  errors.repeatPassword = false;
   generalErrorMessage.value = '';
 
   let hasError = false;
+  const missingFields: string[] = [];
 
-  if (!validateEmail(form.email)) {
+  if (!form.email.trim()) {
     errors.email = true;
-    generalErrorMessage.value = 'Invalid email format!';
+    missingFields.push('Email');
+  }
+  if (!form.username.trim()) {
+    errors.username = true;
+    missingFields.push('Username');
+  }
+  if (!form.password.trim()) {
+    errors.password = true;
+    missingFields.push('Password');
+  }
+  if (!form.repeatPassword.trim()) {
+    errors.repeatPassword = true;
+    missingFields.push('Repeat password');
+  }
+
+  if (missingFields.length > 0) {
+    generalErrorMessage.value = `Missing fields: ${missingFields.join(', ')}`;
     hasError = true;
   } 
-  else if (form.password !== form.repeatPassword) {
-    errors.password = true;
-    generalErrorMessage.value = 'The passwords do not match!';
-    hasError = true;
+  else {
+    if (!validateEmail(form.email)) {
+      errors.email = true;
+      generalErrorMessage.value = 'Helytelen e-mail cím formátum!';
+      hasError = true;
+    } else if (form.password !== form.repeatPassword) {
+      errors.password = true;
+      errors.repeatPassword = true;
+      generalErrorMessage.value = 'A jelszavak nem egyeznek!';
+      hasError = true;
+    }
   }
 
   if (hasError) return;
