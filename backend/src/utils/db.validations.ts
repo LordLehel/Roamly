@@ -36,3 +36,17 @@ export const getRoleByTypeOrThrow = async (roleType: string): Promise<roles> => 
 
   return role;
 };
+
+export const getUserByEmailOrThrow = async (userEmail: string): Promise<users> => {
+  const user = await prisma.users.findUnique({
+    where: {
+      email: userEmail
+    }
+  });
+
+  if (!user) {
+    throw new Error('USER_NOT_FOUND_WITH_PROVIDED_EMAIL');
+  }
+
+  return user;
+}

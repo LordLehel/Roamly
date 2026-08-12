@@ -1,14 +1,14 @@
 import prisma from '../../prisma';
-import { groups } from '@prisma/client';
+import { groups, Prisma } from '@prisma/client';
 import { profileRelatedToTheGroup, PaginatedGroups } from '../../types/group.types';
-import { getGroupOrThrow, getRoleByTypeOrThrow, getUserOrThrow } from '../../utils/db.validations';
+import { getGroupOrThrow, getRoleByTypeOrThrow, getUserByEmailOrThrow, getUserOrThrow } from '../../utils/db.validations';
 
-export const createGroup = async (creatorUuid: string, name: string): Promise<groups> => {
+export const createGroup = async (creatorUuid: string, name: string, initialInvites?: {email: string, role: string}[]): Promise<groups> => {
   const user = await getUserOrThrow(creatorUuid);
 
   const leaderRole = await getRoleByTypeOrThrow('leader');
 
-  const newGroup = prisma.groups.create({
+  const newGroup = await prisma.groups.create({
     data: {
       name,
       current_size: 1,
@@ -28,13 +28,22 @@ export const createGroup = async (creatorUuid: string, name: string): Promise<gr
     },
   });
 
+  if (initialInvites && initialInvites.length > 0) {
+    await Promise.all(
+      initialInvites.map(async (invitee: {email: string, role: string}) => {
+        await inviteUsersToYourGroup(creatorUuid, invitee.email, newGroup.uuid, invitee.role);
+      })
+    );
+  }
+
   return newGroup;
 };
 
+// cursor is optional (?) because the first listing won't include it
 export const listAllGroupsTheUserIsPartOf = async (
   userUuid: string,
-  page: number,
   limit: number,
+  cursor?: string,
 ): Promise<PaginatedGroups> => {
   const user = await getUserOrThrow(userUuid);
 
@@ -54,35 +63,8 @@ export const listAllGroupsTheUserIsPartOf = async (
     },
   };
 
-  // we calculate the total number of items in the table so we can decide
-  // if the page query parameter given by the user is valid or not
-  const numberOfItems = await prisma.groups.count({
-    where: userFilter,
-  });
-
-  // calculating the number off existing pages the user could ask for
-  // if there is 0 items in the table there could be only valid 1 page
-  const totalValidPages = Math.ceil(numberOfItems / limit) || 1;
-
-  if (page > totalValidPages) {
-    return {
-      items: [],
-      meta: {
-        total_items: numberOfItems,
-        total_pages: totalValidPages,
-        current_page: page,
-        items_per_page: limit,
-      },
-    };
-  }
-
-  // calculating how many elements we should skip
-  const skip = (page - 1) * limit;
-
-  const groupList = await prisma.groups.findMany({
-    skip: skip,
+  const queryOptions: Prisma.groupsFindManyArgs = {
     take: limit,
-
     where: userFilter,
 
     select: {
@@ -93,36 +75,52 @@ export const listAllGroupsTheUserIsPartOf = async (
 
       group_profiles: {
         where: {
-          roles: {
-            type: 'leader',
-          },
+            users: { uuid: user.uuid }
         },
         select: {
-          nickname: true,
-          description: true,
-
-          users: {
+          roles: {
             select: {
-              uuid: true,
-              username: true,
-              email: true,
-            },
+              type: true,
+            }
           },
         },
       },
     },
-    orderBy: {
-      created_at: 'desc',
-    },
-  });
+    orderBy: [
+      { created_at: 'desc' },
+      { uuid: 'desc' },
+    ]
+  }
+
+  // if the frontend sent a cursor we put it into the query
+  if (cursor) {
+    queryOptions.cursor = {
+      uuid: cursor
+    };
+
+    // we skip the cursor, it was already part of the previous list
+    queryOptions.skip = 1;
+  }
+
+  const groupList = await prisma.groups.findMany(queryOptions);
+
+  // next cursor could be either null, if there isn't any data left in the database
+  // or the last elements uuid
+  let nextCursor = null;
+
+  if (groupList.length === limit) {
+    nextCursor = groupList[groupList.length - 1].uuid;
+  }
 
   return {
     items: groupList,
     meta: {
-      total_items: numberOfItems,
-      total_pages: totalValidPages,
-      current_page: page,
-      items_per_page: limit,
+      next_cursor: nextCursor,
+      // has_next_page will be false if the database doesn't contain any more data to be sent
+      has_next_page: nextCursor !== null,
+      limit: limit,
+      // number of sent data
+      count: groupList.length
     },
   };
 };
@@ -182,13 +180,13 @@ export const joinAGroupByUuidIfUserIsInvited = async (
 
 export const inviteUsersToYourGroup = async (
   userUuid: string,
-  invitedUserUuid: string,
+  invitedUserEmail: string,
   groupUuid: string,
   inviteWithRole: string,
 ): Promise<profileRelatedToTheGroup> => {
   const user = await getUserOrThrow(userUuid);
 
-  const invitedUser = await getUserOrThrow(invitedUserUuid);
+  const invitedUser = await getUserByEmailOrThrow(invitedUserEmail);
 
   const group = await getGroupOrThrow(groupUuid);
 

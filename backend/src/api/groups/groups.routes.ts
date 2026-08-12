@@ -8,7 +8,7 @@ const router = Router();
 
 router.post('/create', requireAuth, validateData(createGroupSchema), groupsRoutes.createGroup);
 router.get('/all', requireAuth, groupsRoutes.listAllGroupsTheUserIsPartOf);
-router.post('/:groupUuid/join', requireAuth, groupsRoutes.listAllGroupsTheUserIsPartOf);
+router.post('/:groupUuid/join', requireAuth, groupsRoutes.joinAGroupByUuidIfUserIsInvited);
 router.post('/:groupUuid/invite', requireAuth, groupsRoutes.inviteUsersToYourGroup);
 
 export default router;
