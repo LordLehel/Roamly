@@ -163,7 +163,23 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { reactive, ref, watch } from 'vue';
+import { useApi } from '~/composables/useApi';
+
+const api = useApi();
+const router = useRouter();
+
+interface RegisterResponse {
+  status: string;
+  message: string;
+}
+
+interface ApiErrorResponse {
+  data?: {
+    message?: string;
+  };
+  message?: string;
+}
 
 // The forms default values
 const form = reactive({
@@ -183,6 +199,7 @@ const errors = reactive({
 
 // The forms error message
 const generalErrorMessage = ref('');
+const successMessage = ref('');
 
 //email validation
 const validateEmail = (email: string) => {
@@ -223,7 +240,7 @@ const clearForm = () => {
 };
 
 // Registration form handler
-const handleRegister = () => {
+const handleRegister = async () => {
   errors.email = false;
   errors.username = false;
   errors.password = false;
@@ -268,6 +285,34 @@ const handleRegister = () => {
   }
 
   if (hasError) return;
+
+  try {
+    // API hívás a backend felé a pontos interfésszel
+    const response = await api<RegisterResponse>('/auth/register', {
+      method: 'POST',
+      body: {
+        username: form.username,
+        email: form.email,
+        password: form.password,
+      },
+    });
+
+    successMessage.value = response.message || 'Registration successful!';
+    
+    // Siker esetén átirányítás a login oldalra 2 másodperc múlva
+    setTimeout(() => {
+      router.push('/login');
+    }, 2000);
+
+  } catch (err: unknown) {
+    const errorObj = err as ApiErrorResponse;
+    const backendMessage = errorObj?.data?.message || errorObj?.message || 'Registration failed!';
+    generalErrorMessage.value = backendMessage;
+
+    if (backendMessage.toLowerCase().includes('email') || backendMessage.toLowerCase().includes('exist') || backendMessage.toLowerCase().includes('taken')) {
+      errors.email = true;
+    }
+  }
 
   console.log('Sending request to register user with data:', form);
 };
