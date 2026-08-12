@@ -12,8 +12,6 @@ export const createGroup = async (req: Request, res: Response): Promise<void> =>
       return;
     }
 
-
-
     const newGroup = await groupsService.createGroup(user.uuid, groupName, initialInvites);
 
     res.status(201).json({
@@ -56,12 +54,12 @@ export const listAllGroupsTheUserIsPartOf = async (req: Request, res: Response):
   try {
     // limit must be int, if isn't provided it will be 15 by default
     let limit = parseInt(req.query.limit as string) || 15;
-    
+
     // if limit isn't a number or positive it's value will be 15 by default
     if (isNaN(limit) || limit < 1) {
       limit = 15;
     }
-    
+
     // if limit is greater than 50, it's value will be set to 50
     if (limit > 50) {
       limit = 50;
@@ -69,16 +67,16 @@ export const listAllGroupsTheUserIsPartOf = async (req: Request, res: Response):
 
     // cursor must be a string, or it could be undefined if it isn't provided
     const cursor = req.query.cursor as string | undefined;
-    
+
     // if cursor is provided but isn't a string we send an error message
     if (cursor && typeof cursor !== 'string') {
       res.status(400).json({
-        error: 'Invalid cursor foramt!'
+        error: 'Invalid cursor foramt!',
       });
 
       return;
     }
-    
+
     const user = res.locals.user;
 
     if (!user?.uuid) {
@@ -150,6 +148,15 @@ export const joinAGroupByUuidIfUserIsInvited = async (
   } catch (error: unknown) {
     if (error instanceof Error) {
       const errorMessage = error.message;
+
+      if (errorMessage === 'USER_NOT_INVITED_OR_ALREADY_PART_OF_THE_GROUP') {
+        res.status(404).json({
+          status: 'error',
+          message: 'User not invited to or already part of the group!',
+        });
+
+        return;
+      }
 
       if (errorMessage === 'USER_NOT_FOUND') {
         res.status(403).json({
@@ -270,6 +277,115 @@ export const inviteUsersToYourGroup = async (req: Request, res: Response): Promi
     res.status(500).json({
       status: 'error',
       message: 'Error! There was an issue during the invitation of a user!',
+    });
+  }
+};
+
+export const pendingInvites = async (req: Request, res: Response): Promise<void> => {
+  try {
+    // limit must be int, if isn't provided it will be 15 by default
+    let limit = parseInt(req.query.limit as string) || 15;
+
+    // if limit isn't a number or positive it's value will be 15 by default
+    if (isNaN(limit) || limit < 1) {
+      limit = 15;
+    }
+
+    // if limit is greater than 50, it's value will be set to 50
+    if (limit > 50) {
+      limit = 50;
+    }
+
+    // cursor must be a string, or it could be undefined if it isn't provided
+    const cursor = req.query.cursor as string | undefined;
+
+    // if cursor is provided but isn't a string we send an error message
+    if (cursor && typeof cursor !== 'string') {
+      res.status(400).json({
+        error: 'Invalid cursor foramt!',
+      });
+
+      return;
+    }
+
+    const user = res.locals.user;
+
+    if (!user?.uuid) {
+      res.status(401).json({
+        status: 'error',
+        message: 'Authorization needed!',
+      });
+
+      return;
+    }
+
+    const pendingInviteGroups = await groupsService.pendingInvites(user?.uuid, limit, cursor);
+
+    res.status(202).json({
+      status: 'success',
+      message: 'The list of all groups the user has pending invites to:',
+      data: pendingInviteGroups,
+    });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      const errorMessage = error.message;
+
+      if (errorMessage === 'USER_NOT_FOUND') {
+        res.status(403).json({
+          status: 'error',
+          message: 'You must have a registered user to list groups you are part of!',
+        });
+
+        return;
+      }
+    }
+  }
+
+  res.status(500).json({
+    status: 'error',
+    message: 'Error! There was an issue listing the groups the user has pending invites to!',
+  });
+};
+
+export const joinGroupInfos = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { groupUuid } = req.params;
+
+    const user = res.locals.user;
+
+    if (!user?.uuid) {
+      res.status(401).json({
+        status: 'error',
+        message: 'Authorization needed!',
+      });
+
+      return;
+    }
+
+    const infosOfTheGroup = await groupsService.joinGroupInfos(groupUuid as string, user.uuid);
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Information about the group the user wants to join:',
+      data: infosOfTheGroup,
+    });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      const errorMessage = error.message;
+
+      if (errorMessage === 'USER_ALREADY_JOINED_THE_GROUP') {
+        res.status(409).json({
+          status: 'error',
+          message: 'This user is already in the group!',
+        });
+
+        return;
+      }
+    }
+    console.log(error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Error! There was an issue during the listing of the information about the group!',
     });
   }
 };

@@ -1,9 +1,22 @@
 import prisma from '../../prisma';
 import { groups, Prisma } from '@prisma/client';
-import { profileRelatedToTheGroup, PaginatedGroups } from '../../types/group.types';
-import { getGroupOrThrow, getRoleByTypeOrThrow, getUserByEmailOrThrow, getUserOrThrow } from '../../utils/db.validations';
+import {
+  profileRelatedToTheGroup,
+  PaginatedGroups,
+  GroupProfilesInfos,
+} from '../../types/group.types';
+import {
+  getGroupOrThrow,
+  getRoleByTypeOrThrow,
+  getUserByEmailOrThrow,
+  getUserOrThrow,
+} from '../../utils/db.validations';
 
-export const createGroup = async (creatorUuid: string, name: string, initialInvites?: {email: string, role: string}[]): Promise<groups> => {
+export const createGroup = async (
+  creatorUuid: string,
+  name: string,
+  initialInvites?: { email: string; role: string }[],
+): Promise<groups> => {
   const user = await getUserOrThrow(creatorUuid);
 
   const leaderRole = await getRoleByTypeOrThrow('leader');
@@ -30,9 +43,9 @@ export const createGroup = async (creatorUuid: string, name: string, initialInvi
 
   if (initialInvites && initialInvites.length > 0) {
     await Promise.all(
-      initialInvites.map(async (invitee: {email: string, role: string}) => {
+      initialInvites.map(async (invitee: { email: string; role: string }) => {
         await inviteUsersToYourGroup(creatorUuid, invitee.email, newGroup.uuid, invitee.role);
-      })
+      }),
     );
   }
 
@@ -75,27 +88,24 @@ export const listAllGroupsTheUserIsPartOf = async (
 
       group_profiles: {
         where: {
-            users: { uuid: user.uuid }
+          users: { uuid: user.uuid },
         },
         select: {
           roles: {
             select: {
               type: true,
-            }
+            },
           },
         },
       },
     },
-    orderBy: [
-      { created_at: 'desc' },
-      { uuid: 'desc' },
-    ]
-  }
+    orderBy: [{ created_at: 'desc' }, { uuid: 'desc' }],
+  };
 
   // if the frontend sent a cursor we put it into the query
   if (cursor) {
     queryOptions.cursor = {
-      uuid: cursor
+      uuid: cursor,
     };
 
     // we skip the cursor, it was already part of the previous list
@@ -120,7 +130,7 @@ export const listAllGroupsTheUserIsPartOf = async (
       has_next_page: nextCursor !== null,
       limit: limit,
       // number of sent data
-      count: groupList.length
+      count: groupList.length,
     },
   };
 };
@@ -175,6 +185,16 @@ export const joinAGroupByUuidIfUserIsInvited = async (
     },
   });
 
+  await prisma.groups.update({
+    where: {
+      group_id: group.group_id,
+    },
+
+    data: {
+      current_size: { increment: 1 },
+    },
+  });
+
   return updatedProfile;
 };
 
@@ -222,7 +242,7 @@ export const inviteUsersToYourGroup = async (
   });
 
   if (alreadyInTheGroup) {
-    throw new Error('USER_ALREADY_INVITED_IN_GROUP_OR');
+    throw new Error('USER_ALREADY_IN_GROUP_OR_INVITED');
   }
 
   const createdProfile = await prisma.group_profiles.create({
@@ -237,4 +257,146 @@ export const inviteUsersToYourGroup = async (
   });
 
   return createdProfile;
+};
+
+export const pendingInvites = async (
+  userUuid: string,
+  limit: number,
+  cursor?: string,
+): Promise<PaginatedGroups> => {
+  const user = await getUserOrThrow(userUuid);
+
+  const userFilter = {
+    group_profiles: {
+      some: {
+        users: {
+          uuid: user.uuid,
+        },
+
+        roles: {
+          type: {
+            in: ['invitedLeader', 'invitedMember'],
+          },
+        },
+      },
+    },
+  };
+
+  const queryOptions: Prisma.groupsFindManyArgs = {
+    take: limit,
+    where: userFilter,
+
+    select: {
+      uuid: true,
+      name: true,
+      current_size: true,
+      created_at: true,
+
+      group_profiles: {
+        where: {
+          roles: { type: 'leader' },
+        },
+        select: {
+          users: {
+            select: {
+              username: true,
+              email: true,
+            },
+          },
+          roles: {
+            select: {
+              type: true,
+            },
+          },
+        },
+      },
+    },
+    orderBy: [{ created_at: 'desc' }, { uuid: 'desc' }],
+  };
+
+  // if the frontend sent a cursor we put it into the query
+  if (cursor) {
+    queryOptions.cursor = {
+      uuid: cursor,
+    };
+
+    // we skip the cursor, it was already part of the previous list
+    queryOptions.skip = 1;
+  }
+
+  const groupList = await prisma.groups.findMany(queryOptions);
+
+  // next cursor could be either null, if there isn't any data left in the database
+  // or the last elements uuid
+  let nextCursor = null;
+
+  if (groupList.length === limit) {
+    nextCursor = groupList[groupList.length - 1].uuid;
+  }
+
+  return {
+    items: groupList,
+    meta: {
+      next_cursor: nextCursor,
+      // has_next_page will be false if the database doesn't contain any more data to be sent
+      has_next_page: nextCursor !== null,
+      limit: limit,
+      // number of sent data
+      count: groupList.length,
+    },
+  };
+};
+
+export const joinGroupInfos = async (
+  groupUuid: string,
+  userUuid: string,
+): Promise<GroupProfilesInfos[]> => {
+  const group = await getGroupOrThrow(groupUuid);
+
+  const user = await getUserOrThrow(userUuid);
+
+  const alreadyInTheGroup = await prisma.group_profiles.findUnique({
+    where: {
+      user_id_group_id: {
+        user_id: user.user_id,
+        group_id: group.group_id,
+      },
+      roles: {
+        type: {
+          notIn: ['invitedMember', 'invitedLeader'],
+        },
+      },
+    },
+  });
+
+  if (alreadyInTheGroup) {
+    throw new Error('USER_ALREADY_JOINED_THE_GROUP');
+  }
+
+  const groupInfos = await prisma.group_profiles.findMany({
+    where: {
+      group_id: group.group_id,
+
+      roles: {
+        type: {
+          in: ['member', 'leader'],
+        },
+      },
+    },
+    select: {
+      users: {
+        select: {
+          email: true,
+          username: true,
+        },
+      },
+      roles: {
+        select: {
+          type: true,
+        },
+      },
+    },
+  });
+
+  return groupInfos;
 };

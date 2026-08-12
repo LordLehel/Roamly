@@ -40,8 +40,8 @@ export const getRoleByTypeOrThrow = async (roleType: string): Promise<roles> => 
 export const getUserByEmailOrThrow = async (userEmail: string): Promise<users> => {
   const user = await prisma.users.findUnique({
     where: {
-      email: userEmail
-    }
+      email: userEmail,
+    },
   });
 
   if (!user) {
@@ -49,4 +49,4 @@ export const getUserByEmailOrThrow = async (userEmail: string): Promise<users> =
   }
 
   return user;
-}
+};

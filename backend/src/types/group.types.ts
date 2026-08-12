@@ -13,10 +13,10 @@ export type GroupWithRole = Prisma.groupsGetPayload<{
       roles: {
         select: {
           type: true;
-        }
-      }
-    }
-  }
+        };
+      };
+    };
+  };
 }>;
 
 export type PaginatedGroups = {
@@ -32,5 +32,21 @@ export type PaginatedGroups = {
 export type profileRelatedToTheGroup = Prisma.group_profilesGetPayload<{
   include: {
     roles: true;
+  };
+}>;
+
+export type GroupProfilesInfos = Prisma.group_profilesGetPayload<{
+  select: {
+    users: {
+      select: {
+        email: true;
+        username: true;
+      };
+    };
+    roles: {
+      select: {
+        type: true;
+      };
+    };
   };
 }>;

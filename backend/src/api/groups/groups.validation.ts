@@ -13,15 +13,12 @@ export const createGroupSchema = z.object({
   initialInvites: z
     .array(
       z.object({
-        email: z
-          .string()
-          .email('invalid email adress format!'),
-        role: z
-          .enum(['invitedMember', 'invitedLeader'], {
-            message: 'Role must be either "invitedMember" or "invitedLeader"!'
-          }),
-      })
+        email: z.string().email('invalid email adress format!'),
+        role: z.enum(['invitedMember', 'invitedLeader'], {
+          message: 'Role must be either "invitedMember" or "invitedLeader"!',
+        }),
+      }),
     )
-    .max(50, "You can only invite up to 50 users at once!")
+    .max(50, 'You can only invite up to 50 users at once!')
     .optional(),
 });
