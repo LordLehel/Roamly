@@ -243,6 +243,14 @@ watch(
   },
 );
 
+watch(
+  () => form.repeatPassword,
+  () => {
+    errors.repeatPassword = false;
+    generalErrorMessage.value = '';
+  },
+);
+
 const clearForm = () => {
   form.email = '';
   form.username = '';
