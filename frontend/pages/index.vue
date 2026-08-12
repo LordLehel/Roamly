@@ -1,68 +1,81 @@
 <template>
-  <div class="p-8 max-w-4xl mx-auto font-sans">
-    <h1 class="text-3xl font-bold text-gray-800 mb-8">Users Management</h1>
+  <UContainer class="py-8 max-w-max">
+    <h1 class="text-3xl font-bold mb-8 border-solid border-b border-gray-700">Users Management</h1>
 
     <!-- MUTATION - creating new user -->
-    <div class="mb-8 p-6 border border-gray-200 rounded-xl bg-gray-50 shadow-sm">
-      <h3 class="text-xl font-semibold text-gray-800 mb-4">Add New User</h3>
+    <UCard class="mb-8">
+      <template #header>
+        <h3 class="text-xl font-semibold">Add New User</h3>
+      </template>
 
-      <button
-        class="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
-        :disabled="isCreating"
+      <!-- Create button -->
+      <UButton
+        color="neutral"
+        variant="solid"
+        :loading="isCreating"
+        :label="isCreating ? 'Saving to Database...' : 'Create Test User'"
         @click="handleCreateUser"
-      >
-        {{ isCreating ? 'Saving to Database...' : 'Create Test User' }}
-      </button>
+      />
 
-      <!-- Loading state -->
-      <p v-if="createError" class="mt-3 text-sm text-red-600 font-medium">
-        Failed to create: {{ createError.message }}
-      </p>
-    </div>
+      <!-- Error state (Mutation) -->
+      <UAlert
+        v-if="createError"
+        class="mt-4"
+        color="error"
+        variant="soft"
+        icon="i-heroicons-exclamation-circle"
+        :title="`Failed to create: ${createError.message}`"
+      />
+    </UCard>
 
     <!-- QUERY - listing users -->
     <div>
       <!-- Loading state -->
-      <p v-if="isLoading" class="text-gray-500 animate-pulse flex items-center gap-2">
-        Fetching data from the backend...
-      </p>
+      <div v-if="isLoading" class="flex items-center gap-2 text-gray-500">
+        <UIcon name="i-heroicons-arrow-path" class="w-5 h-5 animate-spin" />
+        <span>Fetching data from the backend...</span>
+      </div>
 
-      <!-- Error state -->
-      <p v-else-if="error" class="p-4 bg-red-50 text-red-600 border border-red-200 rounded-lg">
-        Error occurred: {{ error }}
-      </p>
+      <!-- Error state (Query) -->
+      <UAlert
+        v-else-if="error"
+        color="error"
+        variant="soft"
+        icon="i-heroicons-exclamation-triangle"
+        :title="`Error occurred: ${error}`"
+      />
 
       <!-- Successful response -->
       <div v-else-if="usersData" class="space-y-6">
-        <p class="text-gray-600 font-medium">
+        <p class="font-medium flex items-center gap-2">
           Users in database:
-          <span class="text-gray-900 font-bold">{{ usersData.data.length }}</span>
+          <UBadge color="neutral" variant="subtle">{{ usersData.data.length }}</UBadge>
         </p>
 
-        <!-- users list-->
-        <ul class="space-y-3">
-          <li
-            v-for="user in usersData.data"
-            :key="user.id"
-            class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm flex flex-col sm:flex-row sm:items-center justify-between"
-          >
-            <div>
-              <p class="font-semibold text-gray-800">{{ user.name }}</p>
-              <p class="text-sm text-gray-500">{{ user.email }}</p>
+        <!-- users list -->
+        <div class="space-y-3">
+          <!-- User card -->
+          <UCard v-for="user in usersData.data" :key="user.id" :ui="{ body: 'px-4 py-3' }">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between">
+              <div>
+                <p class="font-semibold">{{ user.name }}</p>
+                <p class="text-sm text-gray-500">{{ user.email }}</p>
+              </div>
             </div>
-          </li>
-        </ul>
+          </UCard>
+        </div>
 
-        <!-- refresh users-->
-        <button
-          class="px-4 py-2 bg-gray-100 text-gray-700 font-medium border border-gray-300 rounded-lg hover:bg-gray-200 transition-colors"
-          @click="() => refreshUsers"
-        >
-          Refresh List manually
-        </button>
+        <!-- refresh users -->
+        <UButton
+          color="neutral"
+          variant="outline"
+          icon="i-heroicons-arrow-path"
+          label="Refresh List manually"
+          @click="() => refreshUsers()"
+        />
       </div>
     </div>
-  </div>
+  </UContainer>
 </template>
 
 <script setup lang="ts">
