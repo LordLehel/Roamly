@@ -201,11 +201,11 @@ const errors = reactive({
   repeatPassword: false,
 });
 
-// The forms error message
+// Messages
 const generalErrorMessage = ref('');
 const successMessage = ref('');
 
-//email validation
+// email validation
 const validateEmail = (email: string) => {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 };
@@ -261,6 +261,7 @@ const clearForm = () => {
   errors.password = false;
   errors.repeatPassword = false;
   generalErrorMessage.value = '';
+  successMessage.value = '';
 };
 
 // Registration form handler
@@ -270,6 +271,7 @@ const handleRegister = async () => {
   errors.password = false;
   errors.repeatPassword = false;
   generalErrorMessage.value = '';
+  successMessage.value = '';
 
   let hasError = false;
   const missingFields: string[] = [];
