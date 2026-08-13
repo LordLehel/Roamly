@@ -76,3 +76,16 @@ export type InfosOfTheGroupTheUserIsPartOf = Prisma.groupsGetPayload<{
     };
   };
 }>;
+
+export type userGroupProfile = Prisma.group_profilesGetPayload<{
+  select: {
+    nickname: true;
+    description: true;
+
+    roles: {
+      select: {
+        type: true;
+      };
+    };
+  };
+}>;

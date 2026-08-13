@@ -1,5 +1,6 @@
 import { groups, roles, users } from '@prisma/client';
 import prisma from '../prisma';
+import * as groupTypes from '../types/group.types';
 
 export const getUserOrThrow = async (userUuid: string): Promise<users> => {
   const user = await prisma.users.findUnique({
@@ -84,4 +85,34 @@ export const leaderOfTheGroupOrThrow = async (user: users, group: groups): Promi
   if (!isTheUserLeaderInTheGroup) {
     throw new Error('USER_IS_NOT_LEADER_IN_GROUP');
   }
+};
+
+export const getUserGroupProfile = async (
+  user: users,
+  group: groups,
+): Promise<groupTypes.userGroupProfile> => {
+  const targetUserProfile = await prisma.group_profiles.findUnique({
+    where: {
+      user_id_group_id: {
+        user_id: user.user_id,
+        group_id: group.group_id,
+      },
+    },
+    select: {
+      nickname: true,
+      description: true,
+
+      roles: {
+        select: {
+          type: true,
+        },
+      },
+    },
+  });
+
+  if (!targetUserProfile) {
+    throw new Error('USER_PROFILE_IN_GROUP_NOT_FOUND');
+  }
+
+  return targetUserProfile;
 };

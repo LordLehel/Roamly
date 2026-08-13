@@ -1,7 +1,9 @@
 import { Request, Response } from 'express';
 import * as groupsService from './groups.service';
-import { updatedGroupSchema } from './groups.validation';
+import { listGroupsSchema } from './groups.validation';
 import { z } from 'zod';
+
+type ListGroupsQuery = z.infer<typeof listGroupsSchema>;
 
 export const createGroup = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -54,31 +56,6 @@ export const createGroup = async (req: Request, res: Response): Promise<void> =>
 
 export const listAllGroupsTheUserIsPartOf = async (req: Request, res: Response): Promise<void> => {
   try {
-    // limit must be int, if isn't provided it will be 15 by default
-    let limit = parseInt(req.query.limit as string) || 15;
-
-    // if limit isn't a number or positive it's value will be 15 by default
-    if (isNaN(limit) || limit < 1) {
-      limit = 15;
-    }
-
-    // if limit is greater than 50, it's value will be set to 50
-    if (limit > 50) {
-      limit = 50;
-    }
-
-    // cursor must be a string, or it could be undefined if it isn't provided
-    const cursor = req.query.cursor as string | undefined;
-
-    // if cursor is provided but isn't a string we send an error message
-    if (cursor && typeof cursor !== 'string') {
-      res.status(400).json({
-        error: 'Invalid cursor foramt!',
-      });
-
-      return;
-    }
-
     const user = res.locals.user;
 
     if (!user?.uuid) {
@@ -89,6 +66,8 @@ export const listAllGroupsTheUserIsPartOf = async (req: Request, res: Response):
 
       return;
     }
+
+    const { limit, cursor } = req.query as unknown as ListGroupsQuery;
 
     const groupList = await groupsService.listAllGroupsTheUserIsPartOf(user.uuid, limit, cursor);
 
@@ -152,7 +131,7 @@ export const joinAGroupByUuidIfUserIsInvited = async (
       const errorMessage = error.message;
 
       if (errorMessage === 'USER_NOT_INVITED_OR_ALREADY_PART_OF_THE_GROUP') {
-        res.status(404).json({
+        res.status(403).json({
           status: 'error',
           message: 'User not invited to or already part of the group!',
         });
@@ -170,7 +149,7 @@ export const joinAGroupByUuidIfUserIsInvited = async (
       }
 
       if (errorMessage === 'GROUP_NOT_FOUND') {
-        res.status(403).json({
+        res.status(404).json({
           status: 'error',
           message: 'The group you are trying to join does not exist!',
         });
@@ -203,15 +182,6 @@ export const inviteUsersToYourGroup = async (req: Request, res: Response): Promi
     const { groupUuid } = req.params;
 
     const { invitedUserEmail, inviteWithRole } = req.body;
-
-    if (!invitedUserEmail || !inviteWithRole) {
-      res.status(400).json({
-        status: 'error',
-        message: 'invitedUserEmail and inviteWithRole are required in the request body!',
-      });
-
-      return;
-    }
 
     const createdInvite = await groupsService.inviteUsersToYourGroup(
       user.uuid,
@@ -285,31 +255,6 @@ export const inviteUsersToYourGroup = async (req: Request, res: Response): Promi
 
 export const pendingInvites = async (req: Request, res: Response): Promise<void> => {
   try {
-    // limit must be int, if isn't provided it will be 15 by default
-    let limit = parseInt(req.query.limit as string) || 15;
-
-    // if limit isn't a number or positive it's value will be 15 by default
-    if (isNaN(limit) || limit < 1) {
-      limit = 15;
-    }
-
-    // if limit is greater than 50, it's value will be set to 50
-    if (limit > 50) {
-      limit = 50;
-    }
-
-    // cursor must be a string, or it could be undefined if it isn't provided
-    const cursor = req.query.cursor as string | undefined;
-
-    // if cursor is provided but isn't a string we send an error message
-    if (cursor && typeof cursor !== 'string') {
-      res.status(400).json({
-        error: 'Invalid cursor foramt!',
-      });
-
-      return;
-    }
-
     const user = res.locals.user;
 
     if (!user?.uuid) {
@@ -321,9 +266,11 @@ export const pendingInvites = async (req: Request, res: Response): Promise<void>
       return;
     }
 
-    const pendingInviteGroups = await groupsService.pendingInvites(user?.uuid, limit, cursor);
+    const { limit, cursor } = req.query as unknown as ListGroupsQuery;
 
-    res.status(202).json({
+    const pendingInviteGroups = await groupsService.pendingInvites(user.uuid, limit, cursor);
+
+    res.status(200).json({
       status: 'success',
       message: 'The list of all groups the user has pending invites to:',
       data: pendingInviteGroups,
@@ -341,12 +288,12 @@ export const pendingInvites = async (req: Request, res: Response): Promise<void>
         return;
       }
     }
-  }
 
-  res.status(500).json({
-    status: 'error',
-    message: 'Error! There was an issue listing the groups the user has pending invites to!',
-  });
+    res.status(500).json({
+      status: 'error',
+      message: 'Error! There was an issue listing the groups the user has pending invites to!',
+    });
+  }
 };
 
 export const joinGroupInfos = async (req: Request, res: Response): Promise<void> => {
@@ -529,7 +476,7 @@ export const updateGroup = async (req: Request, res: Response): Promise<void> =>
       return;
     }
 
-    const validatedData = updatedGroupSchema.parse(req.body);
+    const validatedData = req.body;
 
     const updatedGroupInfos = await groupsService.updateGroup(
       user.uuid,
@@ -543,15 +490,6 @@ export const updateGroup = async (req: Request, res: Response): Promise<void> =>
       data: updatedGroupInfos,
     });
   } catch (error: unknown) {
-    if (error instanceof z.ZodError) {
-      res.status(400).json({
-        status: 'error',
-        message: 'Validation failed!',
-        errors: error.flatten().fieldErrors,
-      });
-
-      return;
-    }
     if (error instanceof Error) {
       const errorMessage = error.message;
 
@@ -586,6 +524,168 @@ export const updateGroup = async (req: Request, res: Response): Promise<void> =>
     res.status(500).json({
       status: 'error',
       message: 'Error! There was an issue while updating the group!',
+    });
+  }
+};
+
+export const removeUserFromGroupByEmail = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const user = res.locals.user;
+
+    const { groupUuid, email: userToRemoveEmail } = req.params;
+
+    if (!user?.uuid) {
+      res.status(401).json({
+        status: 'error',
+        message: 'Authorization needed!',
+      });
+
+      return;
+    }
+
+    await groupsService.removeUserFromGroupByEmail(
+      user.uuid,
+      groupUuid as string,
+      userToRemoveEmail as string,
+    );
+
+    res.status(200).json({
+      status: 'success',
+      message: 'User successfully removed from group!',
+    });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      const errorMessage = error.message;
+
+      if (errorMessage === 'USER_NOT_FOUND') {
+        res.status(403).json({
+          status: 'error',
+          message: 'You must have a registered user to remove a user from a group!',
+        });
+
+        return;
+      }
+
+      if (errorMessage === 'GROUP_NOT_FOUND') {
+        res.status(404).json({
+          status: 'error',
+          message: 'This group does not exist!',
+        });
+
+        return;
+      }
+
+      if (errorMessage === 'USER_NOT_FOUND_WITH_PROVIDED_EMAIL') {
+        res.status(404).json({
+          status: 'error',
+          message: 'The user with this email address does not exist!',
+        });
+
+        return;
+      }
+
+      if (errorMessage === 'USER_IS_NOT_LEADER_IN_GROUP') {
+        res.status(401).json({
+          status: 'error',
+          message: 'User must have a leader role in the group to remove others',
+        });
+
+        return;
+      }
+
+      if (errorMessage === 'USER_PROFILE_IN_GROUP_NOT_FOUND') {
+        res.status(400).json({
+          status: 'error',
+          message: 'User must be in the group to be able to be removed!',
+        });
+
+        return;
+      }
+
+      if (errorMessage === 'LEADERS_CAN_NOT_BE_REMOVED') {
+        res.status(400).json({
+          status: 'error',
+          message: 'Leaders of the group can not be removed!',
+        });
+
+        return;
+      }
+    }
+
+    console.log(error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Error! There was an issue while removing user from the group!',
+    });
+  }
+};
+
+export const userLeavingGroup = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const user = res.locals.user;
+
+    const { groupUuid } = req.params;
+
+    if (!user?.uuid) {
+      res.status(401).json({
+        status: 'error',
+        message: 'Authorization needed!',
+      });
+
+      return;
+    }
+
+    await groupsService.userLeavingGroup(user.uuid, groupUuid as string);
+
+    res.status(200).json({
+      status: 'success',
+      message: 'User successfully left from group!',
+    });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      const errorMessage = error.message;
+
+      if (errorMessage === 'USER_NOT_FOUND') {
+        res.status(403).json({
+          status: 'error',
+          message: 'You must have a registered user to leave from a group!',
+        });
+
+        return;
+      }
+
+      if (errorMessage === 'GROUP_NOT_FOUND') {
+        res.status(404).json({
+          status: 'error',
+          message: 'This group does not exist!',
+        });
+
+        return;
+      }
+
+      if (errorMessage === 'USER_PROFILE_IN_GROUP_NOT_FOUND') {
+        res.status(400).json({
+          status: 'error',
+          message: 'User must be in the group to be able to leave!',
+        });
+
+        return;
+      }
+
+      if (errorMessage === 'CANNOT_LEAVE_AS_ONLY_LEADER') {
+        res.status(400).json({
+          status: 'error',
+          message: 'User can not leave if there are no other leaders in the group!',
+        });
+
+        return;
+      }
+    }
+
+    console.log(error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Error! There was an issue while leaving from the group!',
     });
   }
 };

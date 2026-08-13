@@ -10,6 +10,7 @@ import {
   getGroupOrThrow,
   getRoleByTypeOrThrow,
   getUserByEmailOrThrow,
+  getUserGroupProfile,
   getUserOrThrow,
   leaderOfTheGroupOrThrow,
   userPartOfTheGroupOrThrow,
@@ -173,30 +174,34 @@ export const joinAGroupByUuidIfUserIsInvited = async (
 
   const existingRole = await getRoleByTypeOrThrow(newRoleName);
 
-  const updatedProfile = await prisma.group_profiles.update({
-    where: {
-      user_id_group_id: {
-        user_id: user.user_id,
+  const [updatedProfile] = await prisma.$transaction([
+    // updating profile
+    prisma.group_profiles.update({
+      where: {
+        user_id_group_id: {
+          user_id: user.user_id,
+          group_id: group.group_id,
+        },
+      },
+      data: {
+        role_id: existingRole.role_id,
+      },
+      include: {
+        roles: true,
+      },
+    }),
+
+    // incrementing group size
+    prisma.groups.update({
+      where: {
         group_id: group.group_id,
       },
-    },
-    data: {
-      role_id: existingRole.role_id,
-    },
-    include: {
-      roles: true,
-    },
-  });
 
-  await prisma.groups.update({
-    where: {
-      group_id: group.group_id,
-    },
-
-    data: {
-      current_size: { increment: 1 },
-    },
-  });
+      data: {
+        current_size: { increment: 1 },
+      },
+    }),
+  ]);
 
   return updatedProfile;
 };
@@ -494,4 +499,106 @@ export const updateGroup = async (
   });
 
   return updatedGroup;
+};
+
+export const removeUserFromGroupByEmail = async (
+  userUuid: string,
+  groupUuid: string,
+  userToRemoveEmail: string,
+): Promise<void> => {
+  const user = await getUserOrThrow(userUuid);
+
+  const group = await getGroupOrThrow(groupUuid);
+
+  const userToRemove = await getUserByEmailOrThrow(userToRemoveEmail);
+
+  await leaderOfTheGroupOrThrow(user, group);
+
+  const targetUserProfile = await getUserGroupProfile(userToRemove, group);
+
+  if (targetUserProfile.roles.type === 'leader') {
+    throw new Error('LEADERS_CAN_NOT_BE_REMOVED');
+  }
+
+  await prisma.group_profiles.delete({
+    where: {
+      user_id_group_id: {
+        user_id: userToRemove.user_id,
+        group_id: group.group_id,
+      },
+    },
+  });
+};
+
+export const userLeavingGroup = async (userUuid: string, groupUuid: string): Promise<void> => {
+  const user = await getUserOrThrow(userUuid);
+
+  const group = await getGroupOrThrow(groupUuid);
+
+  const userProfile = await getUserGroupProfile(user, group);
+
+  // number of current users in the group
+  const currentGroupSize = await prisma.group_profiles.count({
+    where: {
+      group_id: group.group_id,
+    },
+  });
+
+  // if there is only one user left in the group
+  // we delete the group too
+  if (currentGroupSize === 1) {
+    await prisma.groups.delete({
+      where: {
+        group_id: group.group_id,
+      },
+    });
+
+    return;
+  }
+
+  // there are other users in the group too, but the user that wants to leave is a leader
+  if (userProfile.roles.type === 'leader') {
+    // how many leaders are in the group
+    const numberOfLeaders = await prisma.group_profiles.count({
+      where: {
+        group_id: group.group_id,
+        roles: {
+          type: 'leader',
+        },
+      },
+    });
+
+    // if the user is the only leader of the group
+    // he can leave only if he promotes someone else to leader role before
+    if (numberOfLeaders === 1) {
+      throw new Error('CANNOT_LEAVE_AS_ONLY_LEADER');
+    }
+  }
+
+  // user isn't leader or there are other leaders too
+  // we are using transaction, so the deletion of the profile
+  // and the decrementation of the group size will happen at once
+  await prisma.$transaction([
+    // deleting the user
+    prisma.group_profiles.delete({
+      where: {
+        user_id_group_id: {
+          user_id: user.user_id,
+          group_id: group.group_id,
+        },
+      },
+    }),
+
+    // decrementing group size
+    prisma.groups.update({
+      where: {
+        group_id: group.group_id,
+      },
+      data: {
+        current_size: {
+          decrement: 1,
+        },
+      },
+    }),
+  ]);
 };
