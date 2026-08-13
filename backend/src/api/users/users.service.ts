@@ -10,13 +10,3 @@ export const getProfile = async (uuid: string): Promise<users | null> => {
 
   return profile;
 };
-
-export const getProfile = async (uuid: string): Promise<users | null> => {
-  const profile = await prisma.users.findUnique({
-    where: {
-      uuid: uuid,
-    },
-  });
-
-  return profile;
-}
