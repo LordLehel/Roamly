@@ -12,7 +12,7 @@ const api = useApi();
 
 const testAuthentication = async () => {
   try {
-    const response = await api('/users/profile'); 
+    const response = await api('/users/profile');
     console.log('Success! The servers response:', response);
     alert('Success! You are signed in!');
   } catch (error) {
