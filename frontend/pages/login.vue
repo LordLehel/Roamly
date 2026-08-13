@@ -37,12 +37,14 @@
           to="/register"
           class="border border-green-500/50 px-4 py-2 rounded-md bg-green-950/50 backdrop-blur-bg hover:bg-green-800 text-green-50 transition-colors"
         />
-        <UAvatar
-          icon="i-heroicons-user"
-          color="neutral"
-          size="sm"
-          class="ring-1 ring-green-500/50 bg-green-950/50 backdrop-blur-md hover:bg-green-800 text-green-50 transition-colors"
-        />
+        <NuxtLink to="/">
+          <UAvatar
+            icon="i-heroicons-user"
+            color="neutral"
+            size="sm"
+            class="ring-1 ring-green-500/50 bg-green-950/50 backdrop-blur-md hover:bg-green-800 text-green-50 transition-colors"
+          />
+        </NuxtLink>
       </div>
     </header>
 
@@ -76,9 +78,10 @@
                 placeholder="sir_real_99@roamly.com"
                 class="w-full"
                 :ui="{
-                  base: error || backendError
-                    ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors'
-                    : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors',
+                  base:
+                    error || backendError
+                      ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors'
+                      : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors',
                 }"
               />
             </template>
@@ -96,9 +99,10 @@
                 placeholder="********"
                 class="w-full"
                 :ui="{
-                  base: error || backendError
-                    ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors'
-                    : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors',
+                  base:
+                    error || backendError
+                      ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors'
+                      : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors',
                 }"
               />
             </template>
@@ -139,9 +143,34 @@
 
     <!-- FOOTER -->
     <footer
-      class="py-3 text-center text-xs text-green-500 border-t border-green-900/50 bg-black/30 backdrop-blur-md"
+      class="py-4 px-6 flex items-center justify-between text-xs text-green-500 border-t border-green-900/50 bg-black/30 backdrop-blur-md"
     >
-      Copyright - Roamly idk.
+      <!-- Copyright -->
+      <div class="opacity-75">Copyright - Roamly idk.</div>
+
+      <!-- Links -->
+      <div class="flex gap-4 font-medium tracking-wide">
+        <NuxtLink
+          to="/"
+          class="hover:text-green-300 hover:underline underline-offset-4 transition-all"
+        >
+          Home
+        </NuxtLink>
+        <span class="opacity-50">|</span>
+        <NuxtLink
+          to="/about"
+          class="hover:text-green-300 hover:underline underline-offset-4 transition-all"
+        >
+          About
+        </NuxtLink>
+        <span class="opacity-50">|</span>
+        <NuxtLink
+          to="/support"
+          class="hover:text-green-300 hover:underline underline-offset-4 transition-all"
+        >
+          Support
+        </NuxtLink>
+      </div>
     </footer>
   </div>
 </template>
@@ -163,8 +192,14 @@ const form = reactive<LoginFormState>({
 const backendError = ref('');
 const successMessage = ref('');
 
-watch(() => form.email, () => backendError.value = '');
-watch(() => form.password, () => backendError.value = '');
+watch(
+  () => form.email,
+  () => (backendError.value = ''),
+);
+watch(
+  () => form.password,
+  () => (backendError.value = ''),
+);
 
 const clearForm = () => {
   Object.assign(form, { email: '', password: '' });
@@ -198,7 +233,6 @@ const handleLogin = async () => {
 
     successMessage.value = 'Login successful! Redirecting...';
     setTimeout(() => router.push('/'), 2000);
-
   } catch (err: unknown) {
     const errorObj = err as ApiErrorResponse;
     const errorData = errorObj?.data;
