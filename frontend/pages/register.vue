@@ -69,10 +69,11 @@
               variant="outline"
               placeholder="sir_real_99@roamly.com"
               class="w-full"
-              :ui="{ base: errors.email
-                ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors' 
-                : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors'
-                }"
+              :ui="{
+                base: errors.email
+                  ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors'
+                  : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors',
+              }"
             />
           </UFormField>
 
@@ -85,10 +86,11 @@
               variant="outline"
               placeholder="ex. sir_real_99"
               class="w-full"
-              :ui="{ base: errors.username
-                ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors' 
-                : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors'
-                }"
+              :ui="{
+                base: errors.username
+                  ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors'
+                  : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors',
+              }"
             />
           </UFormField>
 
@@ -101,10 +103,11 @@
               variant="outline"
               placeholder="********"
               class="w-full"
-              :ui="{ base: errors.password
-                ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors' 
-                : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors'
-                }"
+              :ui="{
+                base: errors.password
+                  ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors'
+                  : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors',
+              }"
             />
           </UFormField>
 
@@ -117,10 +120,11 @@
               variant="outline"
               placeholder="********"
               class="w-full"
-              :ui="{ base: errors.repeatPassword
-                ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors' 
-                : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors'
-                }"
+              :ui="{
+                base: errors.repeatPassword
+                  ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors'
+                  : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors',
+              }"
             />
           </UFormField>
 
@@ -138,7 +142,7 @@
               color="neutral"
               class="h-10 px-6 text-md ring-1 ring-green-800 bg-green-950/50 hover:bg-green-800 hover:ring- hover:ring-green-500 text-green-50 transition-colors"
               @click="clearForm"
-              />
+            />
 
             <!-- register button -->
             <UButton
@@ -163,7 +167,24 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { reactive, ref, watch } from 'vue';
+import { useApi } from '~/composables/useApi';
+
+const api = useApi();
+const router = useRouter();
+
+// Típusok a válaszokhoz és hibákhoz
+interface RegisterResponse {
+  status: string;
+  message: string;
+}
+
+interface ApiErrorResponse {
+  data?: {
+    message?: string;
+  };
+  message?: string;
+}
 
 // The forms default values
 const form = reactive({
@@ -175,40 +196,53 @@ const form = reactive({
 
 // The forms errors
 const errors = reactive({
-    email: false,
-    username: false,
-    password: false,
-    repeatPassword: false,
+  email: false,
+  username: false,
+  password: false,
+  repeatPassword: false,
 });
 
-// The forms error message
+// Messages
 const generalErrorMessage = ref('');
+const successMessage = ref('');
 
-//email validation
+// email validation
 const validateEmail = (email: string) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+};
 
 // watchers
-watch(() => form.email, () => {
-  errors.email = false;
-  generalErrorMessage.value = '';
-});
+watch(
+  () => form.email,
+  () => {
+    errors.email = false;
+    generalErrorMessage.value = '';
+  },
+);
 
-watch(() => form.username, () => {
-  errors.username = false;
-  generalErrorMessage.value = '';
-});
+watch(
+  () => form.username,
+  () => {
+    errors.username = false;
+    generalErrorMessage.value = '';
+  },
+);
 
-watch(() => form.password, () => {
-  errors.password = false;
-  generalErrorMessage.value = '';
-});
+watch(
+  () => form.password,
+  () => {
+    errors.password = false;
+    generalErrorMessage.value = '';
+  },
+);
 
-watch(() => form.repeatPassword, () => {
-  errors.repeatPassword = false;
-  generalErrorMessage.value = '';
-});
+watch(
+  () => form.repeatPassword,
+  () => {
+    errors.repeatPassword = false;
+    generalErrorMessage.value = '';
+  },
+);
 
 const clearForm = () => {
   form.email = '';
@@ -220,15 +254,17 @@ const clearForm = () => {
   errors.password = false;
   errors.repeatPassword = false;
   generalErrorMessage.value = '';
+  successMessage.value = '';
 };
 
 // Registration form handler
-const handleRegister = () => {
+const handleRegister = async () => {
   errors.email = false;
   errors.username = false;
   errors.password = false;
   errors.repeatPassword = false;
   generalErrorMessage.value = '';
+  successMessage.value = '';
 
   let hasError = false;
   const missingFields: string[] = [];
@@ -253,8 +289,7 @@ const handleRegister = () => {
   if (missingFields.length > 0) {
     generalErrorMessage.value = `Missing fields: ${missingFields.join(', ')}`;
     hasError = true;
-  } 
-  else {
+  } else {
     if (!validateEmail(form.email)) {
       errors.email = true;
       generalErrorMessage.value = 'Helytelen e-mail cím formátum!';
@@ -269,6 +304,33 @@ const handleRegister = () => {
 
   if (hasError) return;
 
-  console.log('Sending request to register user with data:', form);
+  try {
+    const response = await api<RegisterResponse>('/auth/register', {
+      method: 'POST',
+      body: {
+        username: form.username,
+        email: form.email,
+        password: form.password,
+      },
+    });
+
+    successMessage.value = response.message || 'Registration successful!';
+
+    setTimeout(() => {
+      router.push('/login');
+    }, 2000);
+  } catch (err: unknown) {
+    const errorObj = err as ApiErrorResponse;
+    const backendMessage = errorObj?.data?.message || errorObj?.message || 'Registration failed!';
+    generalErrorMessage.value = backendMessage;
+
+    if (
+      backendMessage.toLowerCase().includes('email') ||
+      backendMessage.toLowerCase().includes('exist') ||
+      backendMessage.toLowerCase().includes('taken')
+    ) {
+      errors.email = true;
+    }
+  }
 };
 </script>
