@@ -94,6 +94,24 @@
             />
           </UFormField>
 
+          <!-- Phone Field -->
+          <UFormField name="phone">
+            <p class="text-sm text-green-400">Phone number</p>
+            <UInput
+              v-model="form.phone"
+              type="tel"
+              color="neutral"
+              variant="outline"
+              placeholder="ex. +40 712 345 678"
+              class="w-full"
+              :ui="{
+                base: errors.phone
+                  ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors'
+                  : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors',
+              }"
+            />
+          </UFormField>
+
           <UFormField name="password">
             <p class="text-sm text-green-400">Password</p>
             <UInput
@@ -131,6 +149,11 @@
           <!-- Error message -->
           <div v-if="generalErrorMessage" class="text-red-400 text-sm text-center font-medium">
             {{ generalErrorMessage }}
+          </div>
+
+          <!-- Success message -->
+          <div v-if="successMessage" class="text-green-400 text-sm text-center font-medium">
+            {{ successMessage }}
           </div>
 
           <!-- register buttons -->
@@ -178,9 +201,12 @@ interface RegisterResponse {
   message: string;
 }
 
+// Type for error response (Bővítve a Zod lehetséges formátumaival)
 interface ApiErrorResponse {
   data?: {
-    message?: string;
+    status?: string;
+    // A message lehet egy sima string, vagy egy objektum, ami mezőnevekhez rendel string tömböket (Zod format)
+    message?: string | Record<string, string[]>;
   };
   message?: string;
 }
@@ -189,6 +215,7 @@ interface ApiErrorResponse {
 const form = reactive({
   email: '',
   username: '',
+  phone: '',
   password: '',
   repeatPassword: '',
 });
@@ -197,6 +224,7 @@ const form = reactive({
 const errors = reactive({
   email: false,
   username: false,
+  phone: false,
   password: false,
   repeatPassword: false,
 });
@@ -208,6 +236,11 @@ const successMessage = ref('');
 // email validation
 const validateEmail = (email: string) => {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+};
+
+// phone validation
+const validatePhone = (phone: string) => {
+  return /^\+\d{1,4}[\s\d]{6,14}$/.test(phone);
 };
 
 // watchers
@@ -223,6 +256,14 @@ watch(
   () => form.username,
   () => {
     errors.username = false;
+    generalErrorMessage.value = '';
+  },
+);
+
+watch(
+  () => form.phone,
+  () => {
+    errors.phone = false;
     generalErrorMessage.value = '';
   },
 );
@@ -254,10 +295,12 @@ watch(
 const clearForm = () => {
   form.email = '';
   form.username = '';
+  form.phone = '';
   form.password = '';
   form.repeatPassword = '';
   errors.email = false;
   errors.username = false;
+  errors.phone = false;
   errors.password = false;
   errors.repeatPassword = false;
   generalErrorMessage.value = '';
@@ -268,6 +311,7 @@ const clearForm = () => {
 const handleRegister = async () => {
   errors.email = false;
   errors.username = false;
+  errors.phone = false;
   errors.password = false;
   errors.repeatPassword = false;
   generalErrorMessage.value = '';
@@ -276,6 +320,7 @@ const handleRegister = async () => {
   let hasError = false;
   const missingFields: string[] = [];
 
+  // Check for missing fields
   if (!form.email.trim()) {
     errors.email = true;
     missingFields.push('Email');
@@ -283,6 +328,10 @@ const handleRegister = async () => {
   if (!form.username.trim()) {
     errors.username = true;
     missingFields.push('Username');
+  }
+  if (!form.phone.trim()) {
+    errors.phone = true;
+    missingFields.push('Phone');
   }
   if (!form.password.trim()) {
     errors.password = true;
@@ -297,14 +346,19 @@ const handleRegister = async () => {
     generalErrorMessage.value = `Missing fields: ${missingFields.join(', ')}`;
     hasError = true;
   } else {
+    // Validate email, phone and passwords
     if (!validateEmail(form.email)) {
       errors.email = true;
-      generalErrorMessage.value = 'Helytelen e-mail cím formátum!';
+      generalErrorMessage.value = 'Wrong email format!';
+      hasError = true;
+    } else if (!validatePhone(form.phone)) {
+      errors.phone = true;
+      generalErrorMessage.value = 'Wrong phone format (ex. +40 712 345 678)!';
       hasError = true;
     } else if (form.password !== form.repeatPassword) {
       errors.password = true;
       errors.repeatPassword = true;
-      generalErrorMessage.value = 'A jelszavak nem egyeznek!';
+      generalErrorMessage.value = 'Passwords do not match!';
       hasError = true;
     }
   }
@@ -312,34 +366,75 @@ const handleRegister = async () => {
   if (hasError) return;
 
   try {
-    // API hívás a backend felé a pontos interfésszel
+    // api request
     const response = await api<RegisterResponse>('/auth/register', {
       method: 'POST',
       body: {
         username: form.username,
         email: form.email,
+        phone: form.phone,
         password: form.password,
       },
     });
 
-    successMessage.value = response.message || 'Registration successful!';
+    // Log response - DEBUG - REMOVE LATER
+    console.log('Registration successful!');
+    console.log(response);
 
-    // Siker esetén átirányítás a login oldalra 2 másodperc múlva
+    successMessage.value = 'Registration successful!';
+
+    // Redirect to login if registration is successful
     setTimeout(() => {
       router.push('/login');
     }, 2000);
   } catch (err: unknown) {
     const errorObj = err as ApiErrorResponse;
-    const backendMessage = errorObj?.data?.message || errorObj?.message || 'Registration failed!';
-    generalErrorMessage.value = backendMessage;
+    const errorData = errorObj?.data;
 
-    if (
-      backendMessage.toLowerCase().includes('email') ||
-      backendMessage.toLowerCase().includes('exist') ||
-      backendMessage.toLowerCase().includes('taken')
-    ) {
-      errors.email = true;
+    let backendMessage = 'Registration failed!';
+
+    if (errorData && errorData.message) {
+      // Simple string error message
+      if (typeof errorData.message === 'string') {
+        backendMessage = errorData.message;
+
+        const msgLower = backendMessage.toLowerCase();
+        if (
+          msgLower.includes('email') ||
+          msgLower.includes('exist') ||
+          msgLower.includes('taken')
+        ) {
+          errors.email = true;
+        }
+      }
+      // Zod error object
+      else if (typeof errorData.message === 'object') {
+        const allErrors: string[] = [];
+
+        // Végigmegyünk az objektum kulcsain (pl. 'password', 'email')
+        for (const [field, fieldErrors] of Object.entries(errorData.message)) {
+          // Ha a kapott mezőnév benne van az 'errors' objektumunkban, bepirosítjuk (típusbiztosan!)
+          if (field in errors) {
+            errors[field as keyof typeof errors] = true;
+          }
+
+          // A mezőhöz tartozó hibaüzeneteket beletesszük egy közös tömbbe
+          if (Array.isArray(fieldErrors)) {
+            allErrors.push(...fieldErrors);
+          }
+        }
+
+        // Combined error messages
+        if (allErrors.length > 0) {
+          backendMessage = allErrors.join(' | ');
+        }
+      }
+    } else if (errorObj?.message) {
+      // Fallback error message
+      backendMessage = errorObj.message;
     }
+
+    generalErrorMessage.value = backendMessage;
   }
 
   console.log('Sending request to register user with data:', form);
