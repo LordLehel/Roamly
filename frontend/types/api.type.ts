@@ -6,7 +6,7 @@ export interface ApiResponse<T> {
 export interface LoginResponse {
   status: string;
   message: string;
-  token?: string; 
+  token?: string;
 }
 
 export interface RegisterResponse {
