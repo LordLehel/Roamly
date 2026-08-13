@@ -1,20 +1,19 @@
 <template>
-  <!-- MAIN CONTAINER: full-screen, dark-background -->
+  <!-- MAIN CONTAINER: Alabástrom háttér, sötét erdei zöld alapszöveg -->
   <div
-    class="min-h-screen flex flex-col text-white font-sans bg-cover bg-center bg-no-repeat bg-fixed"
+    class="min-h-screen flex flex-col bg-[#FAF9F6] text-[#2F3E32] font-sans bg-cover bg-center bg-no-repeat bg-fixed"
     style="background-image: url('/login/login-background.jpg')"
   >
-    <!-- HEADER -->
+    <!-- HEADER: Sápadt zsályazöld sáv, puha árnyékkal, üveghatással -->
     <header
-      class="flex items-center justify-between px-6 py-4 border-b border-green-900/50 bg-black/30 backdrop-blur-md"
+      class="flex items-center justify-between px-6 py-4 bg-[#EDF1EE]/70 backdrop-blur-md shadow-sm relative z-10"
     >
       <!-- Left side: Go Back -->
       <div class="flex-1">
         <UButton
           label="Go Back"
-          variant="outline"
-          color="neutral"
-          class="border border-green-500/50 px-4 py-2 rounded-md bg-green-950/50 backdrop-blur-bg hover:bg-green-800 text-green-50 transition-colors"
+          variant="solid"
+          class="rounded-full bg-[#7A9A82] hover:bg-[#68856F] text-white px-5 py-2 transition-colors shadow-sm font-bold tracking-wide"
           @click="$router.back()"
         />
       </div>
@@ -22,66 +21,63 @@
       <!-- Center: Logo -->
       <NuxtLink
         to="/"
-        class="flex items-center gap-2 border border-green-500/50 px-4 py-2 rounded-md bg-green-950/50 backdrop-blur-bg hover:bg-green-800 text-green-50 transition-colors"
+        class="flex items-center gap-2 text-[#2F3E32] hover:opacity-80 transition-opacity"
       >
-        <UIcon name="i-heroicons-map-pin" class="w-6 h-6 text-green-400" />
-        <span class="text-lg font-semibold tracking-wider text-green-50">ROAMLY</span>
+        <UIcon name="i-heroicons-map-pin" class="w-7 h-7 text-[#7A9A82]" />
+        <span class="text-xl font-semibold tracking-wider">ROAMLY</span>
       </NuxtLink>
 
       <!-- Right side: Register & Profile -->
       <div class="flex-1 flex justify-end items-center gap-4">
         <UButton
           label="Register"
-          variant="outline"
-          color="neutral"
           to="/register"
-          class="border border-green-500/50 px-4 py-2 rounded-md bg-green-950/50 backdrop-blur-bg hover:bg-green-800 text-green-50 transition-colors"
+          variant="solid"
+          class="rounded-full bg-[#E5A93B] hover:bg-[#D49933] text-white px-5 py-2 transition-colors shadow-sm font-bold tracking-wide"
         />
         <NuxtLink to="/">
           <UAvatar
             icon="i-heroicons-user"
-            color="neutral"
             size="sm"
-            class="ring-1 ring-green-500/50 bg-green-950/50 backdrop-blur-md hover:bg-green-800 text-green-50 transition-colors"
+            class="bg-[#2F3E32] text-[#FAF9F6] ring-2 ring-[#2F3E32]/10 shadow-sm"
           />
         </NuxtLink>
       </div>
     </header>
 
     <!-- MAIN CONTENT: Login Form -->
-    <main class="flex-1 flex items-center justify-center p-4">
-      <!--Form card -->
+    <main class="flex-1 flex items-center justify-center p-6">
+      <!-- Form card -->
       <UCard
-        class="w-full max-w-md bg-black/60 backdrop-blur-xl ring-1 ring-green-500/30 shadow-2xl shadow-black/80"
+        class="w-full max-w-md bg-white/70 backdrop-blur-xl rounded-[25px] shadow-[0_15px_40px_rgba(47,62,50,0.15)] border-0 ring-1 ring-white/50"
         :ui="{ body: 'p-8' }"
       >
         <!-- Form Header -->
         <div class="text-center mb-8">
-          <h1 class="text-2xl font-medium tracking-wide text-green-50">Log into account</h1>
+          <h1 class="text-2xl font-medium tracking-wide text-[#2F3E32]">Log into account</h1>
         </div>
 
         <UForm
           :schema="loginSchema"
           :state="form"
-          class="w-full flex flex-col gap-4"
+          class="w-full flex flex-col gap-5"
           @submit="handleLogin"
         >
           <!-- Email Field -->
           <UFormField name="email">
             <template #default="{ error }">
-              <p class="text-sm text-green-400">Email</p>
+              <p class="text-sm font-medium text-[#2F3E32] mb-1.5 ml-1">Email</p>
               <UInput
                 v-model="form.email"
                 type="email"
-                color="neutral"
-                variant="outline"
+                variant="none"
                 placeholder="sir_real_99@roamly.com"
                 class="w-full"
                 :ui="{
                   base:
                     error || backendError
-                      ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors'
-                      : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors',
+                      ? 'bg-red-50 text-red-900 rounded-xl ring-1 ring-red-500 !placeholder-red-300 focus:ring-2 focus:ring-red-500 transition-colors h-11 px-4 shadow-none'
+                      : 'bg-[#E8F0F5] text-[#2F3E32] rounded-xl ring-1 ring-[#D0E0EB] !placeholder-gray-400 focus:ring-2 focus:ring-[#7A9A82] transition-colors h-11 px-4 shadow-none',
                 }"
               />
             </template>
@@ -90,51 +86,55 @@
           <!-- Password Field -->
           <UFormField name="password">
             <template #default="{ error }">
-              <p class="text-sm text-green-400">Password</p>
+              <p class="text-sm font-medium text-[#2F3E32] mb-1.5 ml-1">Password</p>
               <UInput
                 v-model="form.password"
                 type="password"
-                color="neutral"
-                variant="outline"
+                variant="none"
                 placeholder="********"
                 class="w-full"
                 :ui="{
                   base:
                     error || backendError
-                      ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors'
-                      : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors',
+                      ? 'bg-red-50 text-red-900 rounded-xl ring-1 ring-red-500 !placeholder-red-300 focus:ring-2 focus:ring-red-500 transition-colors h-11 px-4 shadow-none'
+                      : 'bg-[#E8F0F5] text-[#2F3E32] rounded-xl ring-1 ring-[#D0E0EB] !placeholder-gray-400 focus:ring-2 focus:ring-[#7A9A82] transition-colors h-11 px-4 shadow-none',
                 }"
               />
             </template>
           </UFormField>
 
-          <div v-if="backendError" class="text-red-400 text-sm text-center font-medium">
+          <!-- Backend Error Message -->
+          <div
+            v-if="backendError"
+            class="text-red-500 text-sm text-center font-medium bg-red-50 p-2 rounded-xl"
+          >
             {{ backendError }}
           </div>
 
           <!-- Success message -->
-          <div v-if="successMessage" class="text-green-400 text-sm text-center font-medium">
+          <div
+            v-if="successMessage"
+            class="text-[#7A9A82] text-sm text-center font-medium bg-[#EDF1EE] p-2 rounded-lg"
+          >
             {{ successMessage }}
           </div>
 
-          <!-- login buttons -->
-          <div class="flex items-center justify-between pt-6">
-            <!-- cancel button -->
+          <!-- Login buttons -->
+          <div class="flex items-center justify-between pt-4">
+            <!-- Cancel button -->
             <UButton
               label="Cancel"
-              variant="outline"
-              color="neutral"
-              class="h-10 px-6 text-md ring-1 ring-green-800 bg-green-950/50 hover:bg-green-800 hover:ring-1 hover:ring-green-500 text-green-50 transition-colors"
+              variant="ghost"
+              class="rounded-full bg-gray-200 ring-1 ring-[#E5A93B] text-[#E5A93B] hover:bg-[#E5A93B] hover:text-white h-11 px-8 font-bold tracking-wide transition-colors"
               @click="clearForm"
             />
 
-            <!-- login button -->
+            <!-- Login button -->
             <UButton
               type="submit"
               label="Log in"
-              color="neutral"
               variant="solid"
-              class="h-10 px-6 text-md ring-1 ring-green-800 bg-green-950/50 hover:bg-green-800 hover:ring-1 hover:ring-green-500 text-green-50 transition-colors"
+              class="rounded-full bg-[#7A9A82] hover:bg-[#68856F] text-white shadow-[inset_0_1px_3px_rgba(255,255,255,0.3),0_2px_4px_rgba(122,154,130,0.3)] h-11 px-8 font-bold tracking-wide transition-all"
             />
           </div>
         </UForm>
@@ -143,30 +143,30 @@
 
     <!-- FOOTER -->
     <footer
-      class="py-4 px-6 flex items-center justify-between text-xs text-green-500 border-t border-green-900/50 bg-black/30 backdrop-blur-md"
+      class="py-5 px-6 flex items-center justify-between text-xs text-[#2F3E32] bg-[#EDF1EE]/70 backdrop-blur-md shadow-[0_-2px_10px_rgba(0,0,0,0.02)] relative z-10"
     >
       <!-- Copyright -->
-      <div class="opacity-75">Copyright - Roamly idk.</div>
+      <div class="font-medium opacity-80">Copyright - Roamly Co. 2026</div>
 
       <!-- Links -->
-      <div class="flex gap-4 font-medium tracking-wide">
+      <div class="flex gap-4 font-semibold tracking-wide">
         <NuxtLink
           to="/"
-          class="hover:text-green-300 hover:underline underline-offset-4 transition-all"
+          class="hover:text-[#7A9A82] hover:underline underline-offset-4 transition-colors"
         >
           Home
         </NuxtLink>
-        <span class="opacity-50">|</span>
+        <span class="opacity-30">|</span>
         <NuxtLink
           to="/about"
-          class="hover:text-green-300 hover:underline underline-offset-4 transition-all"
+          class="hover:text-[#7A9A82] hover:underline underline-offset-4 transition-colors"
         >
           About
         </NuxtLink>
-        <span class="opacity-50">|</span>
+        <span class="opacity-30">|</span>
         <NuxtLink
           to="/support"
-          class="hover:text-green-300 hover:underline underline-offset-4 transition-all"
+          class="hover:text-[#7A9A82] hover:underline underline-offset-4 transition-colors"
         >
           Support
         </NuxtLink>
@@ -176,7 +176,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { reactive, ref, watch } from 'vue';
 import { useApi } from '../composables/useApi';
 import type { ApiErrorResponse, LoginResponse } from '../types/api.type';
 import type { LoginFormState } from '../utils/login.schema';

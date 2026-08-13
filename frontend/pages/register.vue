@@ -1,7 +1,7 @@
 <template>
-  <!-- MAIN CONTAINER: Alabástrom háttér, sötét erdei zöld alapszöveg -->
+  <!-- MAIN CONTAINER -->
   <div
-    class="min-h-screen flex flex-col bg-[#FAF9F6] text-[#2F3E32] font-sans"
+    class="min-h-screen flex flex-col bg-[#FAF9F6] text-[#2F3E32] font-sans bg-cover bg-center bg-no-repeat bg-fixed"
     style="background-image: url('/register/register-background.jpg')"
   >
     <!-- HEADER -->
@@ -178,7 +178,7 @@
             <UButton
               label="Cancel"
               variant="ghost"
-              class="rounded-full bg-gray-200 ring-1 ring-[#E5A93B] text-[#E5A93B] hover:bg-[#E5A93B]  hover:text-white h-11 px-8 font-medium transition-colors"
+              class="rounded-full bg-gray-200 ring-1 ring-[#E5A93B] text-[#E5A93B] hover:bg-[#E5A93B] hover:text-white h-11 px-8 font-medium transition-colors"
               @click="clearForm"
             />
 
@@ -198,7 +198,7 @@
       class="py-5 px-6 flex items-center justify-between text-xs text-[#2F3E32] bg-[#EDF1EE]/70 backdrop-blur-md shadow-[0_-2px_10px_rgba(0,0,0,0.02)] relative z-10"
     >
       <!-- Copyright -->
-      <div class="font-medium opacity-80">Copyright - Roamly Co. 2024</div>
+      <div class="font-medium opacity-80">Copyright - Roamly Co. 2026</div>
 
       <!-- Links -->
       <div class="flex gap-4 font-semibold tracking-wide">
