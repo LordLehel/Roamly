@@ -4,7 +4,7 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
-  modules: ['@pinia/nuxt', '@pinia/colada-nuxt', '@nuxt/eslint', '@nuxt/ui'],
+  modules: ['@pinia/nuxt', '@pinia/colada-nuxt', '@nuxt/eslint', '@nuxt/ui', '@nuxtjs/google-fonts'],
 
   postcss: {
     plugins: {
@@ -20,5 +20,12 @@ export default defineNuxtConfig({
     public: {
       apiBaseUrl: 'http://localhost:3000/api',
     },
+  },
+
+  googleFonts: {
+    families: {
+      Quicksand: [400, 500, 600, 700],
+    },
+    display: 'swap',
   },
 });
