@@ -58,8 +58,12 @@
           <h1 class="text-2xl font-medium tracking-wide text-green-50">Register account</h1>
         </div>
 
-        <UForm :schema="registerSchema" :state="form" class="w-full flex flex-col gap-4" @submit="handleRegister">
-          
+        <UForm
+          :schema="registerSchema"
+          :state="form"
+          class="w-full flex flex-col gap-4"
+          @submit="handleRegister"
+        >
           <!-- Email Field -->
           <UFormField name="email">
             <template #default="{ error }">
@@ -245,11 +249,10 @@ const handleRegister = async () => {
 
     successMessage.value = 'Registration successful! Redirecting to login page...';
     setTimeout(() => router.push('/login'), 2000);
-
   } catch (err: unknown) {
     const errorObj = err as ApiErrorResponse;
     const errorData = errorObj?.data;
-    
+
     let msg = 'Registration failed!';
 
     if (errorData && errorData.message) {
