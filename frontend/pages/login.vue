@@ -191,13 +191,14 @@ const handleLogin = async () => {
       },
     });
 
-    // Ha később szeretnéd a JWT tokent elmenteni, itt megteheted:
-    // pl. localStorage.setItem('token', _response.token);
+    // store token
+    if (_response.token) {
+      localStorage.setItem('auth_token', _response.token);
+    }
 
     successMessage.value = 'Login successful! Redirecting...';
-    
-    // Redirect after 2 seconds
     setTimeout(() => router.push('/'), 2000);
+
   } catch (err: unknown) {
     const errorObj = err as ApiErrorResponse;
     const errorData = errorObj?.data;
