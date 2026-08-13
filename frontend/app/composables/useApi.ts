@@ -5,13 +5,13 @@ export const useApi = () => {
     baseURL: config.public.apiBaseUrl as string,
 
     onRequest({ options }) {
-     if (typeof window !== 'undefined') {
-       const token = localStorage.getItem('auth_token');
-       if (token) {
-           options.headers = new Headers(options.headers);
-           options.headers.set('Authorization', `Bearer ${token}`);
-       }
-     }
+      if (typeof window !== 'undefined') {
+        const token = localStorage.getItem('auth_token');
+        if (token) {
+          options.headers = new Headers(options.headers);
+          options.headers.set('Authorization', `Bearer ${token}`);
+        }
+      }
     },
 
     onResponseError({ response }) {
