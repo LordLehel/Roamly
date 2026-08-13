@@ -24,7 +24,7 @@
         to="/"
         class="flex items-center gap-2 border border-green-500/50 px-4 py-2 rounded-md bg-green-950/50 backdrop-blur-bg hover:bg-green-800 text-green-50 transition-colors"
       >
-        <UIcon name="i-heroicons-map-pin" class="w-6 h-6 text-green-400-" />
+        <UIcon name="i-heroicons-map-pin" class="w-6 h-6 text-green-400" />
         <span class="text-lg font-semibold tracking-wider text-green-50">ROAMLY</span>
       </NuxtLink>
 
@@ -58,97 +58,110 @@
           <h1 class="text-2xl font-medium tracking-wide text-green-50">Register account</h1>
         </div>
 
-        <!-- Form Body -->
-        <form class="w-full flex flex-col gap-4" novalidate @submit.prevent="handleRegister">
+        <UForm :schema="registerSchema" :state="form" class="w-full flex flex-col gap-4" @submit="handleRegister">
+          
+          <!-- Email Field -->
           <UFormField name="email">
-            <p class="text-sm text-green-400">Email</p>
-            <UInput
-              v-model="form.email"
-              type="email"
-              color="neutral"
-              variant="outline"
-              placeholder="sir_real_99@roamly.com"
-              class="w-full"
-              :ui="{
-                base: errors.email
-                  ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors'
-                  : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors',
-              }"
-            />
+            <template #default="{ error }">
+              <p class="text-sm text-green-400">Email</p>
+              <UInput
+                v-model="form.email"
+                type="email"
+                color="neutral"
+                variant="outline"
+                placeholder="sir_real_99@roamly.com"
+                class="w-full"
+                :ui="{
+                  base: error
+                    ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors'
+                    : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors',
+                }"
+              />
+            </template>
           </UFormField>
 
+          <!-- Username Field -->
           <UFormField name="username">
-            <p class="text-sm text-green-400">Username</p>
-            <UInput
-              v-model="form.username"
-              type="text"
-              color="neutral"
-              variant="outline"
-              placeholder="ex. sir_real_99"
-              class="w-full"
-              :ui="{
-                base: errors.username
-                  ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors'
-                  : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors',
-              }"
-            />
+            <template #default="{ error }">
+              <p class="text-sm text-green-400">Username</p>
+              <UInput
+                v-model="form.username"
+                type="text"
+                color="neutral"
+                variant="outline"
+                placeholder="ex. sir_real_99"
+                class="w-full"
+                :ui="{
+                  base: error
+                    ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors'
+                    : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors',
+                }"
+              />
+            </template>
           </UFormField>
 
           <!-- Phone Field -->
           <UFormField name="phone">
-            <p class="text-sm text-green-400">Phone number</p>
-            <UInput
-              v-model="form.phone"
-              type="tel"
-              color="neutral"
-              variant="outline"
-              placeholder="ex. +40 712 345 678"
-              class="w-full"
-              :ui="{
-                base: errors.phone
-                  ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors'
-                  : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors',
-              }"
-            />
+            <template #default="{ error }">
+              <p class="text-sm text-green-400">Phone number</p>
+              <UInput
+                v-model="form.phone"
+                type="phone"
+                color="neutral"
+                variant="outline"
+                placeholder="ex. +40 712 345 678"
+                class="w-full"
+                :ui="{
+                  base: error
+                    ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors'
+                    : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors',
+                }"
+              />
+            </template>
           </UFormField>
 
+          <!-- Password Field -->
           <UFormField name="password">
-            <p class="text-sm text-green-400">Password</p>
-            <UInput
-              v-model="form.password"
-              type="password"
-              color="neutral"
-              variant="outline"
-              placeholder="********"
-              class="w-full"
-              :ui="{
-                base: errors.password
-                  ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors'
-                  : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors',
-              }"
-            />
+            <template #default="{ error }">
+              <p class="text-sm text-green-400">Password</p>
+              <UInput
+                v-model="form.password"
+                type="password"
+                color="neutral"
+                variant="outline"
+                placeholder="********"
+                class="w-full"
+                :ui="{
+                  base: error
+                    ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors'
+                    : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors',
+                }"
+              />
+            </template>
           </UFormField>
 
+          <!-- Repeat Password Field -->
           <UFormField name="repeatPassword">
-            <p class="text-sm text-green-400">Repeat password</p>
-            <UInput
-              v-model="form.repeatPassword"
-              type="password"
-              color="neutral"
-              variant="outline"
-              placeholder="********"
-              class="w-full"
-              :ui="{
-                base: errors.repeatPassword
-                  ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors'
-                  : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors',
-              }"
-            />
+            <template #default="{ error }">
+              <p class="text-sm text-green-400">Repeat password</p>
+              <UInput
+                v-model="form.repeatPassword"
+                type="password"
+                color="neutral"
+                variant="outline"
+                placeholder="********"
+                class="w-full"
+                :ui="{
+                  base: error
+                    ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors'
+                    : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors',
+                }"
+              />
+            </template>
           </UFormField>
 
-          <!-- Error message -->
-          <div v-if="generalErrorMessage" class="text-red-400 text-sm text-center font-medium">
-            {{ generalErrorMessage }}
+          <div v-if="backendError" class="text-red-400 text-sm text-center font-medium">
+            {{ backendError }}
           </div>
 
           <!-- Success message -->
@@ -163,7 +176,7 @@
               label="Cancel"
               variant="outline"
               color="neutral"
-              class="h-10 px-6 text-md ring-1 ring-green-800 bg-green-950/50 hover:bg-green-800 hover:ring- hover:ring-green-500 text-green-50 transition-colors"
+              class="h-10 px-6 text-md ring-1 ring-green-800 bg-green-950/50 hover:bg-green-800 hover:ring-1 hover:ring-green-500 text-green-50 transition-colors"
               @click="clearForm"
             />
 
@@ -173,10 +186,10 @@
               label="Register"
               color="neutral"
               variant="solid"
-              class="h-10 px-6 text-md ring-1 ring-green-800 bg-green-950/50 hover:bg-green-800 hover:ring- hover:ring-green-500 text-green-50 transition-colors"
+              class="h-10 px-6 text-md ring-1 ring-green-800 bg-green-950/50 hover:bg-green-800 hover:ring-1 hover:ring-green-500 text-green-50 transition-colors"
             />
           </div>
-        </form>
+        </UForm>
       </UCard>
     </main>
 
@@ -190,30 +203,15 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, watch } from 'vue';
-import { useApi } from '~/composables/useApi';
+import { reactive, ref } from 'vue';
+import { useApi } from '../composables/useApi';
+import type { RegisterResponse, ApiErrorResponse } from '../types/api.type';
+import type { RegisterFormState } from '../utils/register.schema.ts';
 
 const api = useApi();
 const router = useRouter();
 
-// Type for register response
-interface RegisterResponse {
-  status: string;
-  message: string;
-}
-
-// Type for error response (Bővítve a Zod lehetséges formátumaival)
-interface ApiErrorResponse {
-  data?: {
-    status?: string;
-    // A message lehet egy sima string, vagy egy objektum, ami mezőnevekhez rendel string tömböket (Zod format)
-    message?: string | Record<string, string[]>;
-  };
-  message?: string;
-}
-
-// The forms default values
-const form = reactive({
+const form = reactive<RegisterFormState>({
   email: '',
   username: '',
   phone: '',
@@ -221,146 +219,21 @@ const form = reactive({
   repeatPassword: '',
 });
 
-// The forms errors
-const errors = reactive({
-  email: false,
-  username: false,
-  phone: false,
-  password: false,
-  repeatPassword: false,
-});
-
-// Messages
-const generalErrorMessage = ref('');
+const backendError = ref('');
 const successMessage = ref('');
 
-// email validation
-const validateEmail = (email: string) => {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-};
-
-// phone validation
-const validatePhone = (phone: string) => {
-  return /^\+\d{1,4}[\s\d]{6,14}$/.test(phone);
-};
-
-// watchers
-watch(
-  () => form.email,
-  () => {
-    errors.email = false;
-    generalErrorMessage.value = '';
-  },
-);
-
-watch(
-  () => form.username,
-  () => {
-    errors.username = false;
-    generalErrorMessage.value = '';
-  },
-);
-
-watch(
-  () => form.phone,
-  () => {
-    errors.phone = false;
-    generalErrorMessage.value = '';
-  },
-);
-
-watch(
-  () => form.password,
-  () => {
-    errors.password = false;
-    generalErrorMessage.value = '';
-  },
-);
-
-watch(
-  () => form.repeatPassword,
-  () => {
-    errors.repeatPassword = false;
-    generalErrorMessage.value = '';
-  },
-);
-
 const clearForm = () => {
-  form.email = '';
-  form.username = '';
-  form.phone = '';
-  form.password = '';
-  form.repeatPassword = '';
-  errors.email = false;
-  errors.username = false;
-  errors.phone = false;
-  errors.password = false;
-  errors.repeatPassword = false;
-  generalErrorMessage.value = '';
+  Object.assign(form, { email: '', username: '', phone: '', password: '', repeatPassword: '' });
+  backendError.value = '';
   successMessage.value = '';
 };
 
-// Registration form handler
 const handleRegister = async () => {
-  errors.email = false;
-  errors.username = false;
-  errors.phone = false;
-  errors.password = false;
-  errors.repeatPassword = false;
-  generalErrorMessage.value = '';
+  backendError.value = '';
   successMessage.value = '';
-
-  let hasError = false;
-  const missingFields: string[] = [];
-
-  // Check for missing fields
-  if (!form.email.trim()) {
-    errors.email = true;
-    missingFields.push('Email');
-  }
-  if (!form.username.trim()) {
-    errors.username = true;
-    missingFields.push('Username');
-  }
-  if (!form.phone.trim()) {
-    errors.phone = true;
-    missingFields.push('Phone');
-  }
-  if (!form.password.trim()) {
-    errors.password = true;
-    missingFields.push('Password');
-  }
-  if (!form.repeatPassword.trim()) {
-    errors.repeatPassword = true;
-    missingFields.push('Repeat password');
-  }
-
-  if (missingFields.length > 0) {
-    generalErrorMessage.value = `Missing fields: ${missingFields.join(', ')}`;
-    hasError = true;
-  } else {
-    // Validate email, phone and passwords
-    if (!validateEmail(form.email)) {
-      errors.email = true;
-      generalErrorMessage.value = 'Wrong email format!';
-      hasError = true;
-    } else if (!validatePhone(form.phone)) {
-      errors.phone = true;
-      generalErrorMessage.value = 'Wrong phone format (ex. +40 712 345 678)!';
-      hasError = true;
-    } else if (form.password !== form.repeatPassword) {
-      errors.password = true;
-      errors.repeatPassword = true;
-      generalErrorMessage.value = 'Passwords do not match!';
-      hasError = true;
-    }
-  }
-
-  if (hasError) return;
 
   try {
-    // api request
-    const response = await api<RegisterResponse>('/auth/register', {
+    const _response = await api<RegisterResponse>('/auth/register', {
       method: 'POST',
       body: {
         username: form.username,
@@ -370,62 +243,30 @@ const handleRegister = async () => {
       },
     });
 
-    // Log response - DEBUG - REMOVE LATER
-    console.log('Registration successful!');
-    console.log(response);
+    successMessage.value = 'Registration successful! Redirecting to login page...';
+    setTimeout(() => router.push('/login'), 2000);
 
-    successMessage.value = 'Registration successful!';
-
-    // Redirect to login if registration is successful
-    setTimeout(() => {
-      router.push('/login');
-    }, 2000);
-    
   } catch (err: unknown) {
     const errorObj = err as ApiErrorResponse;
     const errorData = errorObj?.data;
-
-    let backendMessage = 'Registration failed!';
+    
+    let msg = 'Registration failed!';
 
     if (errorData && errorData.message) {
-      // Simple string error message
       if (typeof errorData.message === 'string') {
-        backendMessage = errorData.message;
-
-        const msgLower = backendMessage.toLowerCase();
-        if (msgLower.includes('email') || msgLower.includes('exist') || msgLower.includes('taken')) {
-          errors.email = true;
-        }
-      } 
-      // Zod error object
-      else if (typeof errorData.message === 'object') {
+        msg = errorData.message;
+      } else if (typeof errorData.message === 'object') {
         const allErrors: string[] = [];
-
-        // Végigmegyünk az objektum kulcsain (pl. 'password', 'email')
-        for (const [field, fieldErrors] of Object.entries(errorData.message)) {
-          
-          // Ha a kapott mezőnév benne van az 'errors' objektumunkban, bepirosítjuk (típusbiztosan!)
-          if (field in errors) {
-            errors[field as keyof typeof errors] = true;
-          }
-
-          // A mezőhöz tartozó hibaüzeneteket beletesszük egy közös tömbbe
-          if (Array.isArray(fieldErrors)) {
-            allErrors.push(...fieldErrors);
-          }
+        for (const fieldErrors of Object.values(errorData.message)) {
+          if (Array.isArray(fieldErrors)) allErrors.push(...fieldErrors);
         }
-
-        // Combined error messages
-        if (allErrors.length > 0) {
-          backendMessage = allErrors.join(' | ');
-        }
+        if (allErrors.length > 0) msg = allErrors.join(' | ');
       }
     } else if (errorObj?.message) {
-      // Fallback error message
-      backendMessage = errorObj.message;
+      msg = errorObj.message;
     }
 
-    generalErrorMessage.value = backendMessage;
+    backendError.value = msg;
   }
 };
 </script>
