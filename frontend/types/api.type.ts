@@ -3,6 +3,14 @@ export interface ApiResponse<T> {
   data: T;
 }
 
+export interface UserProfileResponse {
+  status?: string;
+  username?: string;
+  data?: {
+    username?: string;
+  };
+}
+
 export interface LoginResponse {
   status: string;
   message: string;
