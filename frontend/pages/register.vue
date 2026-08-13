@@ -2,7 +2,7 @@
   <!-- MAIN CONTAINER: full-screen, dark-background -->
   <div
     class="min-h-screen flex flex-col text-white font-sans bg-cover bg-center bg-no-repeat bg-fixed"
-    style="background-image: url('/login/login-background.jpg')"
+    style="background-image: url('/register/register-background.jpg')"
   >
     <!-- HEADER -->
     <header
@@ -28,13 +28,13 @@
         <span class="text-lg font-semibold tracking-wider text-green-50">ROAMLY</span>
       </NuxtLink>
 
-      <!-- Right side: Register & Profile -->
+      <!-- Right side: Log in & Profile -->
       <div class="flex-1 flex justify-end items-center gap-4">
         <UButton
-          label="Register"
+          label="Log in"
           variant="outline"
           color="neutral"
-          to="/register"
+          to="/login"
           class="border border-green-500/50 px-4 py-2 rounded-md bg-green-950/50 backdrop-blur-bg hover:bg-green-800 text-green-50 transition-colors"
         />
         <NuxtLink to="/">
@@ -48,7 +48,7 @@
       </div>
     </header>
 
-    <!-- MAIN CONTENT: Login Form -->
+    <!-- MAIN CONTENT: Register Form -->
     <main class="flex-1 flex items-center justify-center p-4">
       <!--Form card -->
       <UCard
@@ -57,14 +57,14 @@
       >
         <!-- Form Header -->
         <div class="text-center mb-8">
-          <h1 class="text-2xl font-medium tracking-wide text-green-50">Log into account</h1>
+          <h1 class="text-2xl font-medium tracking-wide text-green-50">Register account</h1>
         </div>
 
         <UForm
-          :schema="loginSchema"
+          :schema="registerSchema"
           :state="form"
           class="w-full flex flex-col gap-4"
-          @submit="handleLogin"
+          @submit="handleRegister"
         >
           <!-- Email Field -->
           <UFormField name="email">
@@ -78,10 +78,49 @@
                 placeholder="sir_real_99@roamly.com"
                 class="w-full"
                 :ui="{
-                  base:
-                    error || backendError
-                      ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors'
-                      : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors',
+                  base: error
+                    ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors'
+                    : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors',
+                }"
+              />
+            </template>
+          </UFormField>
+
+          <!-- Username Field -->
+          <UFormField name="username">
+            <template #default="{ error }">
+              <p class="text-sm text-green-400">Username</p>
+              <UInput
+                v-model="form.username"
+                type="text"
+                color="neutral"
+                variant="outline"
+                placeholder="ex. sir_real_99"
+                class="w-full"
+                :ui="{
+                  base: error
+                    ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors'
+                    : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors',
+                }"
+              />
+            </template>
+          </UFormField>
+
+          <!-- Phone Field -->
+          <UFormField name="phone">
+            <template #default="{ error }">
+              <p class="text-sm text-green-400">Phone number</p>
+              <UInput
+                v-model="form.phone"
+                type="phone"
+                color="neutral"
+                variant="outline"
+                placeholder="ex. +40 712 345 678"
+                class="w-full"
+                :ui="{
+                  base: error
+                    ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors'
+                    : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors',
                 }"
               />
             </template>
@@ -99,10 +138,29 @@
                 placeholder="********"
                 class="w-full"
                 :ui="{
-                  base:
-                    error || backendError
-                      ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors'
-                      : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors',
+                  base: error
+                    ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors'
+                    : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors',
+                }"
+              />
+            </template>
+          </UFormField>
+
+          <!-- Repeat Password Field -->
+          <UFormField name="repeatPassword">
+            <template #default="{ error }">
+              <p class="text-sm text-green-400">Repeat password</p>
+              <UInput
+                v-model="form.repeatPassword"
+                type="password"
+                color="neutral"
+                variant="outline"
+                placeholder="********"
+                class="w-full"
+                :ui="{
+                  base: error
+                    ? 'bg-red-950/50 text-red-50 ring-1 ring-red-500 !placeholder-red-400 focus:ring-1 focus:ring-red-500 transition-colors'
+                    : 'bg-green-950/50 text-green-50 ring-1 ring-green-500/50 !placeholder-green-400 focus:ring-1 focus:ring-green-500 transition-colors',
                 }"
               />
             </template>
@@ -117,7 +175,7 @@
             {{ successMessage }}
           </div>
 
-          <!-- login buttons -->
+          <!-- register buttons -->
           <div class="flex items-center justify-between pt-6">
             <!-- cancel button -->
             <UButton
@@ -128,10 +186,10 @@
               @click="clearForm"
             />
 
-            <!-- login button -->
+            <!-- register button -->
             <UButton
               type="submit"
-              label="Log in"
+              label="Register"
               color="neutral"
               variant="solid"
               class="h-10 px-6 text-md ring-1 ring-green-800 bg-green-950/50 hover:bg-green-800 hover:ring-1 hover:ring-green-500 text-green-50 transition-colors"
@@ -178,66 +236,51 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
 import { useApi } from '../composables/useApi';
-import type { ApiErrorResponse, LoginResponse } from '../types/api.type';
-import type { LoginFormState } from '../utils/login.schema';
+import type { RegisterResponse, ApiErrorResponse } from '../types/api.type';
+import type { RegisterFormState } from '../utils/register.schema.ts';
 
 const api = useApi();
 const router = useRouter();
 
-const form = reactive<LoginFormState>({
+const form = reactive<RegisterFormState>({
   email: '',
+  username: '',
+  phone: '',
   password: '',
+  repeatPassword: '',
 });
 
 const backendError = ref('');
 const successMessage = ref('');
 
-watch(
-  () => form.email,
-  () => (backendError.value = ''),
-);
-watch(
-  () => form.password,
-  () => (backendError.value = ''),
-);
-
 const clearForm = () => {
-  Object.assign(form, { email: '', password: '' });
+  Object.assign(form, { email: '', username: '', phone: '', password: '', repeatPassword: '' });
   backendError.value = '';
   successMessage.value = '';
 };
 
-const handleLogin = async () => {
+const handleRegister = async () => {
   backendError.value = '';
   successMessage.value = '';
 
-  // Form validation: is empty?
-  if (!form.email.trim() || !form.password.trim()) {
-    backendError.value = 'Please fill in both email and password!';
-    return;
-  }
-
   try {
-    const _response = await api<LoginResponse>('/auth/login', {
+    const _response = await api<RegisterResponse>('/auth/register', {
       method: 'POST',
       body: {
+        username: form.username,
         email: form.email,
+        phone: form.phone,
         password: form.password,
       },
     });
 
-    // store token
-    if (_response.token) {
-      localStorage.setItem('auth_token', _response.token);
-    }
-
-    successMessage.value = 'Login successful! Redirecting...';
-    setTimeout(() => router.push('/'), 2000);
+    successMessage.value = 'Registration successful! Redirecting to login page...';
+    setTimeout(() => router.push('/login'), 2000);
   } catch (err: unknown) {
     const errorObj = err as ApiErrorResponse;
     const errorData = errorObj?.data;
 
-    let msg = 'Login failed!';
+    let msg = 'Registration failed!';
 
     if (errorData && errorData.message) {
       if (typeof errorData.message === 'string') {
