@@ -10,9 +10,14 @@ export const userService = {
 
   createUser(userData: UserInDto) {
     const api = useApi();
-    return api<UserOutDto>('/users', {
+    return api<UserOutDto>('/auth/register', {
       method: 'POST',
-      body: userData,
+      body: {
+        username: userData.username,
+        email: userData.email,
+        phone: userData.phone,
+        password: userData.password,
+      },
     });
   },
 };
