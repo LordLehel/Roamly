@@ -48,7 +48,6 @@ export const deleteProfile = async (userUuid: string): Promise<void> => {
     },
   });
 
-
   await prisma.users.delete({
     where: {
       user_id: user.user_id,
@@ -83,4 +82,23 @@ export const changePassword = async (
       password: hashedPassword,
     },
   });
+};
+
+export const uploadProfilePicture = async (userUuid: string, pictureUrl: string): Promise<users> => {
+  const user = await prisma.users.findFirstOrThrow ({
+    where: {
+      uuid: userUuid,
+    },
+  });
+
+  const updatedUser = await prisma.users.update({
+    where: {
+      user_id: user.user_id,
+    },
+    data: {
+      profile_image_url: pictureUrl,
+    },
+  });
+
+  return updatedUser;
 };

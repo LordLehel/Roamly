@@ -1,11 +1,12 @@
 import { Request, Response } from 'express';
 import * as userService from './users.service';
+import { Prisma } from '@prisma/client';
 
 export const getProfile = async (req: Request, res: Response): Promise<void> => {
   try {
     const user = res.locals.user;
     if (!user?.uuid) {
-      res.status(401).json({ message: 'Authorization needed!' });
+      res.status(401).json({ status: 'error', message: 'Authorization needed!' });
       return;
     }
 
@@ -16,18 +17,12 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
       data: profile,
     });
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      const errorMessage = error.message;
-
-      if (errorMessage === 'USER_NOT_FOUND') {
-        res.status(401).json({
-          status: 'error',
-          message:
-            'You are not authorized to list information about this user or user does not exist!',
-        });
-
-        return;
-      }
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      res.status(404).json({
+        status: 'error',
+        message: 'User was not found!',
+      });
+      return;
     }
 
     console.error(error);
@@ -57,17 +52,12 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
       data: updatedUser,
     });
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      const errorMessage = error.message;
-
-      if (errorMessage === 'USER_NOT_FOUND') {
-        res.status(401).json({
-          status: 'error',
-          message: 'You are not authorized to update this user or user does not exist!',
-        });
-
-        return;
-      }
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      res.status(404).json({
+        status: 'error',
+        message: 'User was not found!',
+      });
+      return;
     }
 
     console.error(error);
@@ -95,17 +85,12 @@ export const deleteProfile = async (req: Request, res: Response): Promise<void> 
       message: 'User deleted successfully!',
     });
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      const errorMessage = error.message;
-
-      if (errorMessage === 'USER_NOT_FOUND') {
-        res.status(401).json({
-          status: 'error',
-          message: 'You are not authorized to delete this user or user does not exist!',
-        });
-
-        return;
-      }
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      res.status(404).json({
+        status: 'error',
+        message: 'User was not found!',
+      });
+      return;
     }
 
     console.error(error);
@@ -138,18 +123,15 @@ export const changePassword = async (req: Request, res: Response): Promise<void>
       message: 'Password changed successfully!',
     });
   } catch (error: unknown) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      res.status(404).json({
+        status: 'error',
+        message: 'User was not found!',
+      });
+      return;
+    }
     if (error instanceof Error) {
       const errorMessage = error.message;
-
-      if (errorMessage === 'USER_NOT_FOUND') {
-        res.status(401).json({
-          status: 'error',
-          message:
-            'You are not authorized to change password for this user or user does not exist!',
-        });
-
-        return;
-      }
 
       if (errorMessage === 'OLD_PASSWORD_INVALID') {
         res.status(400).json({
@@ -168,3 +150,31 @@ export const changePassword = async (req: Request, res: Response): Promise<void>
     });
   }
 };
+
+// export const uploadProfilePicture = async (req: Request, res: Response): Promise<void> => {
+//   try {
+//     const user = res.locals.user;
+
+//     if (!user?.uuid) {
+//       res.status(401).json({
+//         status: 'error',
+//         message: 'Authorization needed!',
+//       });
+
+//       return;
+//     }
+
+//     const file = req.file;
+
+//     if (!file) {
+//       res.status(400).json({
+//         status: 'error',
+//         message: 'No image provided!',
+//       });
+//     }
+
+//     const pictureUrl = `/uploads/${file.filename}`;
+
+//     const updateUser
+//   }
+// }

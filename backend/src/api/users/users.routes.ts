@@ -6,17 +6,17 @@ import * as zodSchemas from './users.validation';
 
 const router = Router();
 
-router.get('/me', requireAuth, usersRoutes.getProfile);
+router.use(requireAuth)
+
+router.get('/me', usersRoutes.getProfile);
 router.patch(
   '/me',
-  requireAuth,
   validateData(zodSchemas.updateProfileScheme, 'body'),
   usersRoutes.updateProfile,
 );
-router.delete('/me', requireAuth, usersRoutes.deleteProfile);
+router.delete('/me', usersRoutes.deleteProfile);
 router.patch(
   '/me/password',
-  requireAuth,
   validateData(zodSchemas.changePasswordScheme, 'body'),
   usersRoutes.changePassword,
 );
