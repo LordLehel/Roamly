@@ -6,12 +6,6 @@ export default defineNuxtConfig({
 
   modules: ['@pinia/nuxt', '@pinia/colada-nuxt', '@nuxt/eslint', '@nuxt/ui'],
 
-  postcss: {
-    plugins: {
-      '@tailwindcss/postcss': {},
-    },
-  },
-
   devServer: {
     port: 5000,
   },
