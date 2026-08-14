@@ -32,7 +32,10 @@ export const listGroupsSchema = z.object({
     .max(50, 'limit parameter must be less than or equal to 50!')
     .default(15),
 
-  cursor: z.uuid({ message: 'Invalid cursor format! Cursor must be a valid UUID!' }).optional(),
+  cursor: z.preprocess(
+    (val: unknown) => (val === '' ? undefined : val),
+    z.uuid({ message: 'Invalid cursor format! Cursor must be a valid UUID!' }).optional(),
+  ),
 });
 
 export const groupUuidValidationSchema = z.object({

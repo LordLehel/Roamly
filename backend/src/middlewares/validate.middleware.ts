@@ -15,7 +15,18 @@ export const validateData = (schema: z.ZodType, target: 'body' | 'query' | 'para
       return;
     }
 
-    req[target] = validation.data;
+    if (target === 'query') {
+      // we are overwriting the Express built in getter with the data formatted by Zod
+      Object.defineProperty(req, 'query', {
+        value: validation.data,
+        writable: true,
+        configurable: true,
+        enumerable: true,
+      });
+    } else {
+      req[target] = validation.data;
+    }
+
     next();
   };
 };
