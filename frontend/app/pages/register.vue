@@ -41,57 +41,57 @@
           @submit="handleRegister"
         >
           <UFormField name="email" label="Email">
-            <template #default="{ error }">
+            <template #default="{ error: fieldError }">
               <!-- Dinamic variant -->
               <UInput
                 v-model="form.email"
                 type="email"
                 placeholder="ex. sir_real_99@roamly.com"
-                :variant="error ? 'glassError' : 'glass'"
+                :variant="fieldError ? 'glassError' : 'glass'"
               />
             </template>
           </UFormField>
 
           <UFormField name="username" label="Username">
-            <template #default="{ error }">
+            <template #default="{ error: fieldError }">
               <UInput
                 v-model="form.username"
                 type="text"
                 placeholder="ex. sir_real_99"
-                :variant="error ? 'glassError' : 'glass'"
+                :variant="fieldError ? 'glassError' : 'glass'"
               />
             </template>
           </UFormField>
 
           <UFormField name="phone" label="Phone number">
-            <template #default="{ error }">
+            <template #default="{ error: fieldError }">
               <UInput
                 v-model="form.phone"
                 type="tel"
                 placeholder="ex. +40 712 345 678"
-                :variant="error ? 'glassError' : 'glass'"
+                :variant="fieldError ? 'glassError' : 'glass'"
               />
             </template>
           </UFormField>
 
           <UFormField name="password" label="Password">
-            <template #default="{ error }">
+            <template #default="{ error: fieldError }">
               <UInput
                 v-model="form.password"
                 type="password"
                 placeholder="********"
-                :variant="error ? 'glassError' : 'glass'"
+                :variant="fieldError ? 'glassError' : 'glass'"
               />
             </template>
           </UFormField>
 
           <UFormField name="repeatPassword" label="Repeat password">
-            <template #default="{ error }">
+            <template #default="{ error: fieldError }">
               <UInput
                 v-model="form.repeatPassword"
                 type="password"
                 placeholder="********"
-                :variant="error ? 'glassError' : 'glass'"
+                :variant="fieldError ? 'glassError' : 'glass'"
               />
             </template>
           </UFormField>
@@ -105,7 +105,7 @@
           </div>
 
           <div class="flex items-center justify-between pt-6">
-            <UButton label="Cancel" variant="glass" @click="clearForm" :disabled="isLoading" />
+            <UButton label="Cancel" variant="glass" :disabled="isLoading" @click="clearForm" />
             <!-- Loading state -->
             <UButton type="submit" label="Register" variant="glass" :loading="isLoading" />
           </div>
