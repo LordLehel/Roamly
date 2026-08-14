@@ -2,9 +2,9 @@ name: CI Checks
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 jobs:
   frontend-checks:
@@ -13,7 +13,7 @@ jobs:
     defaults:
       run:
         working-directory: ./frontend
-        
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -40,7 +40,7 @@ jobs:
     defaults:
       run:
         working-directory: ./backend
-        
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4

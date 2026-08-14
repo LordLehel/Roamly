@@ -51,7 +51,6 @@ export default defineAppConfig({
         label: 'text-sm text-green-400 mb-1 block',
       },
     },
-
     // Avatar
     avatar: {
       slots: {

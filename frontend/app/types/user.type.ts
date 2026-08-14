@@ -1,6 +1,6 @@
 export interface UserOutDto {
   id: string;
-  name: string;
+  username: string;
   email: string;
   phone: string;
   createdAt: Date;
@@ -8,7 +8,7 @@ export interface UserOutDto {
 }
 
 export interface UserInDto {
-  name?: string;
+  username?: string;
   email: string;
   phone: string;
   password?: string;
