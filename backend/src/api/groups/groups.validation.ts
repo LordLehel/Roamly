@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ROLES } from '../../constants/roles.constants';
 
 export const createGroupSchema = z.object({
   groupName: z
@@ -14,8 +15,8 @@ export const createGroupSchema = z.object({
     .array(
       z.object({
         email: z.string().email('invalid email adress format!'),
-        role: z.enum(['invitedMember', 'invitedLeader'], {
-          message: 'Role must be either "invitedMember" or "invitedLeader"!',
+        role: z.enum([ROLES.INVITEDMEMBER, ROLES.INVITEDLEADER], {
+          message: `Role must be either "${ROLES.INVITEDMEMBER}" or "${ROLES.INVITEDLEADER}"!`,
         }),
       }),
     )
@@ -41,8 +42,8 @@ export const groupUuidValidationSchema = z.object({
 export const inviteUsersToYourGroupBodySchema = z.object({
   invitedUserEmail: z.email('Invalid Email Format!'),
 
-  inviteWithRole: z.enum(['invitedLeader', 'invitedMember'], {
-    message: 'Role must be either "invitedMember" or "invitedLeader"!',
+  inviteWithRole: z.enum([ROLES.INVITEDLEADER, ROLES.INVITEDMEMBER], {
+    message: `Role must be either "${ROLES.INVITEDMEMBER}" or "${ROLES.INVITEDLEADER}"!`,
   }),
 });
 

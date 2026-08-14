@@ -6,24 +6,20 @@ import {
   GroupProfilesInfos,
   InfosOfTheGroupTheUserIsPartOf,
 } from '../../types/group.types';
-import {
-  getGroupOrThrow,
-  getRoleByTypeOrThrow,
-  getUserByEmailOrThrow,
-  getUserGroupProfile,
-  getUserOrThrow,
-  leaderOfTheGroupOrThrow,
-  userPartOfTheGroupOrThrow,
-} from '../../utils/db.validations';
+import { ROLES } from '../../constants/roles.constants';
 
 export const createGroup = async (
   creatorUuid: string,
   name: string,
   initialInvites?: { email: string; role: string }[],
 ): Promise<groups> => {
-  const user = await getUserOrThrow(creatorUuid);
+  const user = await prisma.users.findUniqueOrThrow({
+    where: { uuid: creatorUuid },
+  });
 
-  const leaderRole = await getRoleByTypeOrThrow('leader');
+  const leaderRole = await prisma.roles.findFirstOrThrow({
+    where: { type: ROLES.LEADER },
+  });
 
   const newGroup = await prisma.groups.create({
     data: {
@@ -62,7 +58,9 @@ export const listAllGroupsTheUserIsPartOf = async (
   limit: number,
   cursor?: string,
 ): Promise<PaginatedGroups> => {
-  const user = await getUserOrThrow(userUuid);
+  const user = await prisma.users.findUniqueOrThrow({
+    where: { uuid: userUuid },
+  });
 
   const userFilter = {
     group_profiles: {
@@ -73,7 +71,7 @@ export const listAllGroupsTheUserIsPartOf = async (
 
         roles: {
           type: {
-            in: ['leader', 'member'],
+            in: [ROLES.LEADER, ROLES.MEMBER],
           },
         },
       },
@@ -143,16 +141,20 @@ export const joinAGroupByUuidIfUserIsInvited = async (
   userUuid: string,
   groupUuid: string,
 ): Promise<profileRelatedToTheGroup> => {
-  const user = await getUserOrThrow(userUuid);
+  const user = await prisma.users.findUniqueOrThrow({
+    where: { uuid: userUuid },
+  });
 
-  const group = await getGroupOrThrow(groupUuid);
+  const group = await prisma.groups.findUniqueOrThrow({
+    where: { uuid: groupUuid },
+  });
 
   const invitedProfil = await prisma.group_profiles.findFirst({
     where: {
       users: { uuid: user.uuid },
       groups: { uuid: group.uuid },
       roles: {
-        type: { in: ['invitedLeader', 'invitedMember'] },
+        type: { in: [ROLES.INVITEDLEADER, ROLES.INVITEDMEMBER] },
       },
     },
     include: {
@@ -166,13 +168,14 @@ export const joinAGroupByUuidIfUserIsInvited = async (
 
   let newRoleName = 'dummyRole';
 
-  if (invitedProfil.roles.type === 'invitedLeader') {
-    newRoleName = 'leader';
-  } else if (invitedProfil.roles.type === 'invitedMember') {
-    newRoleName = 'member';
+  if (invitedProfil.roles.type === ROLES.INVITEDLEADER) {
+    newRoleName = ROLES.LEADER;
+  } else if (invitedProfil.roles.type === ROLES.INVITEDMEMBER) {
+    newRoleName = ROLES.MEMBER;
   }
-
-  const existingRole = await getRoleByTypeOrThrow(newRoleName);
+  const existingRole = await prisma.roles.findFirstOrThrow({
+    where: { type: newRoleName },
+  });
 
   const [updatedProfile] = await prisma.$transaction([
     // updating profile
@@ -212,15 +215,25 @@ export const inviteUsersToYourGroup = async (
   groupUuid: string,
   inviteWithRole: string,
 ): Promise<profileRelatedToTheGroup> => {
-  const user = await getUserOrThrow(userUuid);
+  const user = await prisma.users.findUniqueOrThrow({
+    where: { uuid: userUuid },
+  });
 
-  const invitedUser = await getUserByEmailOrThrow(invitedUserEmail);
+  const invitedUser = await prisma.users.findUniqueOrThrow({
+    where: {
+      email: invitedUserEmail,
+    },
+  });
 
-  const group = await getGroupOrThrow(groupUuid);
+  const group = await prisma.groups.findUniqueOrThrow({
+    where: { uuid: groupUuid },
+  });
 
-  const role = await getRoleByTypeOrThrow(inviteWithRole);
+  const role = await prisma.roles.findFirstOrThrow({
+    where: { type: inviteWithRole },
+  });
 
-  if (!['invitedLeader', 'invitedMember'].includes(inviteWithRole)) {
+  if (![ROLES.INVITEDLEADER as string, ROLES.INVITEDMEMBER as string].includes(inviteWithRole)) {
     throw new Error('INVALID_INVITATION_ROLE');
   }
 
@@ -236,7 +249,7 @@ export const inviteUsersToYourGroup = async (
     },
   });
 
-  if (!inviterProfile || inviterProfile.roles.type !== 'leader') {
+  if (!inviterProfile || inviterProfile.roles.type !== ROLES.LEADER) {
     throw new Error('NOT_A_LEADER_OF_THE_GROUP');
   }
 
@@ -272,7 +285,9 @@ export const pendingInvites = async (
   limit: number,
   cursor?: string,
 ): Promise<PaginatedGroups> => {
-  const user = await getUserOrThrow(userUuid);
+  const user = await prisma.users.findUniqueOrThrow({
+    where: { uuid: userUuid },
+  });
 
   const userFilter = {
     group_profiles: {
@@ -283,7 +298,7 @@ export const pendingInvites = async (
 
         roles: {
           type: {
-            in: ['invitedLeader', 'invitedMember'],
+            in: [ROLES.INVITEDLEADER, ROLES.INVITEDMEMBER],
           },
         },
       },
@@ -302,7 +317,7 @@ export const pendingInvites = async (
 
       group_profiles: {
         where: {
-          roles: { type: 'leader' },
+          roles: { type: ROLES.LEADER },
         },
         select: {
           users: {
@@ -359,9 +374,13 @@ export const joinGroupInfos = async (
   groupUuid: string,
   userUuid: string,
 ): Promise<GroupProfilesInfos[]> => {
-  const group = await getGroupOrThrow(groupUuid);
+  const group = await prisma.groups.findUniqueOrThrow({
+    where: { uuid: groupUuid },
+  });
 
-  const user = await getUserOrThrow(userUuid);
+  const user = await prisma.users.findUniqueOrThrow({
+    where: { uuid: userUuid },
+  });
 
   const alreadyInTheGroup = await prisma.group_profiles.findUnique({
     where: {
@@ -371,7 +390,7 @@ export const joinGroupInfos = async (
       },
       roles: {
         type: {
-          notIn: ['invitedMember', 'invitedLeader'],
+          notIn: [ROLES.INVITEDMEMBER, ROLES.INVITEDLEADER],
         },
       },
     },
@@ -387,7 +406,7 @@ export const joinGroupInfos = async (
 
       roles: {
         type: {
-          in: ['member', 'leader'],
+          in: [ROLES.MEMBER, ROLES.LEADER],
         },
       },
     },
@@ -413,13 +432,27 @@ export const listAllInfosOfOneGroup = async (
   userUuid: string,
   groupUuid: string,
 ): Promise<InfosOfTheGroupTheUserIsPartOf> => {
-  const user = await getUserOrThrow(userUuid);
+  const user = await prisma.users.findUniqueOrThrow({
+    where: { uuid: userUuid },
+  });
 
-  const group = await getGroupOrThrow(groupUuid);
+  const group = await prisma.groups.findUniqueOrThrow({
+    where: { uuid: groupUuid },
+  });
 
-  await userPartOfTheGroupOrThrow(user, group);
+  await prisma.group_profiles.findFirstOrThrow({
+    where: {
+      user_id: user.user_id,
+      group_id: group.group_id,
+      roles: {
+        type: {
+          in: [ROLES.MEMBER, ROLES.LEADER],
+        },
+      },
+    },
+  });
 
-  const groupInfos = await prisma.groups.findUnique({
+  const groupInfos = await prisma.groups.findUniqueOrThrow({
     where: {
       group_id: group.group_id,
     },
@@ -432,7 +465,7 @@ export const listAllInfosOfOneGroup = async (
         where: {
           roles: {
             type: {
-              in: ['member', 'leader'],
+              in: [ROLES.MEMBER, ROLES.LEADER],
             },
           },
         },
@@ -457,19 +490,28 @@ export const listAllInfosOfOneGroup = async (
     },
   });
 
-  if (!groupInfos) {
-    throw new Error('GROUP_NOT_FOUND');
-  }
-
   return groupInfos;
 };
 
 export const deleteGroup = async (userUuid: string, groupUuid: string): Promise<void> => {
-  const user = await getUserOrThrow(userUuid);
+  const user = await prisma.users.findUniqueOrThrow({
+    where: { uuid: userUuid },
+  });
 
-  const group = await getGroupOrThrow(groupUuid);
+  const group = await prisma.groups.findUniqueOrThrow({
+    where: { uuid: groupUuid },
+  });
 
-  await leaderOfTheGroupOrThrow(user, group);
+  await prisma.group_profiles.findFirstOrThrow({
+    where: {
+      group_id: group.group_id,
+      user_id: user.user_id,
+
+      roles: {
+        type: ROLES.LEADER,
+      },
+    },
+  });
 
   await prisma.groups.delete({
     where: {
@@ -483,11 +525,24 @@ export const updateGroup = async (
   groupUuid: string,
   updateData: { name?: string },
 ): Promise<groups> => {
-  const user = await getUserOrThrow(userUuid);
+  const user = await prisma.users.findUniqueOrThrow({
+    where: { uuid: userUuid },
+  });
 
-  const group = await getGroupOrThrow(groupUuid);
+  const group = await prisma.groups.findUniqueOrThrow({
+    where: { uuid: groupUuid },
+  });
 
-  await leaderOfTheGroupOrThrow(user, group);
+  await prisma.group_profiles.findFirstOrThrow({
+    where: {
+      group_id: group.group_id,
+      user_id: user.user_id,
+
+      roles: {
+        type: ROLES.LEADER,
+      },
+    },
+  });
 
   const updatedGroup = await prisma.groups.update({
     where: {
@@ -506,36 +561,103 @@ export const removeUserFromGroupByEmail = async (
   groupUuid: string,
   userToRemoveEmail: string,
 ): Promise<void> => {
-  const user = await getUserOrThrow(userUuid);
+  const user = await prisma.users.findUniqueOrThrow({
+    where: { uuid: userUuid },
+  });
 
-  const group = await getGroupOrThrow(groupUuid);
+  const group = await prisma.groups.findUniqueOrThrow({
+    where: { uuid: groupUuid },
+  });
 
-  const userToRemove = await getUserByEmailOrThrow(userToRemoveEmail);
+  const userToRemove = await prisma.users.findUniqueOrThrow({
+    where: {
+      email: userToRemoveEmail,
+    },
+  });
 
-  await leaderOfTheGroupOrThrow(user, group);
-
-  const targetUserProfile = await getUserGroupProfile(userToRemove, group);
-
-  if (targetUserProfile.roles.type === 'leader') {
-    throw new Error('LEADERS_CAN_NOT_BE_REMOVED');
-  }
-
-  await prisma.group_profiles.delete({
+  const targetUserProfile = await prisma.group_profiles.findUniqueOrThrow({
     where: {
       user_id_group_id: {
         user_id: userToRemove.user_id,
         group_id: group.group_id,
       },
     },
+    select: {
+      nickname: true,
+      description: true,
+
+      roles: {
+        select: {
+          type: true,
+        },
+      },
+    },
   });
+
+  await prisma.group_profiles.findFirstOrThrow({
+    where: {
+      group_id: group.group_id,
+      user_id: user.user_id,
+
+      roles: {
+        type: ROLES.LEADER,
+      },
+    },
+  });
+
+  if (targetUserProfile.roles.type === ROLES.LEADER) {
+    throw new Error('LEADERS_CAN_NOT_BE_REMOVED');
+  }
+
+  await prisma.$transaction([
+    prisma.group_profiles.delete({
+      where: {
+        user_id_group_id: {
+          user_id: userToRemove.user_id,
+          group_id: group.group_id,
+        },
+      },
+    }),
+    prisma.groups.update({
+      where: {
+        group_id: group.group_id,
+      },
+      data: {
+        current_size: {
+          decrement: 1,
+        },
+      },
+    }),
+  ]);
 };
 
 export const userLeavingGroup = async (userUuid: string, groupUuid: string): Promise<void> => {
-  const user = await getUserOrThrow(userUuid);
+  const user = await prisma.users.findUniqueOrThrow({
+    where: { uuid: userUuid },
+  });
 
-  const group = await getGroupOrThrow(groupUuid);
+  const group = await prisma.groups.findUniqueOrThrow({
+    where: { uuid: groupUuid },
+  });
 
-  const userProfile = await getUserGroupProfile(user, group);
+  const userProfile = await prisma.group_profiles.findUniqueOrThrow({
+    where: {
+      user_id_group_id: {
+        user_id: user.user_id,
+        group_id: group.group_id,
+      },
+    },
+    select: {
+      nickname: true,
+      description: true,
+
+      roles: {
+        select: {
+          type: true,
+        },
+      },
+    },
+  });
 
   // number of current users in the group
   const currentGroupSize = await prisma.group_profiles.count({
@@ -557,13 +679,13 @@ export const userLeavingGroup = async (userUuid: string, groupUuid: string): Pro
   }
 
   // there are other users in the group too, but the user that wants to leave is a leader
-  if (userProfile.roles.type === 'leader') {
+  if (userProfile.roles.type === ROLES.LEADER) {
     // how many leaders are in the group
     const numberOfLeaders = await prisma.group_profiles.count({
       where: {
         group_id: group.group_id,
         roles: {
-          type: 'leader',
+          type: ROLES.LEADER,
         },
       },
     });

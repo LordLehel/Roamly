@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import * as groupsService from './groups.service';
 import { listGroupsSchema } from './groups.validation';
 import { z } from 'zod';
+import { Prisma } from '@prisma/client';
 
 type ListGroupsQuery = z.infer<typeof listGroupsSchema>;
 
@@ -23,27 +24,12 @@ export const createGroup = async (req: Request, res: Response): Promise<void> =>
       message: `Group successfully created with name: ${newGroup.name}`,
     });
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      const errorMessage = error.message;
-
-      if (errorMessage === 'USER_NOT_FOUND') {
-        res.status(403).json({
-          status: 'error',
-          message: 'You must have a registered user to create a group!',
-        });
-
-        return;
-      }
-
-      if (errorMessage === 'ROLE_TYPE_NOT_FOUND') {
-        res.status(500).json({
-          status: 'error',
-          message:
-            'A role does not exist in db, and it is necessary for groupcreation! Please try again later!',
-        });
-
-        return;
-      }
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      res.status(404).json({
+        status: 'error',
+        message: 'A required resource (user or role) was not found!',
+      });
+      return;
     }
 
     console.error(error);
@@ -77,17 +63,12 @@ export const listAllGroupsTheUserIsPartOf = async (req: Request, res: Response):
       data: groupList,
     });
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      const errorMessage = error.message;
-
-      if (errorMessage === 'USER_NOT_FOUND') {
-        res.status(403).json({
-          status: 'error',
-          message: 'You must have a registered user to list groups you are part of!',
-        });
-
-        return;
-      }
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      res.status(404).json({
+        status: 'error',
+        message: 'User was not found!',
+      });
+      return;
     }
 
     console.error(error);
@@ -127,6 +108,14 @@ export const joinAGroupByUuidIfUserIsInvited = async (
       data: updatedProfile,
     });
   } catch (error: unknown) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      res.status(404).json({
+        status: 'error',
+        message: 'The requested group or user does not exist!',
+      });
+      return;
+    }
+
     if (error instanceof Error) {
       const errorMessage = error.message;
 
@@ -134,24 +123,6 @@ export const joinAGroupByUuidIfUserIsInvited = async (
         res.status(403).json({
           status: 'error',
           message: 'User not invited to or already part of the group!',
-        });
-
-        return;
-      }
-
-      if (errorMessage === 'USER_NOT_FOUND') {
-        res.status(403).json({
-          status: 'error',
-          message: 'You must have a registered user to join a group!',
-        });
-
-        return;
-      }
-
-      if (errorMessage === 'GROUP_NOT_FOUND') {
-        res.status(404).json({
-          status: 'error',
-          message: 'The group you are trying to join does not exist!',
         });
 
         return;
@@ -196,26 +167,16 @@ export const inviteUsersToYourGroup = async (req: Request, res: Response): Promi
       data: createdInvite,
     });
   } catch (error: unknown) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      res.status(404).json({
+        status: 'error',
+        message: 'User, group, or role not found!',
+      });
+      return;
+    }
+
     if (error instanceof Error) {
       const errorMessage = error.message;
-
-      if (errorMessage === 'GROUP_NOT_FOUND') {
-        res.status(403).json({
-          status: 'error',
-          message: 'The group you are trying to invite others to does not exist!',
-        });
-
-        return;
-      }
-
-      if (errorMessage === 'ROLE_TYPE_NOT_FOUND') {
-        res.status(403).json({
-          status: 'error',
-          message: 'You must have a valid role to invite others to your group!',
-        });
-
-        return;
-      }
 
       if (errorMessage === 'INVALID_INVITATION_ROLE') {
         res.status(400).json({
@@ -276,17 +237,12 @@ export const pendingInvites = async (req: Request, res: Response): Promise<void>
       data: pendingInviteGroups,
     });
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      const errorMessage = error.message;
-
-      if (errorMessage === 'USER_NOT_FOUND') {
-        res.status(403).json({
-          status: 'error',
-          message: 'You must have a registered user to list groups you are part of!',
-        });
-
-        return;
-      }
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      res.status(404).json({
+        status: 'error',
+        message: 'User not found!',
+      });
+      return;
     }
 
     res.status(500).json({
@@ -319,17 +275,16 @@ export const joinGroupInfos = async (req: Request, res: Response): Promise<void>
       data: infosOfTheGroup,
     });
   } catch (error: unknown) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      res.status(404).json({
+        status: 'error',
+        message: 'Group or user not found!',
+      });
+      return;
+    }
+
     if (error instanceof Error) {
       const errorMessage = error.message;
-
-      if (errorMessage === 'USER_NOT_FOUND') {
-        res.status(403).json({
-          status: 'error',
-          message: 'You must have a registered user to join a group!',
-        });
-
-        return;
-      }
 
       if (errorMessage === 'USER_ALREADY_JOINED_THE_GROUP') {
         res.status(409).json({
@@ -340,7 +295,7 @@ export const joinGroupInfos = async (req: Request, res: Response): Promise<void>
         return;
       }
     }
-    console.log(error);
+    console.error(error);
     res.status(500).json({
       status: 'error',
       message: 'Error! There was an issue during the listing of the information about the group!',
@@ -371,29 +326,15 @@ export const listAllInfosOfOneGroup = async (req: Request, res: Response): Promi
       data: groupInfos,
     });
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      const errorMessage = error.message;
-
-      if (errorMessage === 'USER_NOT_PART_OF_THE_GROUP') {
-        res.status(403).json({
-          status: 'error',
-          message: 'User must be part of the group to list all of the information about it!',
-        });
-
-        return;
-      }
-
-      if (errorMessage === 'GROUP_NOT_FOUND') {
-        res.status(404).json({
-          status: 'error',
-          message: 'This group does not exist!',
-        });
-
-        return;
-      }
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      res.status(404).json({
+        status: 'error',
+        message: 'The requested group, user, or group membership was not found!',
+      });
+      return;
     }
 
-    console.log(error);
+    console.error(error);
     res.status(500).json({
       status: 'error',
       message: 'Error! There was an issue during the listing of the information about the group!',
@@ -423,38 +364,15 @@ export const deleteGroup = async (req: Request, res: Response): Promise<void> =>
       message: 'Group deleted successfully!',
     });
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      const errorMessage = error.message;
-
-      if (errorMessage === 'USER_NOT_FOUND') {
-        res.status(403).json({
-          status: 'error',
-          message: 'You must have a registered user to delete a group!',
-        });
-
-        return;
-      }
-
-      if (errorMessage === 'GROUP_NOT_FOUND') {
-        res.status(404).json({
-          status: 'error',
-          message: 'This group does not exist!',
-        });
-
-        return;
-      }
-
-      if (errorMessage === 'USER_IS_NOT_LEADER_IN_GROUP') {
-        res.status(403).json({
-          status: 'error',
-          message: 'User must have leader role to delete a group!',
-        });
-
-        return;
-      }
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      res.status(404).json({
+        status: 'error',
+        message: 'Group, user, or leader permissions not found!',
+      });
+      return;
     }
 
-    console.log(error);
+    console.error(error);
     res.status(500).json({
       status: 'error',
       message: 'Error! There was an issue during the deletion of the group!',
@@ -490,37 +408,15 @@ export const updateGroup = async (req: Request, res: Response): Promise<void> =>
       data: updatedGroupInfos,
     });
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      const errorMessage = error.message;
-
-      if (errorMessage === 'USER_NOT_FOUND') {
-        res.status(403).json({
-          status: 'error',
-          message: 'You must have a registered user to update a group!',
-        });
-
-        return;
-      }
-
-      if (errorMessage === 'GROUP_NOT_FOUND') {
-        res.status(404).json({
-          status: 'error',
-          message: 'This group does not exist!',
-        });
-
-        return;
-      }
-
-      if (errorMessage === 'USER_IS_NOT_LEADER_IN_GROUP') {
-        res.status(403).json({
-          status: 'error',
-          message: 'User must have leader role to update a group!',
-        });
-
-        return;
-      }
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      res.status(404).json({
+        status: 'error',
+        message: 'Group, user, or leader permissions not found!',
+      });
+      return;
     }
-    console.log(error);
+
+    console.error(error);
     res.status(500).json({
       status: 'error',
       message: 'Error! There was an issue while updating the group!',
@@ -554,53 +450,16 @@ export const removeUserFromGroupByEmail = async (req: Request, res: Response): P
       message: 'User successfully removed from group!',
     });
   } catch (error: unknown) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      res.status(404).json({
+        status: 'error',
+        message: 'Group, user, or necessary permissions not found!',
+      });
+      return;
+    }
+
     if (error instanceof Error) {
       const errorMessage = error.message;
-
-      if (errorMessage === 'USER_NOT_FOUND') {
-        res.status(403).json({
-          status: 'error',
-          message: 'You must have a registered user to remove a user from a group!',
-        });
-
-        return;
-      }
-
-      if (errorMessage === 'GROUP_NOT_FOUND') {
-        res.status(404).json({
-          status: 'error',
-          message: 'This group does not exist!',
-        });
-
-        return;
-      }
-
-      if (errorMessage === 'USER_NOT_FOUND_WITH_PROVIDED_EMAIL') {
-        res.status(404).json({
-          status: 'error',
-          message: 'The user with this email address does not exist!',
-        });
-
-        return;
-      }
-
-      if (errorMessage === 'USER_IS_NOT_LEADER_IN_GROUP') {
-        res.status(401).json({
-          status: 'error',
-          message: 'User must have a leader role in the group to remove others',
-        });
-
-        return;
-      }
-
-      if (errorMessage === 'USER_PROFILE_IN_GROUP_NOT_FOUND') {
-        res.status(400).json({
-          status: 'error',
-          message: 'User must be in the group to be able to be removed!',
-        });
-
-        return;
-      }
 
       if (errorMessage === 'LEADERS_CAN_NOT_BE_REMOVED') {
         res.status(400).json({
@@ -612,7 +471,7 @@ export const removeUserFromGroupByEmail = async (req: Request, res: Response): P
       }
     }
 
-    console.log(error);
+    console.error(error);
     res.status(500).json({
       status: 'error',
       message: 'Error! There was an issue while removing user from the group!',
@@ -642,35 +501,16 @@ export const userLeavingGroup = async (req: Request, res: Response): Promise<voi
       message: 'User successfully left from group!',
     });
   } catch (error: unknown) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      res.status(404).json({
+        status: 'error',
+        message: 'Group or user profile not found!',
+      });
+      return;
+    }
+
     if (error instanceof Error) {
       const errorMessage = error.message;
-
-      if (errorMessage === 'USER_NOT_FOUND') {
-        res.status(403).json({
-          status: 'error',
-          message: 'You must have a registered user to leave from a group!',
-        });
-
-        return;
-      }
-
-      if (errorMessage === 'GROUP_NOT_FOUND') {
-        res.status(404).json({
-          status: 'error',
-          message: 'This group does not exist!',
-        });
-
-        return;
-      }
-
-      if (errorMessage === 'USER_PROFILE_IN_GROUP_NOT_FOUND') {
-        res.status(400).json({
-          status: 'error',
-          message: 'User must be in the group to be able to leave!',
-        });
-
-        return;
-      }
 
       if (errorMessage === 'CANNOT_LEAVE_AS_ONLY_LEADER') {
         res.status(400).json({
@@ -682,7 +522,7 @@ export const userLeavingGroup = async (req: Request, res: Response): Promise<voi
       }
     }
 
-    console.log(error);
+    console.error(error);
     res.status(500).json({
       status: 'error',
       message: 'Error! There was an issue while leaving from the group!',

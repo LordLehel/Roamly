@@ -2,6 +2,7 @@ import 'dotenv/config';
 import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
+import { ROLES } from '../src/constants/roles.constants';
 
 const connectionString = `${process.env.DATABASE_URL}`;
 const pool = new Pool({ connectionString });
@@ -12,27 +13,27 @@ async function main(): Promise<void> {
   console.log('Seeding database...');
 
   const leaderRole = await prisma.roles.upsert({
-    where: { type: 'leader' },
+    where: { type: ROLES.LEADER },
     update: {},
-    create: { type: 'leader' },
+    create: { type: ROLES.LEADER },
   });
 
   const memberRole = await prisma.roles.upsert({
-    where: { type: 'member' },
+    where: { type: ROLES.MEMBER },
     update: {},
-    create: { type: 'member' },
+    create: { type: ROLES.MEMBER },
   });
 
   const invitedLeaderRole = await prisma.roles.upsert({
-    where: { type: 'invitedLeader' },
+    where: { type: ROLES.INVITEDLEADER },
     update: {},
-    create: { type: 'invitedLeader' },
+    create: { type: ROLES.INVITEDLEADER },
   });
 
   const invitedMemberRole = await prisma.roles.upsert({
-    where: { type: 'invitedMember' },
+    where: { type: ROLES.INVITEDMEMBER },
     update: {},
-    create: { type: 'invitedMember' },
+    create: { type: ROLES.INVITEDMEMBER },
   });
 
   console.log(
