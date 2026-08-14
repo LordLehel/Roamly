@@ -46,7 +46,7 @@
               <UInput
                 v-model="form.email"
                 type="email"
-                placeholder="sir_real_99@roamly.com"
+                placeholder="ex. sir_real_99@roamly.com"
                 :variant="error ? 'glassError' : 'glass'"
               />
             </template>
@@ -96,17 +96,18 @@
             </template>
           </UFormField>
 
-          <div v-if="backendError" class="text-red-400 text-sm text-center font-medium">
-            {{ backendError }}
+          <!-- Colada Mutation error -->
+          <div v-if="error" class="text-red-400 text-sm text-center font-medium">
+            {{ getErrorMessage(error) }}
           </div>
-          <div v-if="successMessage" class="text-green-400 text-sm text-center font-medium">
-            {{ successMessage }}
+          <div v-if="status === 'success'" class="text-green-400 text-sm text-center font-medium">
+            Registration successful! Redirecting to login page...
           </div>
 
           <div class="flex items-center justify-between pt-6">
-            <!-- Cancel és Register gombok az új glass variánssal -->
-            <UButton label="Cancel" variant="glass" @click="clearForm" />
-            <UButton type="submit" label="Register" variant="glass" />
+            <UButton label="Cancel" variant="glass" @click="clearForm" :disabled="isLoading" />
+            <!-- Loading state -->
+            <UButton type="submit" label="Register" variant="glass" :loading="isLoading" />
           </div>
         </UForm>
       </UCard>
@@ -122,13 +123,13 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { reactive } from 'vue';
 import { useRouter } from 'vue-router';
-import { useApi } from '../composables/useApi';
-import type { RegisterResponse, ApiErrorResponse } from '../types/api.type';
+import type { FormSubmitEvent } from '#ui/types';
 import { registerSchema, type RegisterFormState } from '../utils/register.schema';
+import { useCreateUserMutation } from '../queries/user.mutation';
+import { getErrorMessage } from '../utils/error.utils';
 
-const api = useApi();
 const router = useRouter();
 
 const form = reactive<RegisterFormState>({
@@ -139,52 +140,25 @@ const form = reactive<RegisterFormState>({
   repeatPassword: '',
 });
 
-const backendError = ref('');
-const successMessage = ref('');
+const {
+  mutate: registerUser,
+  isLoading,
+  error,
+  status,
+} = useCreateUserMutation(() => {
+  setTimeout(() => router.push('/login'), 2000);
+});
 
 const clearForm = () => {
   Object.assign(form, { email: '', username: '', phone: '', password: '', repeatPassword: '' });
-  backendError.value = '';
-  successMessage.value = '';
 };
 
-const handleRegister = async () => {
-  backendError.value = '';
-  successMessage.value = '';
-
-  try {
-    const _response = await api<RegisterResponse>('/auth/register', {
-      method: 'POST',
-      body: {
-        username: form.username,
-        email: form.email,
-        phone: form.phone,
-        password: form.password,
-      },
-    });
-
-    successMessage.value = 'Registration successful! Redirecting to login page...';
-    setTimeout(() => router.push('/login'), 2000);
-  } catch (err: unknown) {
-    const errorObj = err as ApiErrorResponse;
-    const errorData = errorObj?.data;
-
-    let msg = 'Registration failed!';
-    if (errorData && errorData.message) {
-      if (typeof errorData.message === 'string') {
-        msg = errorData.message;
-      } else if (typeof errorData.message === 'object') {
-        const allErrors: string[] = [];
-        for (const fieldErrors of Object.values(errorData.message)) {
-          if (Array.isArray(fieldErrors)) allErrors.push(...fieldErrors);
-        }
-        if (allErrors.length > 0) msg = allErrors.join(' | ');
-      }
-    } else if (errorObj?.message) {
-      msg = errorObj.message;
-    }
-
-    backendError.value = msg;
-  }
+const handleRegister = (event: FormSubmitEvent<RegisterFormState>) => {
+  registerUser({
+    email: event.data.email,
+    username: event.data.username,
+    phone: event.data.phone,
+    password: event.data.password,
+  });
 };
 </script>
