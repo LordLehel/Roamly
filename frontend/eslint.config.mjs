@@ -7,8 +7,6 @@ export default withNuxt(
     // Customize ESLint rules
     rules: {
       'vue/multi-word-component-names': 'off',
-    }
-  }
+    },
+  },
 );
-
-
