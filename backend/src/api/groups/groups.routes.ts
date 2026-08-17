@@ -1,9 +1,8 @@
 import { Router } from 'express';
-import * as groupsRoutes from './groups.controller';
+import groupsController from './groups.controller';
 import { validateData } from '../../middlewares/validate.middleware';
 import * as zodSchemas from './groups.validation';
 import { requireAuth } from '../../middlewares/auth.middleware';
-import { asyncHandler } from '../../middlewares/asyncHandler';
 
 const router = Router();
 
@@ -13,59 +12,59 @@ router.use(requireAuth);
 router.post(
   '/',
   validateData(zodSchemas.createGroupSchema),
-  asyncHandler(groupsRoutes.createGroup),
+  groupsController.createGroup,
 );
 router.get(
   '/',
   validateData(zodSchemas.listGroupsSchema, 'query'),
-  asyncHandler(groupsRoutes.listAllGroupsTheUserIsPartOf),
+  groupsController.listAllGroupsTheUserIsPartOf,
 );
 router.post(
   '/:groupUuid/join',
   validateData(zodSchemas.groupUuidValidationSchema, 'params'),
-  asyncHandler(groupsRoutes.joinAGroupByUuidIfUserIsInvited),
+  groupsController.joinAGroupByUuidIfUserIsInvited,
 );
 router.post(
   '/:groupUuid/invite',
   validateData(zodSchemas.groupUuidValidationSchema, 'params'),
   validateData(zodSchemas.inviteUsersToYourGroupBodySchema, 'body'),
-  asyncHandler(groupsRoutes.inviteUsersToYourGroup),
+  groupsController.inviteUsersToYourGroup,
 );
 router.get(
   '/invites',
   validateData(zodSchemas.listGroupsSchema, 'query'),
-  asyncHandler(groupsRoutes.pendingInvites),
+  groupsController.pendingInvites,
 );
 router.get(
   '/:groupUuid/preview',
   validateData(zodSchemas.groupUuidValidationSchema, 'params'),
-  asyncHandler(groupsRoutes.joinGroupInfos),
+  groupsController.joinGroupInfos,
 );
 router.get(
   '/:groupUuid',
   validateData(zodSchemas.groupUuidValidationSchema, 'params'),
-  asyncHandler(groupsRoutes.listAllInfosOfOneGroup),
+  groupsController.listAllInfosOfOneGroup,
 );
 router.delete(
   '/:groupUuid',
   validateData(zodSchemas.groupUuidValidationSchema, 'params'),
-  asyncHandler(groupsRoutes.deleteGroup),
+  groupsController.deleteGroup,
 );
 router.patch(
   '/:groupUuid',
   validateData(zodSchemas.groupUuidValidationSchema, 'params'),
   validateData(zodSchemas.updatedGroupSchema, 'body'),
-  asyncHandler(groupsRoutes.updateGroup),
+  groupsController.updateGroup,
 );
 router.delete(
   '/:groupUuid/users/:email',
   validateData(zodSchemas.removeUserFromGroupByEmailSchema, 'params'),
-  asyncHandler(groupsRoutes.removeUserFromGroupByEmail),
+  groupsController.removeUserFromGroupByEmail,
 );
 router.delete(
   '/:groupUuid/leave',
   validateData(zodSchemas.groupUuidValidationSchema, 'params'),
-  asyncHandler(groupsRoutes.userLeavingGroup),
+  groupsController.userLeavingGroup,
 );
 
 export default router;
