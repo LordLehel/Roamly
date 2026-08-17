@@ -14,7 +14,7 @@ export const createGroupSchema = z.object({
   initialInvites: z
     .array(
       z.object({
-        email: z.string().email('invalid email adress format!'),
+        email: z.email('invalid email adress format!'),
         role: z.enum([ROLES.INVITEDMEMBER, ROLES.INVITEDLEADER], {
           message: `Role must be either "${ROLES.INVITEDMEMBER}" or "${ROLES.INVITEDLEADER}"!`,
         }),

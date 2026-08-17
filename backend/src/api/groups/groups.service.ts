@@ -13,7 +13,7 @@ export const createGroup = async (
   name: string,
   initialInvites?: { email: string; role: string }[],
 ): Promise<groups> => {
-  const user = await prisma.users.findUniqueOrThrow({
+  const user = await prisma.users.findFirstOrThrow({
     where: { uuid: creatorUuid },
   });
 
@@ -58,7 +58,7 @@ export const listAllGroupsTheUserIsPartOf = async (
   limit: number,
   cursor?: string,
 ): Promise<PaginatedGroups> => {
-  const user = await prisma.users.findUniqueOrThrow({
+  const user = await prisma.users.findFirstOrThrow({
     where: { uuid: userUuid },
   });
 
@@ -78,9 +78,42 @@ export const listAllGroupsTheUserIsPartOf = async (
     },
   };
 
+  // cursor logic manually (can't make it with uuid using prisma without uuid being unique)
+  let cursorFilter: Prisma.groupsWhereInput = {};
+
+  // data of the element the cursor is pointing at
+  if (cursor) {
+    const cursorItem = await prisma.groups.findFirst({
+      where: {
+        uuid: cursor,
+      },
+      select: {
+        created_at: true,
+        uuid: true,
+      },
+    });
+
+    // items older than the cursor item
+    if (cursorItem) {
+      cursorFilter = {
+        OR: [
+          {
+            created_at: { lt: cursorItem.created_at },
+          },
+          {
+            created_at: cursorItem.created_at,
+            uuid: { lt: cursorItem.uuid },
+          },
+        ],
+      };
+    }
+  }
+
   const queryOptions: Prisma.groupsFindManyArgs = {
     take: limit,
-    where: userFilter,
+    where: {
+      AND: [userFilter, cursorFilter],
+    },
 
     select: {
       uuid: true,
@@ -103,16 +136,6 @@ export const listAllGroupsTheUserIsPartOf = async (
     },
     orderBy: [{ created_at: 'desc' }, { uuid: 'desc' }],
   };
-
-  // if the frontend sent a cursor we put it into the query
-  if (cursor) {
-    queryOptions.cursor = {
-      uuid: cursor,
-    };
-
-    // we skip the cursor, it was already part of the previous list
-    queryOptions.skip = 1;
-  }
 
   const groupList = await prisma.groups.findMany(queryOptions);
 
@@ -141,11 +164,11 @@ export const joinAGroupByUuidIfUserIsInvited = async (
   userUuid: string,
   groupUuid: string,
 ): Promise<profileRelatedToTheGroup> => {
-  const user = await prisma.users.findUniqueOrThrow({
+  const user = await prisma.users.findFirstOrThrow({
     where: { uuid: userUuid },
   });
 
-  const group = await prisma.groups.findUniqueOrThrow({
+  const group = await prisma.groups.findFirstOrThrow({
     where: { uuid: groupUuid },
   });
 
@@ -215,7 +238,7 @@ export const inviteUsersToYourGroup = async (
   groupUuid: string,
   inviteWithRole: string,
 ): Promise<profileRelatedToTheGroup> => {
-  const user = await prisma.users.findUniqueOrThrow({
+  const user = await prisma.users.findFirstOrThrow({
     where: { uuid: userUuid },
   });
 
@@ -225,7 +248,7 @@ export const inviteUsersToYourGroup = async (
     },
   });
 
-  const group = await prisma.groups.findUniqueOrThrow({
+  const group = await prisma.groups.findFirstOrThrow({
     where: { uuid: groupUuid },
   });
 
@@ -285,7 +308,7 @@ export const pendingInvites = async (
   limit: number,
   cursor?: string,
 ): Promise<PaginatedGroups> => {
-  const user = await prisma.users.findUniqueOrThrow({
+  const user = await prisma.users.findFirstOrThrow({
     where: { uuid: userUuid },
   });
 
@@ -305,9 +328,42 @@ export const pendingInvites = async (
     },
   };
 
+  // cursor logic manually (can't make it with uuid using prisma without uuid being unique)
+  let cursorFilter: Prisma.groupsWhereInput = {};
+
+  // data of the element the cursor is pointing at
+  if (cursor) {
+    const cursorItem = await prisma.groups.findFirst({
+      where: {
+        uuid: cursor,
+      },
+      select: {
+        created_at: true,
+        uuid: true,
+      },
+    });
+
+    // items older than the cursor item
+    if (cursorItem) {
+      cursorFilter = {
+        OR: [
+          {
+            created_at: { lt: cursorItem.created_at },
+          },
+          {
+            created_at: cursorItem.created_at,
+            uuid: { lt: cursorItem.uuid },
+          },
+        ],
+      };
+    }
+  }
+
   const queryOptions: Prisma.groupsFindManyArgs = {
     take: limit,
-    where: userFilter,
+    where: {
+      AND: [userFilter, cursorFilter],
+    },
 
     select: {
       uuid: true,
@@ -337,16 +393,6 @@ export const pendingInvites = async (
     orderBy: [{ created_at: 'desc' }, { uuid: 'desc' }],
   };
 
-  // if the frontend sent a cursor we put it into the query
-  if (cursor) {
-    queryOptions.cursor = {
-      uuid: cursor,
-    };
-
-    // we skip the cursor, it was already part of the previous list
-    queryOptions.skip = 1;
-  }
-
   const groupList = await prisma.groups.findMany(queryOptions);
 
   // next cursor could be either null, if there isn't any data left in the database
@@ -374,11 +420,11 @@ export const joinGroupInfos = async (
   groupUuid: string,
   userUuid: string,
 ): Promise<GroupProfilesInfos[]> => {
-  const group = await prisma.groups.findUniqueOrThrow({
+  const group = await prisma.groups.findFirstOrThrow({
     where: { uuid: groupUuid },
   });
 
-  const user = await prisma.users.findUniqueOrThrow({
+  const user = await prisma.users.findFirstOrThrow({
     where: { uuid: userUuid },
   });
 
@@ -432,11 +478,11 @@ export const listAllInfosOfOneGroup = async (
   userUuid: string,
   groupUuid: string,
 ): Promise<InfosOfTheGroupTheUserIsPartOf> => {
-  const user = await prisma.users.findUniqueOrThrow({
+  const user = await prisma.users.findFirstOrThrow({
     where: { uuid: userUuid },
   });
 
-  const group = await prisma.groups.findUniqueOrThrow({
+  const group = await prisma.groups.findFirstOrThrow({
     where: { uuid: groupUuid },
   });
 
@@ -494,11 +540,11 @@ export const listAllInfosOfOneGroup = async (
 };
 
 export const deleteGroup = async (userUuid: string, groupUuid: string): Promise<void> => {
-  const user = await prisma.users.findUniqueOrThrow({
+  const user = await prisma.users.findFirstOrThrow({
     where: { uuid: userUuid },
   });
 
-  const group = await prisma.groups.findUniqueOrThrow({
+  const group = await prisma.groups.findFirstOrThrow({
     where: { uuid: groupUuid },
   });
 
@@ -525,11 +571,11 @@ export const updateGroup = async (
   groupUuid: string,
   updateData: { name?: string },
 ): Promise<groups> => {
-  const user = await prisma.users.findUniqueOrThrow({
+  const user = await prisma.users.findFirstOrThrow({
     where: { uuid: userUuid },
   });
 
-  const group = await prisma.groups.findUniqueOrThrow({
+  const group = await prisma.groups.findFirstOrThrow({
     where: { uuid: groupUuid },
   });
 
@@ -561,11 +607,11 @@ export const removeUserFromGroupByEmail = async (
   groupUuid: string,
   userToRemoveEmail: string,
 ): Promise<void> => {
-  const user = await prisma.users.findUniqueOrThrow({
+  const user = await prisma.users.findFirstOrThrow({
     where: { uuid: userUuid },
   });
 
-  const group = await prisma.groups.findUniqueOrThrow({
+  const group = await prisma.groups.findFirstOrThrow({
     where: { uuid: groupUuid },
   });
 
@@ -632,11 +678,11 @@ export const removeUserFromGroupByEmail = async (
 };
 
 export const userLeavingGroup = async (userUuid: string, groupUuid: string): Promise<void> => {
-  const user = await prisma.users.findUniqueOrThrow({
+  const user = await prisma.users.findFirstOrThrow({
     where: { uuid: userUuid },
   });
 
-  const group = await prisma.groups.findUniqueOrThrow({
+  const group = await prisma.groups.findFirstOrThrow({
     where: { uuid: groupUuid },
   });
 
