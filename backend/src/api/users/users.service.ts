@@ -84,21 +84,46 @@ export const changePassword = async (
   });
 };
 
-export const uploadProfilePicture = async (userUuid: string, pictureUrl: string): Promise<users> => {
-  const user = await prisma.users.findFirstOrThrow ({
+export const uploadProfilePicture = async (
+  userUuid: string,
+  fileData: Express.Multer.File,
+  pictureUrl: string,
+): Promise<users> => {
+  const user = await prisma.users.findFirstOrThrow({
     where: {
       uuid: userUuid,
     },
   });
 
-  const updatedUser = await prisma.users.update({
-    where: {
-      user_id: user.user_id,
-    },
-    data: {
-      profile_image_url: pictureUrl,
-    },
-  });
+  const [, updatedUser] = await prisma.$transaction([
+    // we create the file in the files table
+    prisma.files.create({
+      data: {
+        file_name: fileData.filename,
+        file_url: pictureUrl,
+        file_size: fileData.size,
+        mime_type: fileData.mimetype,
+        ownership_type: 'personal',
+        uploaded_by: user.user_id,
+        user_id: user.user_id,
+        media_files: {
+          create: {
+            description: `${user.email}'s profile picture`,
+          },
+        },
+      },
+    }),
+
+    // update the user
+    prisma.users.update({
+      where: {
+        user_id: user.user_id,
+      },
+      data: {
+        profile_image_url: pictureUrl,
+      },
+    }),
+  ]);
 
   return updatedUser;
 };

@@ -36,7 +36,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
         token: token,
       });
     } else {
-      res.status(500).json({ status: 'error', message: 'Incorrect email or password!' });
+      res.status(401).json({ status: 'error', message: 'Incorrect email or password!' });
     }
   } catch (error) {
     console.error(error);
