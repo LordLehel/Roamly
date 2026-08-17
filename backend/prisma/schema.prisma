@@ -53,7 +53,7 @@ model group_profiles {
 
 model groups {
   group_id       Int              @id @default(autoincrement())
-  uuid           String           @default(uuid()) @db.Uuid
+  uuid           String           @unique @default(uuid()) @db.Uuid
   name           String           @db.VarChar(255)
   current_size   Int              @db.SmallInt
   created_at     DateTime         @default(now()) @db.Timestamp(6)
@@ -61,8 +61,6 @@ model groups {
   events         events[]
   files          files[]
   group_profiles group_profiles[]
-
-  @@index([uuid])
 }
 
 model media_files {
@@ -79,7 +77,7 @@ model roles {
 
 model users {
   user_id            Int                  @id @default(autoincrement())
-  uuid               String               @default(uuid()) @db.Uuid
+  uuid               String               @unique @default(uuid()) @db.Uuid
   username           String               @db.VarChar(64)
   email              String               @unique @db.VarChar(254)
   tel                String?              @unique @db.VarChar(20)
@@ -92,8 +90,6 @@ model users {
   uploaded_files     files[]              @relation("FilesUploadedByUser")
   owned_files        files[]              @relation("FilesOwnedByUser")
   group_profiles     group_profiles[]
-
-  @@index([uuid])
 }
 
 model documents {

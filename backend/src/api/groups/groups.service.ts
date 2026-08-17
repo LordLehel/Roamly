@@ -7,6 +7,7 @@ import {
   InfosOfTheGroupTheUserIsPartOf,
 } from '../../types/group.types';
 import { ROLES } from '../../constants/roles.constants';
+import { BadRequestError, ConflictError, ForbiddenError } from '../../utils/ServerError';
 
 export const createGroup = async (
   creatorUuid: string,
@@ -78,42 +79,9 @@ export const listAllGroupsTheUserIsPartOf = async (
     },
   };
 
-  // cursor logic manually (can't make it with uuid using prisma without uuid being unique)
-  let cursorFilter: Prisma.groupsWhereInput = {};
-
-  // data of the element the cursor is pointing at
-  if (cursor) {
-    const cursorItem = await prisma.groups.findFirst({
-      where: {
-        uuid: cursor,
-      },
-      select: {
-        created_at: true,
-        uuid: true,
-      },
-    });
-
-    // items older than the cursor item
-    if (cursorItem) {
-      cursorFilter = {
-        OR: [
-          {
-            created_at: { lt: cursorItem.created_at },
-          },
-          {
-            created_at: cursorItem.created_at,
-            uuid: { lt: cursorItem.uuid },
-          },
-        ],
-      };
-    }
-  }
-
   const queryOptions: Prisma.groupsFindManyArgs = {
     take: limit,
-    where: {
-      AND: [userFilter, cursorFilter],
-    },
+    where: userFilter,
 
     select: {
       uuid: true,
@@ -137,6 +105,16 @@ export const listAllGroupsTheUserIsPartOf = async (
     orderBy: [{ created_at: 'desc' }, { uuid: 'desc' }],
   };
 
+  // if the frontend sent a cursor we put it into the query
+  if (cursor) {
+    queryOptions.cursor = {
+      uuid: cursor,
+    };
+
+    queryOptions.skip = 1;
+  }
+
+  // we skip the cursor, it was already part of the previous list
   const groupList = await prisma.groups.findMany(queryOptions);
 
   // next cursor could be either null, if there isn't any data left in the database
@@ -186,7 +164,7 @@ export const joinAGroupByUuidIfUserIsInvited = async (
   });
 
   if (!invitedProfil) {
-    throw new Error('USER_NOT_INVITED_OR_ALREADY_PART_OF_THE_GROUP');
+    throw new BadRequestError('User not invited or already part of the group!');
   }
 
   let newRoleName = 'dummyRole';
@@ -257,7 +235,7 @@ export const inviteUsersToYourGroup = async (
   });
 
   if (![ROLES.INVITEDLEADER as string, ROLES.INVITEDMEMBER as string].includes(inviteWithRole)) {
-    throw new Error('INVALID_INVITATION_ROLE');
+    throw new BadRequestError('Invalid invitation role!');
   }
 
   const inviterProfile = await prisma.group_profiles.findUnique({
@@ -273,7 +251,7 @@ export const inviteUsersToYourGroup = async (
   });
 
   if (!inviterProfile || inviterProfile.roles.type !== ROLES.LEADER) {
-    throw new Error('NOT_A_LEADER_OF_THE_GROUP');
+    throw new ForbiddenError('Not a leader of the group!');
   }
 
   const alreadyInTheGroup = await prisma.group_profiles.findUnique({
@@ -286,7 +264,7 @@ export const inviteUsersToYourGroup = async (
   });
 
   if (alreadyInTheGroup) {
-    throw new Error('USER_ALREADY_IN_GROUP_OR_INVITED');
+    throw new ConflictError('User already in group or invited!');
   }
 
   const createdProfile = await prisma.group_profiles.create({
@@ -328,42 +306,9 @@ export const pendingInvites = async (
     },
   };
 
-  // cursor logic manually (can't make it with uuid using prisma without uuid being unique)
-  let cursorFilter: Prisma.groupsWhereInput = {};
-
-  // data of the element the cursor is pointing at
-  if (cursor) {
-    const cursorItem = await prisma.groups.findFirst({
-      where: {
-        uuid: cursor,
-      },
-      select: {
-        created_at: true,
-        uuid: true,
-      },
-    });
-
-    // items older than the cursor item
-    if (cursorItem) {
-      cursorFilter = {
-        OR: [
-          {
-            created_at: { lt: cursorItem.created_at },
-          },
-          {
-            created_at: cursorItem.created_at,
-            uuid: { lt: cursorItem.uuid },
-          },
-        ],
-      };
-    }
-  }
-
   const queryOptions: Prisma.groupsFindManyArgs = {
     take: limit,
-    where: {
-      AND: [userFilter, cursorFilter],
-    },
+    where: userFilter,
 
     select: {
       uuid: true,
@@ -393,6 +338,16 @@ export const pendingInvites = async (
     orderBy: [{ created_at: 'desc' }, { uuid: 'desc' }],
   };
 
+  // if the frontend sent a cursor we put it into the query
+  if (cursor) {
+    queryOptions.cursor = {
+      uuid: cursor,
+    };
+
+    queryOptions.skip = 1;
+  }
+
+  // we skip the cursor, it was already part of the previous list
   const groupList = await prisma.groups.findMany(queryOptions);
 
   // next cursor could be either null, if there isn't any data left in the database
@@ -443,7 +398,7 @@ export const joinGroupInfos = async (
   });
 
   if (alreadyInTheGroup) {
-    throw new Error('USER_ALREADY_JOINED_THE_GROUP');
+    throw new ConflictError('User already joined the group!');
   }
 
   const groupInfos = await prisma.group_profiles.findMany({
@@ -652,7 +607,7 @@ export const removeUserFromGroupByEmail = async (
   });
 
   if (targetUserProfile.roles.type === ROLES.LEADER) {
-    throw new Error('LEADERS_CAN_NOT_BE_REMOVED');
+    throw new BadRequestError('Leaders can not be removed!');
   }
 
   await prisma.$transaction([
@@ -739,7 +694,7 @@ export const userLeavingGroup = async (userUuid: string, groupUuid: string): Pro
     // if the user is the only leader of the group
     // he can leave only if he promotes someone else to leader role before
     if (numberOfLeaders === 1) {
-      throw new Error('CANNOT_LEAVE_AS_ONLY_LEADER');
+      throw new BadRequestError('Cannot leave as only leader!');
     }
   }
 

@@ -9,11 +9,7 @@ const router = Router();
 // all of the enpoints below need authentication
 router.use(requireAuth);
 
-router.post(
-  '/',
-  validateData(zodSchemas.createGroupSchema),
-  groupsController.createGroup,
-);
+router.post('/', validateData(zodSchemas.createGroupSchema), groupsController.createGroup);
 router.get(
   '/',
   validateData(zodSchemas.listGroupsSchema, 'query'),

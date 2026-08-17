@@ -1,5 +1,6 @@
 import { Prisma } from '@prisma/client';
 import { Request, Response, NextFunction } from 'express';
+import { ServerError } from '../utils/ServerError';
 
 export const errorHandler = (
   err: unknown,
@@ -24,36 +25,13 @@ export const errorHandler = (
   }
 
   // business logic errors
-  if (err instanceof Error) {
-    switch (err.message) {
-      // 400 bad request
-      case 'INVALID_INVITATION_ROLE':
-      case 'LEADERS_CAN_NOT_BE_REMOVED':
-      case 'CANNOT_LEAVE_AS_ONLY_LEADER':
-        res.status(400).json({
-          status: 'error',
-          message: err.message,
-        });
-        return;
+  if (err instanceof ServerError) {
+    res.status(err.statusCode).json({
+      status: 'error',
+      message: err.message,
+    });
 
-      // 403 forbidden
-      case 'USER_NOT_INVITED_OR_ALREADY_PART_OF_THE_GROUP':
-      case 'NOT_A_LEADER_OF_THE_GROUP':
-        res.status(403).json({
-          status: 'error',
-          message: err.message,
-        });
-        return;
-
-      // 409 conflict
-      case 'USER_ALREADY_IN_GROUP_OR_INVITED':
-      case 'USER_ALREADY_JOINED_THE_GROUP':
-        res.status(409).json({
-          status: 'error',
-          message: err.message,
-        });
-        return;
-    }
+    return;
   }
 
   console.error('Unhandled Error:', err);
