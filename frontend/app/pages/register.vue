@@ -1,7 +1,7 @@
 <template>
   <UCard variant="glass">
     <div class="text-center mb-8">
-      <h1 class="text-2xl font-medium tracking-wide text-green-50">Register account</h1>
+      <h1 class="text-2xl font-medium tracking-wide text-green-950">Register account</h1>
     </div>
 
     <!-- Register form -->

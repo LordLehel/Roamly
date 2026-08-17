@@ -1,51 +1,71 @@
 <template>
-  <header
-    class="flex items-center justify-between px-6 py-4 border-b border-green-900/50 bg-black/30 backdrop-blur-md"
-  >
+  <header class="flex items-center justify-between px-6 py-4 bg-[#EDF1EE]/70 backdrop-blur-md shadow-sm relative z-10 border-b border-[#2F3E32]/10">
     <div class="flex-1">
-      <slot name="left">
-        <UButton label="Go Back" variant="glassOutline" @click="$router.back()" />
-      </slot>
+      <NuxtLink to="/" class="flex items-center gap-2 text-[#2F3E32] hover:opacity-80 transition-opacity w-max">
+        <UIcon name="i-heroicons-map-pin" class="w-7 h-7 text-[#7A9A82]" />
+        <span class="text-xl font-semibold tracking-wider">ROAMLY</span>
+      </NuxtLink>
     </div>
 
-    <NuxtLink
-      to="/"
-      class="flex items-center gap-2 border border-green-500/50 px-4 py-2 rounded-md bg-green-950/50 backdrop-blur-bg hover:bg-green-800 text-green-50 transition-colors"
-    >
-      <UIcon name="i-heroicons-map-pin" class="w-6 h-6 text-green-400" />
-      <span class="text-lg font-semibold tracking-wider text-green-50">ROAMLY</span>
-    </NuxtLink>
+    <nav class="hidden md:flex gap-8 font-bold tracking-wide">
+      <NuxtLink to="/" class="hover:text-[#7A9A82] hover:underline underline-offset-4 transition-colors">Home</NuxtLink>
+      <NuxtLink to="/about" class="hover:text-[#7A9A82] hover:underline underline-offset-4 transition-colors">About</NuxtLink>
+      <NuxtLink to="/support" class="hover:text-[#7A9A82] hover:underline underline-offset-4 transition-colors">Support</NuxtLink>
+    </nav>
 
     <div class="flex-1 flex justify-end items-center gap-4">
-      <slot name="right">
-        <!-- Log out / Log in -->
-        <template v-if="isLoggedIn">
-          <UButton label="Log out" variant="glassOutline" @click="handleLogout" />
+      <ClientOnly>
+        <div class="flex items-center gap-4">
+          <template v-if="isLoggedIn">
+            <span class="font-bold text-[#2F3E32] tracking-wide text-sm hidden sm:block">
+              {{ userProfile?.username || 'Loading...' }}
+            </span>
+            <UButton icon="i-heroicons-arrow-left-on-rectangle" label="Log out" variant="custom_outline" @click="handleLogout" />
+            <NuxtLink to="/">
+              <UAvatar :alt="userProfile?.username || 'User'" icon="i-heroicons-user" size="sm" />
+            </NuxtLink>
+          </template>
+
+          <template v-else>
+            <UButton label="Log in" to="/login" variant="custom_outline" />
+            <UAvatar icon="i-heroicons-user" size="sm" />
+          </template>
+        </div>
+
+        <template #fallback>
+          <div class="flex items-center gap-3">
+            <UButton label="Log in" to="/login" variant="custom_outline" class="opacity-50" />
+            <UAvatar icon="i-heroicons-user" size="sm" class="opacity-50" />
+          </div>
         </template>
-        <template v-else>
-          <UButton label="Log in" variant="glassOutline" to="/login" />
-        </template>
-        <UAvatar icon="i-heroicons-user" size="sm" />
-      </slot>
+      </ClientOnly>
     </div>
   </header>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { checkIsAuthenticated, logoutUser } from '../utils/auth.utils';
+import { useCurrentUserQuery } from '../queries/user.query';
 
 const router = useRouter();
 const isLoggedIn = ref(false);
 
-// Check if user is logged in
 onMounted(() => {
-  const token = localStorage.getItem('auth_token');
-  isLoggedIn.value = !!token;
+  isLoggedIn.value = checkIsAuthenticated();
+});
+
+const { data: userProfile, error } = useCurrentUserQuery();
+
+watch(error, (newError) => {
+  if (newError) {
+    handleLogout();
+  }
 });
 
 const handleLogout = () => {
-  localStorage.removeItem('auth_token');
+  logoutUser();
   isLoggedIn.value = false;
   router.push('/login');
 };

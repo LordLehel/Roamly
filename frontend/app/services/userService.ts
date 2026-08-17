@@ -20,4 +20,9 @@ export const userService = {
       },
     });
   },
+
+  getCurrentUser() {
+    const api = useApi();
+    return api<ApiResponse<UserOutDto> | UserOutDto>('/users/profile');
+  },
 };

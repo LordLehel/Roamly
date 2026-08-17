@@ -1,7 +1,7 @@
 <template>
   <UCard variant="glass">
     <div class="text-center mb-8">
-      <h1 class="text-2xl font-medium tracking-wide text-green-50">Log into account</h1>
+      <h1 class="text-2xl font-medium tracking-wide text-green-950">Log into your account</h1>
     </div>
 
     <!-- Login form -->
@@ -42,9 +42,9 @@
       </div>
 
       <div class="flex items-center justify-between pt-6">
-        <UButton label="Cancel" variant="glass" :disabled="isLoading" @click="clearForm" />
+        <UButton label="Cancel" variant="action_cancel" :disabled="isLoading" @click="clearForm" />
         <!-- Loading state -->
-        <UButton type="submit" label="Log in" variant="glass" :loading="isLoading" />
+        <UButton type="submit" label="Log in" variant="action_ok" :loading="isLoading" />
       </div>
     </UForm>
   </UCard>
