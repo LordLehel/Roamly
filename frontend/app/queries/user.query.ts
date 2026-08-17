@@ -9,9 +9,9 @@ export const useUserQuery = () => {
     key: ['users', 'list'],
     query: async () => {
       const response = await userService.getUsers();
-      
+
       const rawData = response && 'data' in response ? response.data : response;
-      
+
       return z.array(userProfileSchema).parse(rawData);
     },
     enabled: checkIsAuthenticated(),
@@ -23,9 +23,9 @@ export const useCurrentUserQuery = () => {
     key: ['users', 'current'],
     query: async () => {
       const response = await userService.getCurrentUser();
-      
+
       const rawData = response && 'data' in response ? response.data : response;
-      
+
       return userProfileSchema.parse(rawData);
     },
     enabled: checkIsAuthenticated(),

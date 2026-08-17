@@ -4,7 +4,13 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
-  modules: ['@pinia/nuxt', '@pinia/colada-nuxt', '@nuxt/eslint', '@nuxt/ui', '@nuxtjs/google-fonts'],
+  modules: [
+    '@pinia/nuxt',
+    '@pinia/colada-nuxt',
+    '@nuxt/eslint',
+    '@nuxt/ui',
+    '@nuxtjs/google-fonts',
+  ],
 
   postcss: {
     plugins: {

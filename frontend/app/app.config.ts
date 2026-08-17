@@ -6,17 +6,17 @@ export default defineAppConfig({
       variants: {
         variant: {
           green_whole:
-            "rounded-full bg-[#7A9A82] hover:bg-[#68856F] text-white px-5 py-2 transition-colors shadow-sm font-bold tracking-wide",
+            'rounded-full bg-[#7A9A82] hover:bg-[#68856F] text-white px-5 py-2 transition-colors shadow-sm font-bold tracking-wide',
           yellow_whole:
-            "rounded-full bg-[#E5A93B] hover:bg-[#D49933] text-white px-5 py-2 transition-colors shadow-sm font-bold tracking-wide",
+            'rounded-full bg-[#E5A93B] hover:bg-[#D49933] text-white px-5 py-2 transition-colors shadow-sm font-bold tracking-wide',
           custom_outline:
-            "rounded-full text-[#7A9A82] ring-1 ring-[#7A9A82]/40 hover:bg-[#7A9A82]/20 px-4 py-1.5 transition-colors text-xs font-semibold",
-            
+            'rounded-full text-[#7A9A82] ring-1 ring-[#7A9A82]/40 hover:bg-[#7A9A82]/20 px-4 py-1.5 transition-colors text-xs font-semibold',
+
           action_ok:
-            "rounded-full w-40 justify-center bg-[#7A9A82] hover:bg-[#68856F] text-white shadow-[inset_0_1px_3px_rgba(255,255,255,0.3),0_2px_4px_rgba(122,154,130,0.3)] h-12 font-bold tracking-wide transition-all text-lg",
+            'rounded-full w-40 justify-center bg-[#7A9A82] hover:bg-[#68856F] text-white shadow-[inset_0_1px_3px_rgba(255,255,255,0.3),0_2px_4px_rgba(122,154,130,0.3)] h-12 font-bold tracking-wide transition-all text-lg',
           action_cancel:
-            "rounded-full w-40 justify-center bg-transparent ring-1 ring-[#E5A93B] text-[#E5A93B] hover:bg-[#E5A93B] hover:text-white h-11 font-bold tracking-wide transition-colors",
-            
+            'rounded-full w-40 justify-center bg-transparent ring-1 ring-[#E5A93B] text-[#E5A93B] hover:bg-[#E5A93B] hover:text-white h-11 font-bold tracking-wide transition-colors',
+
           glass:
             'h-10 px-6 text-md bg-white/70 backdrop-blur-xl text-[#2F3E32] ring-1 ring-[#2F3E32]/10 hover:bg-white/90 transition-colors',
           glassOutline:

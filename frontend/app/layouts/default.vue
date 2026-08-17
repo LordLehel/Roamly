@@ -1,6 +1,6 @@
 <!-- frontend/app/layouts/default.vue -->
 <template>
-  <div 
+  <div
     class="min-h-screen flex flex-col bg-[#FAF9F6] text-[#2F3E32] font-sans bg-cover bg-center bg-no-repeat bg-fixed"
     :style="{ backgroundImage: bgImageUrl }"
   >
@@ -29,7 +29,7 @@ const route = useRoute();
 
 const bgImageUrl = computed(() => {
   let pageName = route.name ? String(route.name).split('-')[0] : 'home';
-  
+
   if (pageName === 'index' || pageName === '') {
     pageName = 'home';
   }

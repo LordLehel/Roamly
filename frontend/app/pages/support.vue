@@ -2,7 +2,6 @@
 <template>
   <!-- MAIN CONTENT -->
   <main class="flex-1 flex flex-col items-center px-6 py-12 gap-16 relative z-10 w-full">
-    
     <!-- Top Section: Hero -->
     <section class="flex flex-col items-center text-center mt-10 max-w-3xl">
       <h1 class="text-4xl font-bold text-green-50 tracking-wide">How can we help you?</h1>
@@ -20,7 +19,6 @@
         />
       </div>
     </section>
-    
   </main>
 </template>
 
@@ -28,6 +26,6 @@
 import { definePageMeta } from '#imports';
 
 definePageMeta({
-  layout: 'default'
+  layout: 'default',
 });
 </script>
