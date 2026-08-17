@@ -1,7 +1,7 @@
 import prisma from '../../prisma';
-import { users } from '@prisma/client';
 import { hashPassword, passwordValidator } from '../../utils/password.utils';
 import { userProfileInfo } from '../../types/users.types';
+import { BadRequestError } from '../../utils/ServerError';
 
 export const getProfile = async (uuid: string): Promise<userProfileInfo> => {
   const user = await prisma.users.findFirstOrThrow({
@@ -14,6 +14,7 @@ export const getProfile = async (uuid: string): Promise<userProfileInfo> => {
       tel: true,
       uuid: true,
       created_at: true,
+      updated_at: true,
       profile_image_url: true,
     },
   });
@@ -24,7 +25,7 @@ export const getProfile = async (uuid: string): Promise<userProfileInfo> => {
 export const updateProfile = async (
   userUuid: string,
   updateData: { username?: string; email?: string; tel?: string },
-): Promise<users> => {
+): Promise<userProfileInfo> => {
   const user = await prisma.users.findFirstOrThrow({
     where: {
       uuid: userUuid,
@@ -36,6 +37,10 @@ export const updateProfile = async (
       user_id: user.user_id,
     },
     data: updateData,
+    omit: {
+      password: true,
+      user_id: true,
+    },
   });
 
   return updatedUser;
@@ -69,7 +74,7 @@ export const changePassword = async (
   const isPasswordValid = await passwordValidator(oldPassword, user.password);
 
   if (!isPasswordValid) {
-    throw new Error('OLD_PASSWORD_INVALID');
+    throw new BadRequestError('Old password invalid!');
   }
 
   const hashedPassword = await hashPassword(newPassword);
@@ -88,7 +93,7 @@ export const uploadProfilePicture = async (
   userUuid: string,
   fileData: Express.Multer.File,
   pictureUrl: string,
-): Promise<users> => {
+): Promise<userProfileInfo> => {
   const user = await prisma.users.findFirstOrThrow({
     where: {
       uuid: userUuid,
@@ -121,6 +126,15 @@ export const uploadProfilePicture = async (
       },
       data: {
         profile_image_url: pictureUrl,
+      },
+      select: {
+        username: true,
+        email: true,
+        tel: true,
+        uuid: true,
+        created_at: true,
+        updated_at: true,
+        profile_image_url: true,
       },
     }),
   ]);

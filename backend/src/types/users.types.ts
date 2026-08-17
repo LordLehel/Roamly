@@ -7,6 +7,7 @@ export type userProfileInfo = Prisma.usersGetPayload<{
     tel: true;
     uuid: true;
     created_at: true;
+    updated_at: true;
     profile_image_url: true;
   };
 }>;
