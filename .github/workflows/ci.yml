@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [main, develop]
 
+permissions:
+  contents: write
+
 jobs:
   frontend-checks:
     name: Frontend Linter & Formatter
@@ -17,6 +20,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }} 
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -28,14 +33,20 @@ jobs:
       - name: Install Frontend Dependencies
         run: npm ci
 
-      - name: Check Frontend Formatting
-        run: npx prettier --check .
+      - name: Fix Frontend Formatting
+        run: npx prettier --write .
+
+      - name: Commit and Push Frontend Formatting
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'style: apply frontend prettier formatting'
 
       - name: Run Frontend Linter
         run: npm run lint
 
   backend-checks:
     name: Backend Linter & Formatter
+    needs: frontend-checks
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -44,6 +55,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -55,8 +68,13 @@ jobs:
       - name: Install Backend Dependencies
         run: npm ci
 
-      - name: Check Backend Formatting
-        run: npx prettier --check .
+      - name: Fix Backend Formatting
+        run: npx prettier --write .
+
+      - name: Commit and Push Backend Formatting
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'style: apply backend prettier formatting'
 
       - name: Run Backend Linter
         run: npm run lint

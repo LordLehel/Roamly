@@ -9,7 +9,8 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "lint": "npx eslint .",
-    "format": "prettier --write \"**/*.{js,ts,vue,json,css,scss}\""
+    "format": "prettier --write \"**/*.{js,ts,vue,json,css,scss}\"",
+    "prepare": "husky"
   },
   "dependencies": {
     "@nuxt/ui": "^4.10.0",
@@ -48,7 +49,15 @@
     "@tailwindcss/postcss": "^4.3.3",
     "eslint": "^10.8.0",
     "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.3.0",
     "prettier": "^3.9.6",
     "tailwindcss": "^4.3.3"
+  },
+  "lint-staged": {
+    "**/*.{js,ts,vue,json,css,md}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
   }
 }
