@@ -4,11 +4,7 @@
     class="flex items-center justify-between px-6 py-4 bg-[#EDF1EE]/70 backdrop-blur-md shadow-sm relative z-10 border-b border-[#2F3E32]/10"
   >
     <div class="flex-1">
-      <UButton
-        label="Go Back"
-        variant="green_whole"
-        @click="$router.back()"
-      />
+      <UButton label="Go Back" variant="green_whole" @click="$router.back()" />
     </div>
 
     <NuxtLink
@@ -20,18 +16,8 @@
     </NuxtLink>
 
     <div class="flex-1 flex justify-end items-center gap-4">
-      <UButton
-        v-if="isLoginPage"
-        label="Register"
-        to="/register"
-        variant="yellow_whole"
-      />
-      <UButton
-        v-else-if="isRegisterPage"
-        label="Log in"
-        to="/login"
-        variant="yellow_whole"
-      />
+      <UButton v-if="isLoginPage" label="Register" to="/register" variant="yellow_whole" />
+      <UButton v-else-if="isRegisterPage" label="Log in" to="/login" variant="yellow_whole" />
 
       <UAvatar icon="i-heroicons-user" size="sm" />
     </div>

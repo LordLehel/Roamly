@@ -1,16 +1,33 @@
 <template>
-  <header class="flex items-center justify-between px-6 py-4 bg-[#EDF1EE]/70 backdrop-blur-md shadow-sm relative z-10 border-b border-[#2F3E32]/10">
+  <header
+    class="flex items-center justify-between px-6 py-4 bg-[#EDF1EE]/70 backdrop-blur-md shadow-sm relative z-10 border-b border-[#2F3E32]/10"
+  >
     <div class="flex-1">
-      <NuxtLink to="/" class="flex items-center gap-2 text-[#2F3E32] hover:opacity-80 transition-opacity w-max">
+      <NuxtLink
+        to="/"
+        class="flex items-center gap-2 text-[#2F3E32] hover:opacity-80 transition-opacity w-max"
+      >
         <UIcon name="i-heroicons-map-pin" class="w-7 h-7 text-[#7A9A82]" />
         <span class="text-xl font-semibold tracking-wider">ROAMLY</span>
       </NuxtLink>
     </div>
 
     <nav class="hidden md:flex gap-8 font-bold tracking-wide">
-      <NuxtLink to="/" class="hover:text-[#7A9A82] hover:underline underline-offset-4 transition-colors">Home</NuxtLink>
-      <NuxtLink to="/about" class="hover:text-[#7A9A82] hover:underline underline-offset-4 transition-colors">About</NuxtLink>
-      <NuxtLink to="/support" class="hover:text-[#7A9A82] hover:underline underline-offset-4 transition-colors">Support</NuxtLink>
+      <NuxtLink
+        to="/"
+        class="hover:text-[#7A9A82] hover:underline underline-offset-4 transition-colors"
+        >Home</NuxtLink
+      >
+      <NuxtLink
+        to="/about"
+        class="hover:text-[#7A9A82] hover:underline underline-offset-4 transition-colors"
+        >About</NuxtLink
+      >
+      <NuxtLink
+        to="/support"
+        class="hover:text-[#7A9A82] hover:underline underline-offset-4 transition-colors"
+        >Support</NuxtLink
+      >
     </nav>
 
     <div class="flex-1 flex justify-end items-center gap-4">
@@ -20,7 +37,12 @@
             <span class="font-bold text-[#2F3E32] tracking-wide text-sm hidden sm:block">
               {{ userProfile?.username || 'Loading...' }}
             </span>
-            <UButton icon="i-heroicons-arrow-left-on-rectangle" label="Log out" variant="custom_outline" @click="handleLogout" />
+            <UButton
+              icon="i-heroicons-arrow-left-on-rectangle"
+              label="Log out"
+              variant="custom_outline"
+              @click="handleLogout"
+            />
             <NuxtLink to="/">
               <UAvatar :alt="userProfile?.username || 'User'" icon="i-heroicons-user" size="sm" />
             </NuxtLink>

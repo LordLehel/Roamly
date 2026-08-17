@@ -18,6 +18,6 @@
 import { definePageMeta } from '#imports';
 
 definePageMeta({
-  layout: 'default'
+  layout: 'default',
 });
 </script>
