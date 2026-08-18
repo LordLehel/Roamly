@@ -10,6 +10,12 @@ export const CONST_REGISTER_TITLE = 'Register';
 export const CONST_GO_BACK_TITLE = 'Go Back';
 export const CONST_COPYRIGHT_LABEL = '© Copyright - Roamly Co. 2026 | All rights reserved.';
 
+// Backgrounds
+export const CONST_BG_AUTH = "bg-[url('/register/register-background.jpg')]";
+export const CONST_BG_HOME = "bg-[url('/home/home-background.jpg')]";
+export const CONST_BG_ABOUT = "bg-[url('/about/about-background.jpg')]";
+export const CONST_BG_SUPPORT = "bg-[url('/support/support-background.jpg')]";
+
 // Form
 export const CONST_LOGIN_HEADING = 'Log into your account';
 export const CONST_REGISTER_HEADING = 'Register account';

@@ -79,4 +79,17 @@ export default defineAppConfig({
       },
     },
   },
+
+  // Layout
+  layout: {
+    base: 'min-h-screen flex flex-col bg-light-bg text-dark-text font-sans bg-cover bg-center bg-no-repeat bg-fixed',
+    mainDefault: 'flex-1 flex flex-col',
+    mainAuth: 'flex-1 flex items-center justify-center p-6',
+  },
+
+  // Footer
+  footer: {
+    base: 'py-5 px-6 flex items-center justify-between text-xs text-dark-text bg-light-bg/70 backdrop-blur-md shadow-[0_-2px_10px_rgba(0,0,0,0.02)] relative z-10',
+    text: 'font-medium opacity-80',
+  }
 });
