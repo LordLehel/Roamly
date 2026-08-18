@@ -1,5 +1,5 @@
 import prisma from '../../prisma';
-import { hashPassword, passwordValidator } from '../../utils/password.utils';
+import { hashPassword, validatePassword } from '../../utils/password.utils';
 import { userProfileInfo } from '../../types/users.types';
 import { BadRequestError } from '../../utils/ServerError';
 
@@ -11,7 +11,7 @@ export const getProfile = async (uuid: string): Promise<userProfileInfo> => {
     select: {
       username: true,
       email: true,
-      tel: true,
+      phone_number: true,
       uuid: true,
       created_at: true,
       updated_at: true,
@@ -24,17 +24,11 @@ export const getProfile = async (uuid: string): Promise<userProfileInfo> => {
 
 export const updateProfile = async (
   userUuid: string,
-  updateData: { username?: string; email?: string; tel?: string },
+  updateData: { username?: string; email?: string; phoneNumber?: string },
 ): Promise<userProfileInfo> => {
-  const user = await prisma.users.findFirstOrThrow({
-    where: {
-      uuid: userUuid,
-    },
-  });
-
   const updatedUser = await prisma.users.update({
     where: {
-      user_id: user.user_id,
+      uuid: userUuid,
     },
     data: updateData,
     omit: {
@@ -47,15 +41,9 @@ export const updateProfile = async (
 };
 
 export const deleteProfile = async (userUuid: string): Promise<void> => {
-  const user = await prisma.users.findFirstOrThrow({
-    where: {
-      uuid: userUuid,
-    },
-  });
-
   await prisma.users.delete({
     where: {
-      user_id: user.user_id,
+      uuid: userUuid,
     },
   });
 };
@@ -71,7 +59,7 @@ export const changePassword = async (
     },
   });
 
-  const isPasswordValid = await passwordValidator(oldPassword, user.password);
+  const isPasswordValid = await validatePassword(oldPassword, user.password);
 
   if (!isPasswordValid) {
     throw new BadRequestError('Old password invalid!');
@@ -130,7 +118,7 @@ export const uploadProfilePicture = async (
       select: {
         username: true,
         email: true,
-        tel: true,
+        phone_number: true,
         uuid: true,
         created_at: true,
         updated_at: true,

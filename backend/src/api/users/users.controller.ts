@@ -4,11 +4,7 @@ import { BaseController } from '../../utils/BaseController';
 
 class UsersController extends BaseController {
   public getProfile = this.handleAsync(async (req: Request, res: Response): Promise<void> => {
-    const user = res.locals.user;
-    if (!user?.uuid) {
-      res.status(401).json({ status: 'error', message: 'Authorization needed!' });
-      return;
-    }
+    const user = res.locals.user!;
 
     const profile = await userService.getProfile(user.uuid);
 
@@ -19,12 +15,7 @@ class UsersController extends BaseController {
   });
 
   public updateProfile = this.handleAsync(async (req: Request, res: Response): Promise<void> => {
-    const user = res.locals.user;
-
-    if (!user?.uuid) {
-      res.status(401).json({ status: 'error', message: 'Authorization needed!' });
-      return;
-    }
+    const user = res.locals.user!;
 
     const updateData = req.body;
 
@@ -38,13 +29,7 @@ class UsersController extends BaseController {
   });
 
   public deleteProfile = this.handleAsync(async (req: Request, res: Response): Promise<void> => {
-    const user = res.locals.user;
-
-    if (!user?.uuid) {
-      res.status(401).json({ status: 'error', message: 'Authorization needed!' });
-
-      return;
-    }
+    const user = res.locals.user!;
 
     await userService.deleteProfile(user.uuid);
 
@@ -55,16 +40,7 @@ class UsersController extends BaseController {
   });
 
   public changePassword = this.handleAsync(async (req: Request, res: Response): Promise<void> => {
-    const user = res.locals.user;
-
-    if (!user?.uuid) {
-      res.status(401).json({
-        status: 'error',
-        message: 'Authorization needed!',
-      });
-
-      return;
-    }
+    const user = res.locals.user!;
 
     const { oldPassword, newPassword } = req.body;
 
@@ -78,16 +54,7 @@ class UsersController extends BaseController {
 
   public uploadProfilePicture = this.handleAsync(
     async (req: Request, res: Response): Promise<void> => {
-      const user = res.locals.user;
-
-      if (!user?.uuid) {
-        res.status(401).json({
-          status: 'error',
-          message: 'Authorization needed!',
-        });
-
-        return;
-      }
+      const user = res.locals.user!;
 
       const file = req.file;
 

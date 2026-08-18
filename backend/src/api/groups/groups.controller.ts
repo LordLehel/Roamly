@@ -9,12 +9,7 @@ type ListGroupsQuery = z.infer<typeof listGroupsSchema>;
 class GroupsController extends BaseController {
   public createGroup = this.handleAsync(async (req: Request, res: Response): Promise<void> => {
     const { groupName, initialInvites } = req.body;
-    const user = res.locals.user;
-
-    if (!user?.uuid) {
-      res.status(401).json({ status: 'error', message: 'Authorization needed!' });
-      return;
-    }
+    const user = res.locals.user!;
 
     const newGroup = await groupsService.createGroup(user.uuid, groupName, initialInvites);
 
@@ -27,16 +22,7 @@ class GroupsController extends BaseController {
 
   public listAllGroupsTheUserIsPartOf = this.handleAsync(
     async (req: Request, res: Response): Promise<void> => {
-      const user = res.locals.user;
-
-      if (!user?.uuid) {
-        res.status(401).json({
-          status: 'error',
-          message: 'Authorization needed!',
-        });
-
-        return;
-      }
+      const user = res.locals.user!;
 
       const { limit, cursor } = req.query as unknown as ListGroupsQuery;
 
@@ -52,16 +38,7 @@ class GroupsController extends BaseController {
 
   public joinAGroupByUuidIfUserIsInvited = this.handleAsync(
     async (req: Request, res: Response): Promise<void> => {
-      const user = res.locals.user;
-
-      if (!user?.uuid) {
-        res.status(401).json({
-          status: 'error',
-          message: 'Authorization needed!',
-        });
-
-        return;
-      }
+      const user = res.locals.user!;
 
       const { groupUuid } = req.params;
 
@@ -80,16 +57,7 @@ class GroupsController extends BaseController {
 
   public inviteUsersToYourGroup = this.handleAsync(
     async (req: Request, res: Response): Promise<void> => {
-      const user = res.locals.user;
-
-      if (!user?.uuid) {
-        res.status(401).json({
-          status: 'error',
-          message: 'Authorization needed!',
-        });
-
-        return;
-      }
+      const user = res.locals.user!;
 
       const { groupUuid } = req.params;
 
@@ -111,16 +79,7 @@ class GroupsController extends BaseController {
   );
 
   public pendingInvites = this.handleAsync(async (req: Request, res: Response): Promise<void> => {
-    const user = res.locals.user;
-
-    if (!user?.uuid) {
-      res.status(401).json({
-        status: 'error',
-        message: 'Authorization needed!',
-      });
-
-      return;
-    }
+    const user = res.locals.user!;
 
     const { limit, cursor } = req.query as unknown as ListGroupsQuery;
 
@@ -136,16 +95,7 @@ class GroupsController extends BaseController {
   public joinGroupInfos = this.handleAsync(async (req: Request, res: Response): Promise<void> => {
     const { groupUuid } = req.params;
 
-    const user = res.locals.user;
-
-    if (!user?.uuid) {
-      res.status(401).json({
-        status: 'error',
-        message: 'Authorization needed!',
-      });
-
-      return;
-    }
+    const user = res.locals.user!;
 
     const infosOfTheGroup = await groupsService.joinGroupInfos(groupUuid as string, user.uuid);
 
@@ -158,18 +108,9 @@ class GroupsController extends BaseController {
 
   public listAllInfosOfOneGroup = this.handleAsync(
     async (req: Request, res: Response): Promise<void> => {
-      const user = res.locals.user;
+      const user = res.locals.user!;
 
       const { groupUuid } = req.params;
-
-      if (!user?.uuid) {
-        res.status(401).json({
-          status: 'error',
-          message: 'Authorization needed!',
-        });
-
-        return;
-      }
 
       const groupInfos = await groupsService.listAllInfosOfOneGroup(user.uuid, groupUuid as string);
 
@@ -182,18 +123,9 @@ class GroupsController extends BaseController {
   );
 
   public deleteGroup = this.handleAsync(async (req: Request, res: Response): Promise<void> => {
-    const user = res.locals.user;
+    const user = res.locals.user!;
 
     const { groupUuid } = req.params;
-
-    if (!user?.uuid) {
-      res.status(401).json({
-        status: 'error',
-        message: 'Authorization needed!',
-      });
-
-      return;
-    }
 
     await groupsService.deleteGroup(user.uuid, groupUuid as string);
 
@@ -204,17 +136,8 @@ class GroupsController extends BaseController {
   });
 
   public updateGroup = this.handleAsync(async (req: Request, res: Response): Promise<void> => {
-    const user = res.locals.user;
+    const user = res.locals.user!;
     const { groupUuid } = req.params;
-
-    if (!user?.uuid) {
-      res.status(401).json({
-        status: 'error',
-        message: 'Authorization needed!',
-      });
-
-      return;
-    }
 
     const validatedData = req.body;
 
@@ -233,18 +156,9 @@ class GroupsController extends BaseController {
 
   public removeUserFromGroupByEmail = this.handleAsync(
     async (req: Request, res: Response): Promise<void> => {
-      const user = res.locals.user;
+      const user = res.locals.user!;
 
       const { groupUuid, email: userToRemoveEmail } = req.params;
-
-      if (!user?.uuid) {
-        res.status(401).json({
-          status: 'error',
-          message: 'Authorization needed!',
-        });
-
-        return;
-      }
 
       await groupsService.removeUserFromGroupByEmail(
         user.uuid,
@@ -260,18 +174,9 @@ class GroupsController extends BaseController {
   );
 
   public userLeavingGroup = this.handleAsync(async (req: Request, res: Response): Promise<void> => {
-    const user = res.locals.user;
+    const user = res.locals.user!;
 
     const { groupUuid } = req.params;
-
-    if (!user?.uuid) {
-      res.status(401).json({
-        status: 'error',
-        message: 'Authorization needed!',
-      });
-
-      return;
-    }
 
     await groupsService.userLeavingGroup(user.uuid, groupUuid as string);
 

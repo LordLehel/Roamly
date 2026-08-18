@@ -8,7 +8,7 @@ export const updateProfileScheme = z.object({
     .max(50, 'Username too long! It can not be more than 50 characters long!')
     .optional(),
 
-  email: z.email('Email address format not recognized').optional(),
+  email: z.string().email('Email address format not recognized').optional(),
 
   tel: z
     .string()
