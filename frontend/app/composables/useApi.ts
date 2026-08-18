@@ -21,7 +21,7 @@ export const useApi = () => {
       if (response?.status === 401) {
         const token = useCookie('auth_token');
         token.value = null;
-        
+
         if (typeof window !== 'undefined') {
           navigateTo('/login');
         }

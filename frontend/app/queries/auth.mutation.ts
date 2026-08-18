@@ -13,7 +13,7 @@ export const useLoginUserMutation = (onSuccessCallback?: () => void) => {
       if (data?.token) {
         token.value = data.token;
       }
-      
+
       if (onSuccessCallback) {
         onSuccessCallback();
       }

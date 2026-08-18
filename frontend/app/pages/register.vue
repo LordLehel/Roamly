@@ -2,7 +2,9 @@
 <template>
   <UCard variant="glass">
     <div class="text-center mb-8">
-      <h1 class="text-2xl font-medium tracking-wide text-brand-950">{{ CONST_REGISTER_HEADING }}</h1>
+      <h1 class="text-2xl font-medium tracking-wide text-brand-950">
+        {{ CONST_REGISTER_HEADING }}
+      </h1>
     </div>
 
     <!-- Register form -->
@@ -75,9 +77,19 @@
       </div>
 
       <div class="flex items-center justify-between pt-6">
-        <UButton :label="CONST_CANCEL_BTN" variant="actionCancelButton" :disabled="isLoading" @click="clearForm" />
+        <UButton
+          :label="CONST_CANCEL_BTN"
+          variant="actionCancelButton"
+          :disabled="isLoading"
+          @click="clearForm"
+        />
         <!-- Loading state -->
-        <UButton type="submit" :label="CONST_REGISTER_TITLE" variant="actionOkButton" :loading="isLoading" />
+        <UButton
+          type="submit"
+          :label="CONST_REGISTER_TITLE"
+          variant="actionOkButton"
+          :loading="isLoading"
+        />
       </div>
     </UForm>
   </UCard>

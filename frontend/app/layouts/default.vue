@@ -15,11 +15,11 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRoute, useAppConfig } from '#imports';
-import { 
-  CONST_COPYRIGHT_LABEL, 
-  CONST_BG_HOME, 
-  CONST_BG_ABOUT, 
-  CONST_BG_SUPPORT 
+import {
+  CONST_COPYRIGHT_LABEL,
+  CONST_BG_HOME,
+  CONST_BG_ABOUT,
+  CONST_BG_SUPPORT,
 } from '../utils/constants';
 
 const route = useRoute();

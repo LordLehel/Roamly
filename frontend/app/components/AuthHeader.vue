@@ -4,7 +4,11 @@
     class="flex items-center justify-between px-6 py-4 bg-surface-500/70 backdrop-blur-md shadow-sm relative z-10 border-b border-dark-text/10"
   >
     <div class="flex-1">
-      <UButton :label="CONST_GO_BACK_TITLE" variant="smallPrimaryActionButton" @click="$router.back()" />
+      <UButton
+        :label="CONST_GO_BACK_TITLE"
+        variant="smallPrimaryActionButton"
+        @click="$router.back()"
+      />
     </div>
 
     <NuxtLink
@@ -16,7 +20,12 @@
     </NuxtLink>
 
     <div class="flex-1 flex justify-end items-center gap-4">
-      <UButton v-if="isLoginPage" :label="CONST_REGISTER_TITLE" to="/register" variant="smallAccentActionButton" />
+      <UButton
+        v-if="isLoginPage"
+        :label="CONST_REGISTER_TITLE"
+        to="/register"
+        variant="smallAccentActionButton"
+      />
       <UButton
         v-else-if="isRegisterPage"
         :label="CONST_LOGIN_TITLE"
@@ -48,5 +57,5 @@ const { isAuthenticated } = useAuth();
 const isLoginPage = computed(() => route.path === '/login/' || route.path === '/login');
 const isRegisterPage = computed(() => route.path === '/register/' || route.path === '/register');
 
-const loginRedirectPath = computed(() => isAuthenticated.value ? '/users/profile' : '/login');
+const loginRedirectPath = computed(() => (isAuthenticated.value ? '/users/profile' : '/login'));
 </script>

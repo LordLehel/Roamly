@@ -42,7 +42,7 @@ export default defineAppConfig({
           interactiveGlass: {
             root: 'bg-surface-500/70 backdrop-blur-xl rounded-[25px] shadow-[0_15px_40px_rgba(47,62,50,0.15)] border-0 ring-1 ring-surface-500/50 text-dark-text transition-transform hover:-translate-y-1',
             body: 'flex flex-col items-center justify-center h-full text-center p-8',
-          }
+          },
         },
       },
     },
@@ -80,16 +80,16 @@ export default defineAppConfig({
       variants: {
         size: {
           header: {
-            root: 'w-9 h-9 text-base'
+            root: 'w-9 h-9 text-base',
           },
           profileLg: {
-            root: 'w-24 h-24 text-4xl shadow-md mb-2'
-          }
-        }
+            root: 'w-24 h-24 text-4xl shadow-md mb-2',
+          },
+        },
       },
       defaultVariants: {
-        size: 'header'
-      }
+        size: 'header',
+      },
     },
   },
 
@@ -104,5 +104,5 @@ export default defineAppConfig({
   footer: {
     base: 'py-5 px-6 flex items-center justify-between text-xs text-dark-text bg-light-bg/70 backdrop-blur-md shadow-[0_-2px_10px_rgba(0,0,0,0.02)] relative z-10',
     text: 'font-medium opacity-80',
-  }
+  },
 });

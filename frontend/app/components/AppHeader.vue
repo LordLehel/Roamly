@@ -17,15 +17,18 @@
       <NuxtLink
         to="/"
         class="hover:text-brand-500 hover:underline underline-offset-4 transition-colors"
-      >{{ CONST_HOME_TITLE }}</NuxtLink>
+        >{{ CONST_HOME_TITLE }}</NuxtLink
+      >
       <NuxtLink
         to="/about"
         class="hover:text-brand-500 hover:underline underline-offset-4 transition-colors"
-      >{{ CONST_ABOUT_TITLE }}</NuxtLink>
+        >{{ CONST_ABOUT_TITLE }}</NuxtLink
+      >
       <NuxtLink
         to="/support"
         class="hover:text-brand-500 hover:underline underline-offset-4 transition-colors"
-      >{{ CONST_SUPPORT_TITLE }}</NuxtLink>
+        >{{ CONST_SUPPORT_TITLE }}</NuxtLink
+      >
     </nav>
 
     <div class="flex-1 flex justify-end items-center gap-4">
@@ -91,7 +94,7 @@ import {
 const router = useRouter();
 const { isAuthenticated, logout } = useAuth();
 
-const loginRedirectPath = computed(() => isAuthenticated.value ? '/users/profile' : '/login');
+const loginRedirectPath = computed(() => (isAuthenticated.value ? '/users/profile' : '/login'));
 
 const { data: userProfile, error } = useCurrentUserQuery();
 

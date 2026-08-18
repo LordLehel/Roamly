@@ -23,7 +23,11 @@
 
 <script setup lang="ts">
 import { definePageMeta } from '#imports';
-import { CONST_SUPPORT_HERO, CONST_SUPPORT_DESCRIPTION, CONST_SUPPORT_PICTURE_PATH } from '../utils/constants';
+import {
+  CONST_SUPPORT_HERO,
+  CONST_SUPPORT_DESCRIPTION,
+  CONST_SUPPORT_PICTURE_PATH,
+} from '../utils/constants';
 
 definePageMeta({
   layout: 'default',

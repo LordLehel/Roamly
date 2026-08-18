@@ -1,29 +1,29 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   /* Brand colors */
-  --color-brand-50: #F0FDF4;
-  --color-brand-500: #7A9A82;
-  --color-brand-600: #68856F;
-  --color-brand-950: #052E16;
-  
+  --color-brand-50: #f0fdf4;
+  --color-brand-500: #7a9a82;
+  --color-brand-600: #68856f;
+  --color-brand-950: #052e16;
+
   /* Akcent and surface colors */
-  --color-accent-500: #E5A93B;
-  --color-accent-600: #D49933;
-  --color-dark-text: #2F3E32;
-  --color-surface-500: #EDF1EE;
-  --color-surface-600: #E2E8E4;
-  --color-input-bg: #E8F0F5;
-  --color-input-border: #D0E0EB;
-  --color-light-bg: #FAF9F6;
-  
+  --color-accent-500: #e5a93b;
+  --color-accent-600: #d49933;
+  --color-dark-text: #2f3e32;
+  --color-surface-500: #edf1ee;
+  --color-surface-600: #e2e8e4;
+  --color-input-bg: #e8f0f5;
+  --color-input-border: #d0e0eb;
+  --color-light-bg: #faf9f6;
+
   /* Status and secondary colors */
-  --color-success-400: #4ADE80;
-  --color-error-50: #FEF2F2;
-  --color-error-300: #FCA5A5;
-  --color-error-400: #F87171;
-  --color-error-500: #EF4444;
-  --color-error-900: #7F1D1D;
-  --color-text-muted: #9CA3AF;
-  --color-text-secondary: #6B7280;
+  --color-success-400: #4ade80;
+  --color-error-50: #fef2f2;
+  --color-error-300: #fca5a5;
+  --color-error-400: #f87171;
+  --color-error-500: #ef4444;
+  --color-error-900: #7f1d1d;
+  --color-text-muted: #9ca3af;
+  --color-text-secondary: #6b7280;
 }

@@ -3,7 +3,7 @@ import type { ApiError } from '../types/apiError.type';
 
 export const getErrorMessage = (err: unknown): string => {
   const error = err as ApiError;
-  
+
   // Extracting error message
   let rawMessage = '';
   if (err instanceof Error) {
