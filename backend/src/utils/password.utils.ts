@@ -8,7 +8,7 @@ export const hashPassword = async (password: string): Promise<string> => {
   return hashedPasswd;
 };
 
-export const passwordValidator = async (
+export const validatePassword = async (
   passwordToValidate: string,
   realPassword: string,
 ): Promise<boolean> => {

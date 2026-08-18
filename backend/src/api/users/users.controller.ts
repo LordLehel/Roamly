@@ -1,13 +1,10 @@
 import { Request, Response } from 'express';
 import * as userService from './users.service';
+import { BaseController } from '../../utils/BaseController';
 
-export const getProfile = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const user = res.locals.user;
-    if (!user?.uuid) {
-      res.status(401).json({ message: 'Authorization needed!' });
-      return;
-    }
+class UsersController extends BaseController {
+  public getProfile = this.handleAsync(async (req: Request, res: Response): Promise<void> => {
+    const user = res.locals.user!;
 
     const profile = await userService.getProfile(user.uuid);
 
@@ -15,11 +12,72 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
       status: 'success',
       data: profile,
     });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      status: 'error',
-      message: 'Error! There was an issue with the server during the listing of the asked user!',
+  });
+
+  public updateProfile = this.handleAsync(async (req: Request, res: Response): Promise<void> => {
+    const user = res.locals.user!;
+
+    const updateData = req.body;
+
+    const updatedUser = await userService.updateProfile(user.uuid, updateData);
+
+    res.status(200).json({
+      status: 'success',
+      message: 'User successfully updated!',
+      data: updatedUser,
     });
-  }
-};
+  });
+
+  public deleteProfile = this.handleAsync(async (req: Request, res: Response): Promise<void> => {
+    const user = res.locals.user!;
+
+    await userService.deleteProfile(user.uuid);
+
+    res.status(200).json({
+      status: 'success',
+      message: 'User deleted successfully!',
+    });
+  });
+
+  public changePassword = this.handleAsync(async (req: Request, res: Response): Promise<void> => {
+    const user = res.locals.user!;
+
+    const { oldPassword, newPassword } = req.body;
+
+    await userService.changePassword(user.uuid, oldPassword, newPassword);
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Password changed successfully!',
+    });
+  });
+
+  public uploadProfilePicture = this.handleAsync(
+    async (req: Request, res: Response): Promise<void> => {
+      const user = res.locals.user!;
+
+      const file = req.file;
+
+      if (!file) {
+        res.status(400).json({
+          status: 'error',
+          message: 'No image provided!',
+        });
+
+        return;
+      }
+
+      const pictureUrl = `/uploads/profiles/${file.filename}`;
+
+      const updatedUser = await userService.uploadProfilePicture(user.uuid, file, pictureUrl);
+
+      res.status(200).json({
+        status: 'success',
+        message: 'Profile picture uploaded successfully!',
+        data: updatedUser,
+      });
+    },
+  );
+}
+
+export default new UsersController();

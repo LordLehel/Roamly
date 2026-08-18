@@ -80,7 +80,7 @@ model users {
   uuid               String               @unique @default(uuid()) @db.Uuid
   username           String               @db.VarChar(64)
   email              String               @unique @db.VarChar(254)
-  tel                String?              @unique @db.VarChar(20)
+  phone_number       String?              @unique @db.VarChar(20)
   password           String               @db.VarChar(255)
   profile_image_url  String?
   created_at         DateTime             @default(now()) @db.Timestamp(6)

@@ -3,13 +3,19 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rootRouter from './api/routes';
 import { errorHandler } from './middlewares/error.middleware';
+import path from 'path';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-app.use(helmet());
+// enabling cross origin resources in helmet so the frontend can show files originating from the backend
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  }),
+);
 
 app.use(
   cors({
@@ -17,6 +23,8 @@ app.use(
     credentials: true,
   }),
 );
+
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 app.use('/api', rootRouter);
 
