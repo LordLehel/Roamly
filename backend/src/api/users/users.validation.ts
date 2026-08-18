@@ -10,7 +10,7 @@ export const updateProfileScheme = z.object({
 
   email: z.string().email('Email address format not recognized').optional(),
 
-  tel: z
+  phone_number: z
     .string()
     .transform((val: string, ctx: z.RefinementCtx) => {
       const phoneNumber = parsePhoneNumberFromString(val);
