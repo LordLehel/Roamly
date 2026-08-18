@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rootRouter from './api/routes';
+import { errorHandler } from './middlewares/error.middleware';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -26,6 +27,8 @@ app.get('/api/health', (req: Request, res: Response) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`server listening on port ${PORT}`);

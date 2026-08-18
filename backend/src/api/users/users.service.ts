@@ -1,10 +1,18 @@
 import prisma from '../../prisma';
-import { users } from '@prisma/client';
+import { userProfileInfo } from '../../types/users.types';
 
-export const getProfile = async (uuid: string): Promise<users | null> => {
-  const profile = await prisma.users.findUnique({
+export const getProfile = async (uuid: string): Promise<userProfileInfo> => {
+  const profile = await prisma.users.findFirstOrThrow({
     where: {
       uuid: uuid,
+    },
+    select: {
+      username: true,
+      email: true,
+      tel: true,
+      uuid: true,
+      created_at: true,
+      profile_image_url: true,
     },
   });
 

@@ -1,0 +1,91 @@
+import { Prisma } from '@prisma/client';
+
+export type GroupWithRole = Prisma.groupsGetPayload<{
+  select: {
+    uuid: true;
+    name: true;
+    current_size: true;
+    created_at: true;
+  };
+
+  group_profiles: {
+    select: {
+      roles: {
+        select: {
+          type: true;
+        };
+      };
+    };
+  };
+}>;
+
+export type PaginatedGroups = {
+  items: GroupWithRole[];
+  meta: {
+    next_cursor: string | null;
+    has_next_page: boolean;
+    limit: number;
+    count: number;
+  };
+};
+
+export type profileRelatedToTheGroup = Prisma.group_profilesGetPayload<{
+  include: {
+    roles: true;
+  };
+}>;
+
+export type GroupProfilesInfos = Prisma.group_profilesGetPayload<{
+  select: {
+    users: {
+      select: {
+        email: true;
+        username: true;
+      };
+    };
+    roles: {
+      select: {
+        type: true;
+      };
+    };
+  };
+}>;
+
+export type InfosOfTheGroupTheUserIsPartOf = Prisma.groupsGetPayload<{
+  select: {
+    name: true;
+    current_size: true;
+    created_at: true;
+
+    group_profiles: {
+      select: {
+        users: {
+          select: {
+            email: true;
+            username: true;
+          };
+        };
+        roles: {
+          select: {
+            type: true;
+          };
+        };
+        nickname: true;
+        description: true;
+      };
+    };
+  };
+}>;
+
+export type userGroupProfile = Prisma.group_profilesGetPayload<{
+  select: {
+    nickname: true;
+    description: true;
+
+    roles: {
+      select: {
+        type: true;
+      };
+    };
+  };
+}>;
