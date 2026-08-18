@@ -1,3 +1,6 @@
+// frontend/app/composables/useApi.ts
+import { useRuntimeConfig, useCookie, navigateTo } from '#imports';
+
 export const useApi = () => {
   const config = useRuntimeConfig();
 
@@ -5,21 +8,23 @@ export const useApi = () => {
     baseURL: config.public.apiBaseUrl as string,
 
     onRequest({ options }) {
-      if (typeof window !== 'undefined') {
-        const token = localStorage.getItem('auth_token');
-        if (token) {
-          options.headers = new Headers(options.headers);
-          options.headers.set('Authorization', `Bearer ${token}`);
-        }
+      const token = useCookie('auth_token');
+      if (token.value) {
+        options.headers = new Headers(options.headers);
+        options.headers.set('Authorization', `Bearer ${token.value}`);
       }
     },
 
     onResponseError({ response }) {
       console.error('API response error:', response?.status);
 
-      if (response?.status === 401 && typeof window !== 'undefined') {
-        localStorage.removeItem('auth_token');
-        navigateTo('/login');
+      if (response?.status === 401) {
+        const token = useCookie('auth_token');
+        token.value = null;
+        
+        if (typeof window !== 'undefined') {
+          navigateTo('/login');
+        }
       }
     },
   });

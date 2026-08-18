@@ -31,7 +31,7 @@
     <div class="flex-1 flex justify-end items-center gap-4">
       <ClientOnly>
         <div class="flex items-center gap-4">
-          <template v-if="isLoggedIn">
+          <template v-if="isAuthenticated">
             <span class="font-bold text-dark-text tracking-wide text-sm hidden sm:block">
               {{ userProfile?.username || 'Loading...' }}
             </span>
@@ -75,9 +75,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, computed } from 'vue';
+import { watch, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { checkIsAuthenticated, logoutUser } from '../utils/auth.utils';
+import { useAuth } from '../composables/useAuth';
 import { useCurrentUserQuery } from '../queries/user.query';
 import {
   CONST_BRAND_NAME,
@@ -89,13 +89,9 @@ import {
 } from '../utils/constants';
 
 const router = useRouter();
-const isLoggedIn = ref(false);
+const { isAuthenticated, logout } = useAuth();
 
-const loginRedirectPath = computed(() => isLoggedIn.value ? '/users/profile' : '/login');
-
-onMounted(() => {
-  isLoggedIn.value = checkIsAuthenticated();
-});
+const loginRedirectPath = computed(() => isAuthenticated.value ? '/users/profile' : '/login');
 
 const { data: userProfile, error } = useCurrentUserQuery();
 
@@ -106,8 +102,7 @@ watch(error, (newError) => {
 });
 
 const handleLogout = () => {
-  logoutUser();
-  isLoggedIn.value = false;
+  logout();
   router.push('/login');
 };
 </script>

@@ -75,8 +75,21 @@ export default defineAppConfig({
     // Avatar
     avatar: {
       slots: {
-        root: '!w-9 !h-9 !bg-brand-500 text-surface-500 flex items-center justify-center rounded-full shadow-sm ring-1 ring-brand-500/30 font-bold overflow-hidden hover:ring-2 hover:ring-brand-500',
+        root: '!bg-brand-500 text-surface-500 flex items-center justify-center rounded-full shadow-sm ring-1 ring-brand-500/30 font-bold overflow-hidden hover:ring-2 hover:ring-brand-500 transition-all',
       },
+      variants: {
+        size: {
+          header: {
+            root: 'w-9 h-9 text-base'
+          },
+          profileLg: {
+            root: 'w-24 h-24 text-4xl shadow-md mb-2'
+          }
+        }
+      },
+      defaultVariants: {
+        size: 'header'
+      }
     },
   },
 

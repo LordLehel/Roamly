@@ -1,10 +1,13 @@
+// frontend/app/queries/user.query.ts
 import { useQuery } from '@pinia/colada';
 import { z } from 'zod';
 import { userService } from '~/services/userService';
-import { checkIsAuthenticated } from '~/utils/auth.utils';
+import { useAuth } from '~/composables/useAuth';
 import { userProfileSchema } from '~/utils/user.schema';
 
 export const useUserQuery = () => {
+  const { isAuthenticated } = useAuth();
+
   return useQuery({
     key: ['users', 'list'],
     query: async () => {
@@ -14,11 +17,13 @@ export const useUserQuery = () => {
 
       return z.array(userProfileSchema).parse(rawData);
     },
-    enabled: checkIsAuthenticated(),
+    enabled: isAuthenticated,
   });
 };
 
 export const useCurrentUserQuery = () => {
+  const { isAuthenticated } = useAuth();
+
   return useQuery({
     key: ['users', 'current'],
     query: async () => {
@@ -28,7 +33,7 @@ export const useCurrentUserQuery = () => {
 
       return userProfileSchema.parse(rawData);
     },
-    enabled: checkIsAuthenticated(),
+    enabled: isAuthenticated,
     staleTime: 1000 * 60 * 5,
   });
 };

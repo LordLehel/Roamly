@@ -32,9 +32,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue';
+import { computed } from 'vue';
 import { useRoute } from 'vue-router';
-import { checkIsAuthenticated } from '../utils/auth.utils';
+import { useAuth } from '../composables/useAuth';
 import {
   CONST_GO_BACK_TITLE,
   CONST_BRAND_NAME,
@@ -43,14 +43,10 @@ import {
 } from '../utils/constants';
 
 const route = useRoute();
-const isLoggedIn = ref(false);
-
-onMounted(() => {
-  isLoggedIn.value = checkIsAuthenticated();
-});
+const { isAuthenticated } = useAuth();
 
 const isLoginPage = computed(() => route.path === '/login/' || route.path === '/login');
 const isRegisterPage = computed(() => route.path === '/register/' || route.path === '/register');
 
-const loginRedirectPath = computed(() => isLoggedIn.value ? '/users/profile' : '/login');
+const loginRedirectPath = computed(() => isAuthenticated.value ? '/users/profile' : '/login');
 </script>
