@@ -4,9 +4,9 @@ import { generateToken } from '../../utils/jwt.utils';
 
 export const registerUser = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { username, email, password } = req.body;
+    const { username, email, password, phone_number } = req.body;
 
-    const newUser = await authService.registerUser(username, email, password);
+    const newUser = await authService.registerUser(username, email, password, phone_number);
 
     res.status(201).json({
       status: 'success',

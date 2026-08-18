@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import parsePhoneNumberFromString from 'libphonenumber-js';
 
 export const registerSchema = z.object({
   username: z
@@ -14,6 +15,24 @@ export const registerSchema = z.object({
     .regex(/[A-Z]/, 'Password must contain at least one uppercase character!')
     .regex(/[a-z]/, 'Password must contain at least one lowercase character!')
     .regex(/[0-9]/, 'Password must contain at least one number!'),
+  phone_number: z
+    .string()
+    .transform((val: string, ctx: z.RefinementCtx) => {
+      const phoneNumber = parsePhoneNumberFromString(val);
+
+      if (!phoneNumber || !phoneNumber.isValid()) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'Invalid phone number! Regional code must be included (e.g. +40)',
+        });
+
+        return z.NEVER;
+      }
+
+      // returns the value with the regional code included (+40...)
+      return phoneNumber.number;
+    })
+    .optional(),
 });
 
 export const loginSchema = z.object({
