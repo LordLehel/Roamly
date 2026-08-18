@@ -1,11 +1,12 @@
 import prisma from '../../prisma';
 import { users } from '@prisma/client';
-import { hashPassword, passwordValidator } from '../../utils/password.utils';
+import { hashPassword, validatePassword } from '../../utils/password.utils';
 
 export const registerUser = async (
   username: string,
   email: string,
   password: string,
+  phone_number?: string,
 ): Promise<users> => {
   const hashedPasswd = await hashPassword(password);
 
@@ -13,6 +14,7 @@ export const registerUser = async (
     data: {
       username,
       email,
+      phone_number,
       password: hashedPasswd,
     },
   });
@@ -31,7 +33,7 @@ export const loginUser = async (email: string, password: string): Promise<users 
     return null;
   }
 
-  const isMatch = await passwordValidator(password, user.password);
+  const isMatch = await validatePassword(password, user.password);
 
   if (!isMatch) {
     return null;
