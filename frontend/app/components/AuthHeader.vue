@@ -1,35 +1,56 @@
 <!-- frontend/app/components/AuthHeader.vue -->
 <template>
   <header
-    class="flex items-center justify-between px-6 py-4 bg-[#EDF1EE]/70 backdrop-blur-md shadow-sm relative z-10 border-b border-[#2F3E32]/10"
+    class="flex items-center justify-between px-6 py-4 bg-surface-500/70 backdrop-blur-md shadow-sm relative z-10 border-b border-dark-text/10"
   >
     <div class="flex-1">
-      <UButton label="Go Back" variant="green_whole" @click="$router.back()" />
+      <UButton :label="CONST_GO_BACK_TITLE" variant="smallPrimaryActionButton" @click="$router.back()" />
     </div>
 
     <NuxtLink
       to="/"
-      class="flex items-center gap-2 text-[#2F3E32] hover:opacity-80 transition-opacity"
+      class="flex items-center gap-2 text-dark-text hover:opacity-80 transition-opacity"
     >
-      <UIcon name="i-heroicons-map-pin" class="w-7 h-7 text-[#7A9A82]" />
-      <span class="text-xl font-semibold tracking-wider">ROAMLY</span>
+      <UIcon name="i-heroicons-map-pin" class="w-7 h-7 text-brand-500" />
+      <span class="text-xl font-semibold tracking-wider">{{ CONST_BRAND_NAME }}</span>
     </NuxtLink>
 
     <div class="flex-1 flex justify-end items-center gap-4">
-      <UButton v-if="isLoginPage" label="Register" to="/register" variant="yellow_whole" />
-      <UButton v-else-if="isRegisterPage" label="Log in" to="/login" variant="yellow_whole" />
+      <UButton v-if="isLoginPage" :label="CONST_REGISTER_TITLE" to="/register" variant="smallAccentActionButton" />
+      <UButton
+        v-else-if="isRegisterPage"
+        :label="CONST_LOGIN_TITLE"
+        :to="loginRedirectPath"
+        variant="smallAccentActionButton"
+      />
 
-      <UAvatar icon="i-heroicons-user" size="sm" />
+      <NuxtLink to="/login">
+        <UAvatar icon="i-heroicons-user" />
+      </NuxtLink>
     </div>
   </header>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import { checkIsAuthenticated } from '../utils/auth.utils';
+import {
+  CONST_GO_BACK_TITLE,
+  CONST_BRAND_NAME,
+  CONST_REGISTER_TITLE,
+  CONST_LOGIN_TITLE,
+} from '../utils/constants';
 
 const route = useRoute();
+const isLoggedIn = ref(false);
+
+onMounted(() => {
+  isLoggedIn.value = checkIsAuthenticated();
+});
 
 const isLoginPage = computed(() => route.path === '/login/' || route.path === '/login');
 const isRegisterPage = computed(() => route.path === '/register/' || route.path === '/register');
+
+const loginRedirectPath = computed(() => isLoggedIn.value ? '/users/profile' : '/login');
 </script>

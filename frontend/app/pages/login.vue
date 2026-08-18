@@ -1,7 +1,8 @@
+<!-- frontend/app/pages/login.vue -->
 <template>
   <UCard variant="glass">
     <div class="text-center mb-8">
-      <h1 class="text-2xl font-medium tracking-wide text-green-950">Log into your account</h1>
+      <h1 class="text-2xl font-medium tracking-wide text-brand-950">{{ CONST_LOGIN_HEADING }}</h1>
     </div>
 
     <!-- Login form -->
@@ -11,7 +12,7 @@
       class="w-full flex flex-col gap-4"
       @submit="handleLogin"
     >
-      <UFormField name="email" label="Email">
+      <UFormField name="email" :label="CONST_EMAIL_LABEL">
         <template #default="{ error: fieldError }">
           <UInput
             v-model="form.email"
@@ -22,7 +23,7 @@
         </template>
       </UFormField>
 
-      <UFormField name="password" label="Password">
+      <UFormField name="password" :label="CONST_PASSWORD_LABEL">
         <template #default="{ error: fieldError }">
           <UInput
             v-model="form.password"
@@ -33,18 +34,17 @@
         </template>
       </UFormField>
 
-      <!-- Colada Mutation error -->
-      <div v-if="error" class="text-red-400 text-sm text-center font-medium">
+      <div v-if="error" class="text-error-400 text-sm text-center font-medium">
         {{ getErrorMessage(error) }}
       </div>
-      <div v-if="status === 'success'" class="text-green-400 text-sm text-center font-medium">
-        Login successful! Redirecting...
+      <div v-if="status === 'success'" class="text-success-400 text-sm text-center font-medium">
+        {{ CONST_LOGIN_SUCCESS }}
       </div>
 
       <div class="flex items-center justify-between pt-6">
-        <UButton label="Cancel" variant="action_cancel" :disabled="isLoading" @click="clearForm" />
+        <UButton :label="CONST_CANCEL_BTN" variant="actionCancelButton" :disabled="isLoading" @click="clearForm" />
         <!-- Loading state -->
-        <UButton type="submit" label="Log in" variant="action_ok" :loading="isLoading" />
+        <UButton type="submit" :label="CONST_LOGIN_TITLE" variant="actionOkButton" :loading="isLoading" />
       </div>
     </UForm>
   </UCard>
@@ -57,6 +57,14 @@ import type { FormSubmitEvent } from '#ui/types';
 import { loginSchema, type LoginFormState } from '../utils/login.schema';
 import { useLoginUserMutation } from '../queries/auth.mutation';
 import { getErrorMessage } from '../utils/error.utils';
+import {
+  CONST_LOGIN_HEADING,
+  CONST_EMAIL_LABEL,
+  CONST_PASSWORD_LABEL,
+  CONST_LOGIN_SUCCESS,
+  CONST_CANCEL_BTN,
+  CONST_LOGIN_TITLE,
+} from '../utils/constants';
 
 definePageMeta({
   layout: 'auth',
