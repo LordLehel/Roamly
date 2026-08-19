@@ -23,6 +23,6 @@ export const userService = {
 
   getCurrentUser() {
     const api = useApi();
-    return api<ApiResponse<UserOutDto>>('/users/profile');
+    return api<ApiResponse<UserOutDto>>('/users/me');
   },
 };

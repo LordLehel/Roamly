@@ -6,23 +6,15 @@ import { useAuth } from '~/composables/useAuth';
 export const useCurrentUserQuery = () => {
   // we check if the user is authenticated
   const { isAuthenticated } = useAuth();
-  console.log('useCurrentUserQuery lefutott. isAuthenticated:', isAuthenticated.value);
 
   // we get the current user parsed through zod validation
   return useQuery({
-    key: ['users', 'current'],
+    key: ['users', 'current', isAuthenticated.value],
     query: async () => {
-      console.log('-> getCurrentUser() hívás indítása a userService-en keresztül...');
-      try {
-        const response = await userService.getCurrentUser();
-        console.log('<- Válasz megérkezett a /users/profile végpontról:', response);
-        return response.data;
-      } catch (err) {
-        console.error('X Hiba történt a getCurrentUser lekérdezése közben:', err);
-        throw err;
-      }
+      const response = await userService.getCurrentUser();
+      return response.data;
     },
     enabled: isAuthenticated,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0,
   });
 };
