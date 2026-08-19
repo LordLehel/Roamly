@@ -67,9 +67,7 @@ class UsersController extends BaseController {
         return;
       }
 
-      const pictureUrl = `/uploads/profiles/${file.filename}`;
-
-      const updatedUser = await userService.uploadProfilePicture(user.uuid, file, pictureUrl);
+      const updatedUser = await userService.uploadProfilePicture(user.uuid, file);
 
       res.status(200).json({
         status: 'success',
