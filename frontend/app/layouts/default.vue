@@ -33,22 +33,29 @@ const publicPages = ['index', 'home', 'about', 'support', 'groups'];
 // get page name
 const pageName = computed(() => {
   const name = route.name ? String(route.name).split('-')[0] : 'home';
-  return name ?? 'home'; 
+  return name ?? 'home';
 });
 
 // redirect logic
-watch(isAuthenticated, (isAuth) => {
-  if (!isAuth && !publicPages.includes(pageName.value)) {
-    router.push('/login');
-  }
-}, { immediate: true });
+watch(
+  isAuthenticated,
+  (isAuth) => {
+    if (!isAuth && !publicPages.includes(pageName.value)) {
+      router.push('/login');
+    }
+  },
+  { immediate: true },
+);
 
 // background logic
 const bgClass = computed(() => {
   switch (pageName.value) {
-    case 'about': return CONST_BG_ABOUT;
-    case 'support': return CONST_BG_SUPPORT;
-    default: return CONST_BG_HOME;
+    case 'about':
+      return CONST_BG_ABOUT;
+    case 'support':
+      return CONST_BG_SUPPORT;
+    default:
+      return CONST_BG_HOME;
   }
 });
 </script>

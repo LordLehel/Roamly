@@ -1,7 +1,6 @@
 <!-- frontend/app/pages/index.vue -->
 <template>
   <div class="flex-1 flex flex-col items-center px-6 py-12 gap-24 relative z-10 w-full">
-    
     <!-- HOME section -->
     <section id="home" class="flex flex-col items-center text-center mt-10 max-w-3xl scroll-mt-24">
       <UButton :label="CONST_GET_STARTED" to="/groups" variant="actionHeroButton" />
@@ -12,51 +11,61 @@
 
     <!-- Cards Section -->
     <section class="flex flex-col md:flex-row flex-wrap gap-8 w-full max-w-6xl mt-12">
-      <UCard 
-        v-for="card in featureCards" 
-        :key="card.id" 
+      <UCard
+        v-for="card in featureCards"
+        :key="card.id"
         :variant="activeCard === card.id ? 'outlineGlass' : 'interactiveGlass'"
-        class="overflow-hidden" 
+        class="overflow-hidden"
         :class="[
-          activeCard === card.id ? 'w-full order-1' : 
-          (activeCard ? 'w-full md:flex-1 md:w-auto order-2' : 
-          'w-full md:flex-1 order-0')
+          activeCard === card.id
+            ? 'w-full order-1'
+            : activeCard
+              ? 'w-full md:flex-1 md:w-auto order-2'
+              : 'w-full md:flex-1 order-0',
         ]"
       >
-        <div :class="activeCard === card.id ? 'flex flex-col md:flex-row items-center w-full gap-8 h-full' : 'flex flex-col items-center flex-1 text-center w-full h-full'">
-          
+        <div
+          :class="
+            activeCard === card.id
+              ? 'flex flex-col md:flex-row items-center w-full gap-8 h-full'
+              : 'flex flex-col items-center flex-1 text-center w-full h-full'
+          "
+        >
           <!-- Left side-->
-          <div :class="activeCard === card.id ? 'flex flex-col items-start justify-center md:w-1/3 text-left' : 'flex flex-col items-center w-full justify-between h-full'">
-            
-            <div 
-              class="flex flex-col items-center" 
-            >
+          <div
+            :class="
+              activeCard === card.id
+                ? 'flex flex-col items-start justify-center md:w-1/3 text-left'
+                : 'flex flex-col items-center w-full justify-between h-full'
+            "
+          >
+            <div class="flex flex-col items-center">
               <!-- Title -->
-              <h3 
+              <h3
                 class="text-lg font-bold mb-4 tracking-wide transition-colors duration-500"
                 :class="activeCard === card.id ? 'text-white' : 'text-dark-text'"
               >
                 {{ card.title }}
               </h3>
-              
+
               <!-- Icon -->
-              <UIcon 
-                :name="card.icon" 
-                class="w-14 h-14 mb-4 opacity-80 transition-colors duration-500" 
-                :class="activeCard === card.id ? 'text-white' : 'text-brand-500'" 
+              <UIcon
+                :name="card.icon"
+                class="w-14 h-14 mb-4 opacity-80 transition-colors duration-500"
+                :class="activeCard === card.id ? 'text-white' : 'text-brand-500'"
               />
-              
+
               <!-- Description -->
-              <p 
+              <p
                 class="text-sm mb-6 leading-relaxed transition-colors duration-500"
                 :class="activeCard === card.id ? 'text-white/90' : 'text-dark-text/80 text-center'"
               >
                 {{ card.desc }}
               </p>
             </div>
-            
-            <UButton 
-              variant="ghost" 
+
+            <UButton
+              variant="ghost"
               class="font-bold tracking-wide hover:underline underline-offset-4 transition-colors duration-500"
               :class="activeCard === card.id ? 'text-white hover:text-white/80' : 'text-brand-500'"
               @click="toggleCard(card.id)"
@@ -66,19 +75,21 @@
           </div>
 
           <!-- Right side -->
-          <div 
-            v-if="activeCard === card.id" 
+          <div
+            v-if="activeCard === card.id"
             class="flex-1 p-4 md:border-l border-white/20 text-white/90 leading-relaxed flex items-center text-left"
           >
             {{ card.extendedDesc }}
           </div>
-
         </div>
       </UCard>
     </section>
 
     <!-- ABOUT section -->
-    <section id="about" class="flex flex-col items-center text-center max-w-3xl pt-12 border-t border-dark-text/10 scroll-mt-24">
+    <section
+      id="about"
+      class="flex flex-col items-center text-center max-w-3xl pt-12 border-t border-dark-text/10 scroll-mt-24"
+    >
       <h2 class="text-3xl font-bold text-surface-500 tracking-wide">{{ CONST_ABOUT_HERO }}</h2>
       <p class="mt-8 text-lg text-surface-500 font-medium opacity-90 leading-relaxed">
         {{ CONST_ABOUT_DESCRIPTION }}
@@ -86,7 +97,10 @@
     </section>
 
     <!-- SUPPORT section -->
-    <section id="support" class="flex flex-col items-center text-center max-w-3xl pt-12 border-t border-dark-text/10 scroll-mt-24">
+    <section
+      id="support"
+      class="flex flex-col items-center text-center max-w-3xl pt-12 border-t border-dark-text/10 scroll-mt-24"
+    >
       <h2 class="text-3xl font-bold text-surface-500 tracking-wide">{{ CONST_SUPPORT_HERO }}</h2>
       <p class="mt-8 text-lg text-surface-500 font-medium opacity-90 leading-relaxed">
         {{ CONST_SUPPORT_DESCRIPTION }}
@@ -99,7 +113,6 @@
         />
       </div>
     </section>
-
   </div>
 </template>
 
@@ -156,6 +169,6 @@ const featureCards = [
     icon: 'i-heroicons-photo',
     desc: CONST_GROUP_GALLERY_DESCRIPTION,
     extendedDesc: CONST_GROUP_GALLERY_EXTENDED,
-  }
+  },
 ];
 </script>

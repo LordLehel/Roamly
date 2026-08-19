@@ -23,9 +23,13 @@ const router = useRouter();
 const { isAuthenticated } = useAuth();
 
 // If the user is authenticated, redirect to the <home page> - will be changed later
-watch(isAuthenticated, (isAuth) => {
-  if (isAuth) {
-    router.push('/'); 
-  }
-}, { immediate: true });
+watch(
+  isAuthenticated,
+  (isAuth) => {
+    if (isAuth) {
+      router.push('/');
+    }
+  },
+  { immediate: true },
+);
 </script>

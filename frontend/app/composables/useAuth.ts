@@ -12,7 +12,7 @@ export const useAuth = () => {
   });
 
   const user = useState<UserOutDto | null>('user_profile', () => null);
-  
+
   const isAuthenticated = computed(() => !!token.value);
 
   const login = async (credentials: LoginFormState) => {
@@ -27,4 +27,4 @@ export const useAuth = () => {
   };
 
   return { token, user, isAuthenticated, login, logout };
-}
+};

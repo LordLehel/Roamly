@@ -60,12 +60,12 @@
     </UCard>
 
     <div class="pt-2 text-center w-full">
-        <UButton
-          to="/register"
-          :label="CONST_REGISTER_PROMPT_BTN"
-          variant="actionAccentHeroButton"
-          class="w-full"
-        />
+      <UButton
+        to="/register"
+        :label="CONST_REGISTER_PROMPT_BTN"
+        variant="actionAccentHeroButton"
+        class="w-full"
+      />
     </div>
   </div>
 </template>

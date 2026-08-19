@@ -50,11 +50,7 @@
           </template>
 
           <template v-else>
-            <UButton
-              :label="CONST_LOGIN_TITLE"
-              to="/login"
-              variant="smallHollowActionButton"
-            />
+            <UButton :label="CONST_LOGIN_TITLE" to="/login" variant="smallHollowActionButton" />
             <NuxtLink to="/login">
               <UAvatar icon="i-heroicons-user" />
             </NuxtLink>

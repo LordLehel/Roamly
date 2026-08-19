@@ -40,13 +40,15 @@ export const CONST_HOME_DESCRIPTION =
   "Welcome to Roamly, your ultimate companion for seamless travel planning and unforgettable group adventures. Organize your documents, coordinate schedules, and share your journey's best moments all in one harmonious space.";
 export const CONST_DOCUMENT_MANAGEMENT_DESCRIPTION =
   'Easily organize, store, and access all your travel documents and itineraries in one secure place.';
-export const CONST_DOCUMENT_MANAGEMENT_EXTENDED = "There will be a document feature description here.";
+export const CONST_DOCUMENT_MANAGEMENT_EXTENDED =
+  'There will be a document feature description here.';
 export const CONST_EVENT_CALENDAR_DESCRIPTION =
   'Keep track of your upcoming trips, group meetups, and schedules without missing a single beat.';
-export const CONST_EVENT_CALENDAR_EXTENDED = "There will be a calendar feature description here.";
+export const CONST_EVENT_CALENDAR_EXTENDED = 'There will be a calendar feature description here.';
 export const CONST_GROUP_GALLERY_DESCRIPTION =
   'Share memorable moments and browse through community photo collections from past adventures.';
-export const CONST_GROUP_GALLERY_EXTENDED = "There will be a group gallery feature description here.";
+export const CONST_GROUP_GALLERY_EXTENDED =
+  'There will be a group gallery feature description here.';
 
 // About
 export const CONST_ABOUT_HERO = 'About Roamly';
