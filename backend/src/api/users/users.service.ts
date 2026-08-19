@@ -2,6 +2,7 @@ import prisma from '../../prisma';
 import { hashPassword, validatePassword } from '../../utils/password.utils';
 import { userProfileInfo } from '../../types/users.types';
 import { BadRequestError } from '../../utils/ServerError';
+import { deleteFileFromCloud, uploadFileToCloud } from '../../utils/storage.util';
 
 export const getProfile = async (uuid: string): Promise<userProfileInfo> => {
   const user = await prisma.users.findFirstOrThrow({
@@ -80,7 +81,6 @@ export const changePassword = async (
 export const uploadProfilePicture = async (
   userUuid: string,
   fileData: Express.Multer.File,
-  pictureUrl: string,
 ): Promise<userProfileInfo> => {
   const user = await prisma.users.findFirstOrThrow({
     where: {
@@ -88,44 +88,66 @@ export const uploadProfilePicture = async (
     },
   });
 
-  const [, updatedUser] = await prisma.$transaction([
-    // we create the file in the files table
-    prisma.files.create({
-      data: {
-        file_name: fileData.filename,
-        file_url: pictureUrl,
-        file_size: fileData.size,
-        mime_type: fileData.mimetype,
-        ownership_type: 'personal',
-        uploaded_by: user.user_id,
-        user_id: user.user_id,
-        media_files: {
-          create: {
-            description: `${user.email}'s profile picture`,
-          },
-        },
-      },
-    }),
+  // if the user already has a profile picture we first delete the old one
+  if (user.profile_image_url) {
+    await deleteFileFromCloud(user.profile_image_url);
+  }
 
-    // update the user
-    prisma.users.update({
-      where: {
-        user_id: user.user_id,
-      },
-      data: {
-        profile_image_url: pictureUrl,
-      },
-      select: {
-        username: true,
-        email: true,
-        phone_number: true,
-        uuid: true,
-        created_at: true,
-        updated_at: true,
-        profile_image_url: true,
-      },
-    }),
-  ]);
+  // sending the file to the Cloud, it returns the public URL
+  const cloudPublicUrl = await uploadFileToCloud(fileData, 'profiles');
+
+  // saving the public URL in the database
+  const updatedUser = await prisma.users.update({
+    where: {
+      user_id: user.user_id,
+    },
+    data: {
+      profile_image_url: cloudPublicUrl,
+    },
+    select: {
+      username: true,
+      email: true,
+      phone_number: true,
+      uuid: true,
+      created_at: true,
+      updated_at: true,
+      profile_image_url: true,
+    },
+  });
+
+  return updatedUser;
+};
+
+export const deleteProfilePicture = async (userUuid: string): Promise<userProfileInfo> => {
+  const user = await prisma.users.findUniqueOrThrow({
+    where: {
+      uuid: userUuid,
+    },
+  });
+
+  if (!user.profile_image_url) {
+    throw new BadRequestError('User does not have a profile picture to remove!');
+  }
+
+  await deleteFileFromCloud(user.profile_image_url);
+
+  const updatedUser = await prisma.users.update({
+    where: {
+      user_id: user.user_id,
+    },
+    data: {
+      profile_image_url: null,
+    },
+    select: {
+      username: true,
+      email: true,
+      phone_number: true,
+      uuid: true,
+      created_at: true,
+      updated_at: true,
+      profile_image_url: true,
+    },
+  });
 
   return updatedUser;
 };

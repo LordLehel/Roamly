@@ -1,29 +1,9 @@
 import multer from 'multer';
-import path from 'path';
-import crypto from 'crypto';
 import { Request } from 'express';
+import { BadRequestError } from '../utils/ServerError';
 
-// where do we save the file and what will its name be
-const storage = multer.diskStorage({
-  destination: (
-    _req: Request,
-    _file: Express.Multer.File,
-    _cb: (error: Error | null, destination: string) => void,
-  ): void => {
-    // does the directory exist?
-    _cb(null, 'uploads/profiles/');
-  },
-  filename: (
-    _req: Request,
-    _file: Express.Multer.File,
-    _cb: (error: Error | null, destination: string) => void,
-  ): void => {
-    // generate filename for security
-    const uniqueSuffix = crypto.randomBytes(16).toString('hex') + '-' + Date.now();
-    const extension = path.extname(_file.originalname);
-    _cb(null, `${uniqueSuffix}${extension}`);
-  },
-});
+// we store data in memory before we send it to the cloud
+const storage = multer.memoryStorage();
 
 // filtering provided files, we accept only images here
 const fileFilter = (
@@ -37,7 +17,7 @@ const fileFilter = (
     // we accept the file
     cb(null, true);
   } else {
-    cb(new Error('INVALID_FILE_TYPE'));
+    cb(new BadRequestError('Invalid file type! Only JPG, PNG, WEBP and GIF are allowed!'));
   }
 };
 

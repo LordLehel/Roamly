@@ -67,14 +67,26 @@ class UsersController extends BaseController {
         return;
       }
 
-      const pictureUrl = `/uploads/profiles/${file.filename}`;
-
-      const updatedUser = await userService.uploadProfilePicture(user.uuid, file, pictureUrl);
+      const updatedUser = await userService.uploadProfilePicture(user.uuid, file);
 
       res.status(200).json({
         status: 'success',
         message: 'Profile picture uploaded successfully!',
         data: updatedUser,
+      });
+    },
+  );
+
+  public deleteProfilePicture = this.handleAsync(
+    async (req: Request, res: Response): Promise<void> => {
+      const user = res.locals.user!;
+
+      const updatedUserInfo = await userService.deleteProfilePicture(user.uuid);
+
+      res.status(200).json({
+        status: 'success',
+        message: 'Profile picture deleted successfully!',
+        data: updatedUserInfo,
       });
     },
   );
