@@ -36,10 +36,10 @@
         </template>
       </UFormField>
 
-      <UFormField name="phone" :label="CONST_PHONE_LABEL">
+      <UFormField name="phone_number" :label="CONST_PHONE_LABEL">
         <template #default="{ error: fieldError }">
           <UInput
-            v-model="form.phone"
+            v-model="form.phone_number"
             type="tel"
             placeholder="ex. +40 712 345 678"
             :variant="fieldError ? 'glassError' : 'glass'"
@@ -123,7 +123,7 @@ const router = useRouter();
 const form = reactive<RegisterFormState>({
   email: '',
   username: '',
-  phone: '',
+  phone_number: '',
   password: '',
   repeatPassword: '',
 });
@@ -138,14 +138,14 @@ const {
 });
 
 const clearForm = () => {
-  Object.assign(form, { email: '', username: '', phone: '', password: '', repeatPassword: '' });
+  Object.assign(form, { email: '', username: '', phone_number: '', password: '', repeatPassword: '' });
 };
 
 const handleRegister = (event: FormSubmitEvent<RegisterFormState>) => {
   registerUser({
     email: event.data.email,
     username: event.data.username,
-    phone: event.data.phone,
+    phone_number: event.data.phone_number,
     password: event.data.password,
   });
 };

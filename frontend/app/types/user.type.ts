@@ -2,7 +2,7 @@ export interface UserOutDto {
   id: string;
   username: string;
   email: string;
-  phone: string;
+  phone_number: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -10,6 +10,6 @@ export interface UserOutDto {
 export interface UserInDto {
   username?: string;
   email: string;
-  phone: string;
+  phone_number: string;
   password?: string;
 }
