@@ -138,7 +138,13 @@ const {
 });
 
 const clearForm = () => {
-  Object.assign(form, { email: '', username: '', phone_number: '', password: '', repeatPassword: '' });
+  Object.assign(form, {
+    email: '',
+    username: '',
+    phone_number: '',
+    password: '',
+    repeatPassword: '',
+  });
 };
 
 const handleRegister = (event: FormSubmitEvent<RegisterFormState>) => {

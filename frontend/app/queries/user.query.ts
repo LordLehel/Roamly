@@ -11,8 +11,8 @@ export const useCurrentUserQuery = () => {
   return useQuery({
     key: ['users', 'current', isAuthenticated.value],
     query: async () => {
-        const response = await userService.getCurrentUser();
-        return response.data;  
+      const response = await userService.getCurrentUser();
+      return response.data;
     },
     enabled: isAuthenticated,
     staleTime: 0,
