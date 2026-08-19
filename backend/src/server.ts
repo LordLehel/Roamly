@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rootRouter from './api/routes';
 import { errorHandler } from './middlewares/error.middleware';
+import './config/env.config';
 
 const app = express();
 const PORT = process.env.PORT || 3000;

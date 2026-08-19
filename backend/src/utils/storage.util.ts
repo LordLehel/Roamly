@@ -1,14 +1,15 @@
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import crypto from 'crypto';
 import path from 'node:path';
+import { config } from '../config/env.config';
 
 // initializing client with S3  compatible settings
 const s3Client = new S3Client({
   region: 'auto',
-  endpoint: process.env.R2_ENDPOINT!,
+  endpoint: config.r2.endpoint,
   credentials: {
-    accessKeyId: process.env.R2_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
+    accessKeyId: config.r2.accessKeyId,
+    secretAccessKey: config.r2.secretAccessKey,
   },
 });
 
@@ -23,7 +24,7 @@ export const uploadFileToCloud = async (
 
   // putting together the command for our Cloud provider
   const command = new PutObjectCommand({
-    Bucket: process.env.R2_BUCKET_NAME!,
+    Bucket: config.r2.bucketName,
     Key: uniqueFileName,
     // we give it the file from the memory
     Body: file.buffer,
@@ -34,19 +35,19 @@ export const uploadFileToCloud = async (
   await s3Client.send(command);
 
   // returning the public URL path
-  return `${process.env.R2_PUBLIC_URL}/${uniqueFileName}`;
+  return `${config.r2.publicUrl}/${uniqueFileName}`;
 };
 
 // delete file from cloud
 export const deleteFileFromCloud = async (publicUrl: string): Promise<void> => {
   try {
     // get the file name (key) out of the URL
-    const baseUrl = `${process.env.R2_PUBLIC_URL}/`;
+    const baseUrl = `${config.r2.publicUrl}/`;
     const key = publicUrl.replace(baseUrl, '');
 
     // delete command
     const command = new DeleteObjectCommand({
-      Bucket: process.env.R2_BUCKET_NAME!,
+      Bucket: config.r2.bucketName,
       Key: key,
     });
 
