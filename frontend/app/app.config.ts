@@ -99,6 +99,15 @@ export default defineAppConfig({
     },
   },
 
+  // Select
+  select: {
+      slots: {
+        base: 'w-full bg-input-bg text-dark-text rounded-xl ring-1 ring-input-border placeholder:text-text-muted focus:ring-2 focus:ring-brand-500 transition-colors h-11 px-4 shadow-none cursor-pointer',
+        content: 'bg-surface-500/90 backdrop-blur-xl rounded-xl ring-1 ring-dark-text/10 shadow-lg text-dark-text',
+        item: 'hover:bg-brand-500/20 text-dark-text cursor-pointer data-[highlighted]:bg-brand-500/20 data-[highlighted]:text-dark-text',
+      },
+    },
+
   // Layout
   layout: {
     base: 'min-h-screen flex flex-col bg-light-bg text-dark-text font-sans bg-cover bg-center bg-no-repeat bg-fixed',

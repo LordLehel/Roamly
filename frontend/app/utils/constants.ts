@@ -60,3 +60,18 @@ export const CONST_SUPPORT_HERO = 'How can we help you?';
 export const CONST_SUPPORT_DESCRIPTION =
   'Need assistance with your travel documents, calendar syncing, or account settings? Our support team is here to ensure your Roamly experience is smooth and effortless.';
 export const CONST_SUPPORT_PICTURE_PATH = '/support/json-statham.jpg';
+
+// Groups
+export const CONST_NAV_VIEWS = [
+  { label: 'Profile', value: '/users/profile' },
+  { label: 'Groups', value: '/groups' },
+  { label: 'Events', value: '/events' },
+];
+export const CONST_GROUPS_HEADING = 'Your groups';
+export const CONST_FILTER_LABEL = 'Filter';
+export const CONST_CREATED_AT_LABEL = 'Created at:';
+export const CONST_ROLE_LABEL = 'Your role:';
+export const CONST_DELETE_GROUP_TITLE = 'Delete group';
+export const CONST_DELETE_GROUP_CONFIRM = 'Are you sure you want to delete this group?';
+export const CONST_DELETE_BTN = 'Delete';
+export const CONST_CANCEL_BTN_TEXT = 'Cancel';

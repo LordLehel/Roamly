@@ -28,7 +28,7 @@ const router = useRouter();
 const appConfig = useAppConfig();
 const { isAuthenticated } = useAuth();
 
-const publicPages = ['index', 'home', 'about', 'support', 'groups'];
+const publicPages = ['index', 'home'];
 
 // get page name
 const pageName = computed(() => {
