@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import crypto from 'crypto';
 import path from 'node:path';
 
@@ -35,4 +35,23 @@ export const uploadFileToCloud = async (
 
   // returning the public URL path
   return `${process.env.R2_PUBLIC_URL}/${uniqueFileName}`;
+};
+
+// delete file from cloud
+export const deleteFileFromCloud = async (publicUrl: string): Promise<void> => {
+  try {
+    // get the file name (key) out of the URL
+    const baseUrl = `${process.env.R2_PUBLIC_URL}/`;
+    const key = publicUrl.replace(baseUrl, '');
+
+    // delete command
+    const command = new DeleteObjectCommand({
+      Bucket: process.env.R2_BUCKET_NAME!,
+      Key: key,
+    });
+
+    await s3Client.send(command);
+  } catch (error) {
+    console.error('Error! There was an issue while deleting the file: ', error);
+  }
 };

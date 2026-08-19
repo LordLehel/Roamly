@@ -2,7 +2,7 @@ import prisma from '../../prisma';
 import { hashPassword, validatePassword } from '../../utils/password.utils';
 import { userProfileInfo } from '../../types/users.types';
 import { BadRequestError } from '../../utils/ServerError';
-import { uploadFileToCloud } from '../../utils/storage.util';
+import { deleteFileFromCloud, uploadFileToCloud } from '../../utils/storage.util';
 
 export const getProfile = async (uuid: string): Promise<userProfileInfo> => {
   const user = await prisma.users.findFirstOrThrow({
@@ -88,6 +88,11 @@ export const uploadProfilePicture = async (
     },
   });
 
+  // if the user already has a profile picture we first delete the old one
+  if (user.profile_image_url) {
+    await deleteFileFromCloud(user.profile_image_url);
+  }
+
   // sending the file to the Cloud, it returns the public URL
   const cloudPublicUrl = await uploadFileToCloud(fileData, 'profiles');
 
@@ -98,6 +103,40 @@ export const uploadProfilePicture = async (
     },
     data: {
       profile_image_url: cloudPublicUrl,
+    },
+    select: {
+      username: true,
+      email: true,
+      phone_number: true,
+      uuid: true,
+      created_at: true,
+      updated_at: true,
+      profile_image_url: true,
+    },
+  });
+
+  return updatedUser;
+};
+
+export const deleteProfilePicture = async (userUuid: string): Promise<userProfileInfo> => {
+  const user = await prisma.users.findUniqueOrThrow({
+    where: {
+      uuid: userUuid,
+    },
+  });
+
+  if (!user.profile_image_url) {
+    throw new BadRequestError('User does not have a profile picture to remove!');
+  }
+
+  await deleteFileFromCloud(user.profile_image_url);
+
+  const updatedUser = await prisma.users.update({
+    where: {
+      user_id: user.user_id,
+    },
+    data: {
+      profile_image_url: null,
     },
     select: {
       username: true,

@@ -76,6 +76,20 @@ class UsersController extends BaseController {
       });
     },
   );
+
+  public deleteProfilePicture = this.handleAsync(
+    async (req: Request, res: Response): Promise<void> => {
+      const user = res.locals.user!;
+
+      const updatedUserInfo = await userService.deleteProfilePicture(user.uuid);
+
+      res.status(200).json({
+        status: 'success',
+        message: 'Profile picture deleted successfully!',
+        data: updatedUserInfo,
+      });
+    },
+  );
 }
 
 export default new UsersController();
