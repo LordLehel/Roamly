@@ -1,9 +1,11 @@
 import { Request, Response } from 'express';
 import * as authService from './auth.service';
 import { generateToken } from '../../utils/jwt.utils';
+import { BaseController } from '../../utils/BaseController';
+import { UnauthorizedError } from '../../utils/ServerError';
 
-export const registerUser = async (req: Request, res: Response): Promise<void> => {
-  try {
+class AuthController extends BaseController {
+  public registerUser = this.handleAsync(async (req: Request, res: Response): Promise<void> => {
     const { username, email, password, phone_number } = req.body;
 
     const newUser = await authService.registerUser(username, email, password, phone_number);
@@ -12,17 +14,9 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
       status: 'success',
       message: `User created with username: ${newUser.username}!`,
     });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      status: 'error',
-      message: 'Error! There was a problem creating the new User!',
-    });
-  }
-};
+  });
 
-export const loginUser = async (req: Request, res: Response): Promise<void> => {
-  try {
+  public loginUser = this.handleAsync(async (req: Request, res: Response): Promise<void> => {
     const { email, password } = req.body;
 
     const validLogin = await authService.loginUser(email, password);
@@ -36,12 +30,9 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
         token: token,
       });
     } else {
-      res.status(401).json({ status: 'error', message: 'Incorrect email or password!' });
+      throw new UnauthorizedError('Incorrect email or password!');
     }
-  } catch (error) {
-    console.error(error);
-    res
-      .status(500)
-      .json({ status: 'error', message: 'Error! There was an issue during the login process!' });
-  }
-};
+  });
+}
+
+export default new AuthController();
