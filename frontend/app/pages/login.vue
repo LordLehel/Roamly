@@ -1,53 +1,73 @@
+<!-- frontend/app/pages/login.vue -->
 <template>
-  <UCard variant="glass">
-    <div class="text-center mb-8">
-      <h1 class="text-2xl font-medium tracking-wide text-green-50">Log into account</h1>
+  <!-- Ez a wrapper tartja össze a kártyát és a gombot egyetlen középre zárt oszlopban -->
+  <div class="w-full max-w-md mx-auto flex flex-col gap-6">
+    <UCard variant="glass">
+      <div class="text-center mb-8">
+        <h1 class="text-2xl font-medium tracking-wide text-brand-950">{{ CONST_LOGIN_HEADING }}</h1>
+      </div>
+
+      <UForm
+        :schema="loginSchema"
+        :state="form"
+        class="w-full flex flex-col gap-4"
+        @submit="handleLogin"
+      >
+        <UFormField name="email" :label="CONST_EMAIL_LABEL">
+          <template #default="{ error: fieldError }">
+            <UInput
+              v-model="form.email"
+              type="email"
+              placeholder="ex. sir_real_99@roamly.com"
+              :variant="fieldError ? 'glassError' : 'glass'"
+            />
+          </template>
+        </UFormField>
+
+        <UFormField name="password" :label="CONST_PASSWORD_LABEL">
+          <template #default="{ error: fieldError }">
+            <UInput
+              v-model="form.password"
+              type="password"
+              placeholder="********"
+              :variant="fieldError ? 'glassError' : 'glass'"
+            />
+          </template>
+        </UFormField>
+
+        <div v-if="error" class="text-error-400 text-sm text-center font-medium">
+          {{ getErrorMessage(error) }}
+        </div>
+        <div v-if="status === 'success'" class="text-success-400 text-sm text-center font-medium">
+          {{ CONST_LOGIN_SUCCESS }}
+        </div>
+
+        <div class="flex items-center justify-between pt-6">
+          <UButton
+            :label="CONST_CANCEL_BTN"
+            variant="actionCancelButton"
+            :disabled="isLoading"
+            @click="clearForm"
+          />
+          <UButton
+            type="submit"
+            :label="CONST_LOGIN_TITLE"
+            variant="actionOkButton"
+            :loading="isLoading"
+          />
+        </div>
+      </UForm>
+    </UCard>
+
+    <div class="pt-2 text-center w-full">
+      <UButton
+        to="/register"
+        :label="CONST_REGISTER_PROMPT_BTN"
+        variant="actionAccentHeroButton"
+        class="w-full"
+      />
     </div>
-
-    <!-- Login form -->
-    <UForm
-      :schema="loginSchema"
-      :state="form"
-      class="w-full flex flex-col gap-4"
-      @submit="handleLogin"
-    >
-      <UFormField name="email" label="Email">
-        <template #default="{ error: fieldError }">
-          <UInput
-            v-model="form.email"
-            type="email"
-            placeholder="ex. sir_real_99@roamly.com"
-            :variant="fieldError ? 'glassError' : 'glass'"
-          />
-        </template>
-      </UFormField>
-
-      <UFormField name="password" label="Password">
-        <template #default="{ error: fieldError }">
-          <UInput
-            v-model="form.password"
-            type="password"
-            placeholder="********"
-            :variant="fieldError ? 'glassError' : 'glass'"
-          />
-        </template>
-      </UFormField>
-
-      <!-- Colada Mutation error -->
-      <div v-if="error" class="text-red-400 text-sm text-center font-medium">
-        {{ getErrorMessage(error) }}
-      </div>
-      <div v-if="status === 'success'" class="text-green-400 text-sm text-center font-medium">
-        Login successful! Redirecting...
-      </div>
-
-      <div class="flex items-center justify-between pt-6">
-        <UButton label="Cancel" variant="glass" :disabled="isLoading" @click="clearForm" />
-        <!-- Loading state -->
-        <UButton type="submit" label="Log in" variant="glass" :loading="isLoading" />
-      </div>
-    </UForm>
-  </UCard>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -57,6 +77,15 @@ import type { FormSubmitEvent } from '#ui/types';
 import { loginSchema, type LoginFormState } from '../utils/login.schema';
 import { useLoginUserMutation } from '../queries/auth.mutation';
 import { getErrorMessage } from '../utils/error.utils';
+import {
+  CONST_LOGIN_HEADING,
+  CONST_EMAIL_LABEL,
+  CONST_PASSWORD_LABEL,
+  CONST_LOGIN_SUCCESS,
+  CONST_CANCEL_BTN,
+  CONST_LOGIN_TITLE,
+  CONST_REGISTER_PROMPT_BTN,
+} from '../utils/constants';
 
 definePageMeta({
   layout: 'auth',
@@ -74,12 +103,7 @@ const {
   isLoading,
   error,
   status,
-} = useLoginUserMutation((data) => {
-  if (data?.token) {
-    localStorage.setItem('auth_token', data.token);
-  }
-  setTimeout(() => router.push('/'), 2000);
-});
+} = useLoginUserMutation(() => router.push('/'));
 
 const clearForm = () => {
   Object.assign(form, { email: '', password: '' });

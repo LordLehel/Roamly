@@ -1,20 +1,35 @@
 <template>
-  <div
-    class="min-h-screen flex flex-col text-white font-sans bg-[url('/register/register-background.jpg')] bg-cover bg-center bg-no-repeat bg-fixed"
-  >
-    <!-- Header -->
+  <div :class="[appConfig.layout.base, CONST_BG_AUTH]">
     <AuthHeader />
 
-    <!-- Main Content -->
-    <main class="flex-1 flex items-center justify-center p-4">
+    <main :class="appConfig.layout.mainAuth">
       <slot />
     </main>
 
-    <!-- Footer -->
-    <footer
-      class="py-3 text-center text-xs text-green-500 border-t border-green-900/50 bg-black/30 backdrop-blur-md"
-    >
-      Copyright - Roamly idk.
+    <footer :class="appConfig.footer.base">
+      <div :class="appConfig.footer.text">{{ CONST_COPYRIGHT_LABEL }}</div>
     </footer>
   </div>
 </template>
+
+<script setup lang="ts">
+import { watch } from 'vue';
+import { useAppConfig, useRouter } from '#imports';
+import { useAuth } from '~/composables/useAuth';
+import { CONST_COPYRIGHT_LABEL, CONST_BG_AUTH } from '../utils/constants';
+
+const appConfig = useAppConfig();
+const router = useRouter();
+const { isAuthenticated } = useAuth();
+
+// If the user is authenticated, redirect to the <home page> - will be changed later
+watch(
+  isAuthenticated,
+  (isAuth) => {
+    if (isAuth) {
+      router.push('/');
+    }
+  },
+  { immediate: true },
+);
+</script>

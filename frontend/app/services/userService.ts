@@ -15,9 +15,14 @@ export const userService = {
       body: {
         username: userData.username,
         email: userData.email,
-        phone: userData.phone,
+        phone_number: userData.phone_number,
         password: userData.password,
       },
     });
+  },
+
+  getCurrentUser() {
+    const api = useApi();
+    return api<ApiResponse<UserOutDto>>('/users/profile');
   },
 };
