@@ -14,6 +14,9 @@ export default defineAppConfig({
 
           actionHeroButton:
             'rounded-full inline-flex items-center justify-center !px-12 h-14 bg-brand-500 hover:bg-brand-600 text-surface-500 shadow-[inset_0_1px_3px_rgba(255,255,255,0.3),0_2px_4px_rgba(122,154,130,0.3)] font-bold tracking-wide transition-all hover:-translate-y-1 !text-xl',
+          actionAccentHeroButton:
+            'rounded-full inline-flex items-center justify-center px-10 !h-12 bg-accent-500 hover:bg-accent-600 text-surface-500 shadow-[inset_0_1px_3px_rgba(255,255,255,0.3),0_2px_4px_rgba(122,154,130,0.3)] font-semibold tracking-wide transition-all hover:-translate-y-1 !text-md',
+
 
           actionOkButton:
             'rounded-full !px-10 justify-center bg-brand-500 hover:bg-brand-600 text-surface-500 shadow-[inset_0_1px_3px_rgba(255,255,255,0.3),0_2px_4px_rgba(122,154,130,0.3)] h-12 font-bold tracking-wide transition-all text-lg',
@@ -31,17 +34,21 @@ export default defineAppConfig({
     // Cards
     card: {
       slots: {
-        root: 'w-full max-w-md',
+        root: 'w-full',
         body: 'p-8',
       },
       variants: {
         variant: {
           glass: {
-            root: 'bg-surface-500/70 backdrop-blur-xl rounded-[25px] shadow-[0_15px_40px_rgba(47,62,50,0.15)] border-0 ring-1 ring-surface-500/50 text-dark-text',
+            root: 'bg-surface-500/70 backdrop-blur-xl rounded-[25px] shadow-[0_15px_40px_rgba(47,62,50,0.15)] border-0 ring-1 ring-surface-500/50 text-dark-text max-w-md mx-auto w-full',
           },
           interactiveGlass: {
             root: 'bg-surface-500/70 backdrop-blur-xl rounded-[25px] shadow-[0_15px_40px_rgba(47,62,50,0.15)] border-0 ring-1 ring-surface-500/50 text-dark-text transition-transform hover:-translate-y-1',
             body: 'flex flex-col items-center justify-center h-full text-center p-8',
+          },
+          outlineGlass: {
+            root: 'bg-surface-600/10 backdrop-blur-xl rounded-[25px] shadow-[0_20px_50px_rgba(0,0,0,0.2)] border-0 ring-2 ring-white/60 text-white transition-all duration-500 ease-in-out',
+            body: 'p-8 h-full flex flex-col',
           },
         },
       },

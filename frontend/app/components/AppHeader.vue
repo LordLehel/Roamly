@@ -1,11 +1,11 @@
 <!-- frontend/app/components/AppHeader.vue -->
 <template>
   <header
-    class="flex items-center justify-between px-6 py-4 bg-surface-500/70 backdrop-blur-md shadow-sm relative z-10 border-b border-dark-text/10"
+    class="flex items-center justify-between px-6 py-4 bg-surface-500/70 backdrop-blur-md shadow-sm z-50 border-b border-dark-text/10 sticky top-0"
   >
     <div class="flex-1">
       <NuxtLink
-        to="/"
+        to="/#home"
         class="flex items-center gap-2 text-dark-text hover:opacity-80 transition-opacity w-max"
       >
         <UIcon name="i-heroicons-map-pin" class="w-7 h-7 text-brand-500" />
@@ -15,17 +15,17 @@
 
     <nav class="hidden md:flex gap-8 font-bold tracking-wide">
       <NuxtLink
-        to="/"
+        to="/#home"
         class="hover:text-brand-500 hover:underline underline-offset-4 transition-colors"
         >{{ CONST_HOME_TITLE }}</NuxtLink
       >
       <NuxtLink
-        to="/about"
+        to="/#about"
         class="hover:text-brand-500 hover:underline underline-offset-4 transition-colors"
         >{{ CONST_ABOUT_TITLE }}</NuxtLink
       >
       <NuxtLink
-        to="/support"
+        to="/#support"
         class="hover:text-brand-500 hover:underline underline-offset-4 transition-colors"
         >{{ CONST_SUPPORT_TITLE }}</NuxtLink
       >
@@ -44,7 +44,7 @@
               variant="smallHollowActionButton"
               @click="handleLogout"
             />
-            <NuxtLink to="/login">
+            <NuxtLink to="/users/profile">
               <UAvatar :alt="userProfile?.username || 'User'" icon="i-heroicons-user" />
             </NuxtLink>
           </template>
@@ -52,7 +52,7 @@
           <template v-else>
             <UButton
               :label="CONST_LOGIN_TITLE"
-              :to="loginRedirectPath"
+              to="/login"
               variant="smallHollowActionButton"
             />
             <NuxtLink to="/login">
@@ -65,7 +65,7 @@
           <div class="flex items-center gap-3">
             <UButton
               :label="CONST_LOGIN_TITLE"
-              :to="loginRedirectPath"
+              to="/login"
               variant="smallHollowActionButton"
               class="opacity-50"
             />
@@ -78,8 +78,7 @@
 </template>
 
 <script setup lang="ts">
-import { watch, computed } from 'vue';
-import { useRouter } from 'vue-router';
+import { watch } from 'vue';
 import { useAuth } from '../composables/useAuth';
 import { useCurrentUserQuery } from '../queries/user.query';
 import {
@@ -91,11 +90,7 @@ import {
   CONST_LOGOUT_TITLE,
 } from '../utils/constants';
 
-const router = useRouter();
 const { isAuthenticated, logout } = useAuth();
-
-const loginRedirectPath = computed(() => (isAuthenticated.value ? '/users/profile' : '/login'));
-
 const { data: userProfile, error } = useCurrentUserQuery();
 
 watch(error, (newError) => {
@@ -106,6 +101,5 @@ watch(error, (newError) => {
 
 const handleLogout = () => {
   logout();
-  router.push('/login');
 };
 </script>
