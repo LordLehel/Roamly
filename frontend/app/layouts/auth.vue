@@ -13,8 +13,19 @@
 </template>
 
 <script setup lang="ts">
-import { useAppConfig } from '#imports';
+import { watch } from 'vue';
+import { useAppConfig, useRouter } from '#imports';
+import { useAuth } from '~/composables/useAuth';
 import { CONST_COPYRIGHT_LABEL, CONST_BG_AUTH } from '../utils/constants';
 
 const appConfig = useAppConfig();
+const router = useRouter();
+const { isAuthenticated } = useAuth();
+
+// If the user is authenticated, redirect to the <home page> - will be changed later
+watch(isAuthenticated, (isAuth) => {
+  if (isAuth) {
+    router.push('/'); 
+  }
+}, { immediate: true });
 </script>

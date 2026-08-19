@@ -57,5 +57,5 @@ const { isAuthenticated } = useAuth();
 const isLoginPage = computed(() => route.path === '/login/' || route.path === '/login');
 const isRegisterPage = computed(() => route.path === '/register/' || route.path === '/register');
 
-const loginRedirectPath = computed(() => (isAuthenticated.value ? '/users/profile' : '/login'));
+const loginRedirectPath = computed(() => (isAuthenticated.value ? '/users/profile' :'/login'));
 </script>

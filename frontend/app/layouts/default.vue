@@ -13,8 +13,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useRoute, useAppConfig } from '#imports';
+import { computed, watch } from 'vue';
+import { useRoute, useRouter, useAppConfig } from '#imports';
+import { useAuth } from '~/composables/useAuth';
 import {
   CONST_COPYRIGHT_LABEL,
   CONST_BG_HOME,
@@ -23,21 +24,31 @@ import {
 } from '../utils/constants';
 
 const route = useRoute();
+const router = useRouter();
 const appConfig = useAppConfig();
+const { isAuthenticated } = useAuth();
 
-// Get the background class based on the current route
+const publicPages = ['index', 'home', 'about', 'support', 'groups'];
+
+// get page name
+const pageName = computed(() => {
+  const name = route.name ? String(route.name).split('-')[0] : 'home';
+  return name ?? 'home'; 
+});
+
+// redirect logic
+watch(isAuthenticated, (isAuth) => {
+  if (!isAuth && !publicPages.includes(pageName.value)) {
+    router.push('/login');
+  }
+}, { immediate: true });
+
+// background logic
 const bgClass = computed(() => {
-  const pageName = route.name ? String(route.name).split('-')[0] : 'home';
-
-  switch (pageName) {
-    case 'about':
-      return CONST_BG_ABOUT;
-    case 'support':
-      return CONST_BG_SUPPORT;
-    case 'index':
-    case 'home':
-    default:
-      return CONST_BG_HOME;
+  switch (pageName.value) {
+    case 'about': return CONST_BG_ABOUT;
+    case 'support': return CONST_BG_SUPPORT;
+    default: return CONST_BG_HOME;
   }
 });
 </script>
