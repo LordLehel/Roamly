@@ -1,6 +1,7 @@
 import prisma from '../../prisma';
 import { users } from '@prisma/client';
 import { hashPassword, validatePassword } from '../../utils/password.utils';
+import { UnauthorizedError } from '../../utils/ServerError';
 
 export const registerUser = async (
   username: string,
@@ -22,7 +23,7 @@ export const registerUser = async (
   return newUser;
 };
 
-export const loginUser = async (email: string, password: string): Promise<users | null> => {
+export const loginUser = async (email: string, password: string): Promise<users> => {
   const user = await prisma.users.findUnique({
     where: {
       email: email,
@@ -30,13 +31,13 @@ export const loginUser = async (email: string, password: string): Promise<users 
   });
 
   if (!user) {
-    return null;
+    throw new UnauthorizedError('Incorrect email or password!');
   }
 
   const isMatch = await validatePassword(password, user.password);
 
   if (!isMatch) {
-    return null;
+    throw new UnauthorizedError('Incorrect email or password!');
   }
 
   return user;

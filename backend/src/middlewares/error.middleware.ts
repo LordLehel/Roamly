@@ -1,6 +1,7 @@
 import { Prisma } from '@prisma/client';
 import { Request, Response, NextFunction } from 'express';
 import { ServerError } from '../utils/ServerError';
+import { ZodError } from 'zod';
 
 export const errorHandler = (
   err: unknown,
@@ -29,6 +30,27 @@ export const errorHandler = (
     res.status(err.statusCode).json({
       status: 'error',
       message: err.message,
+    });
+
+    return;
+  }
+
+  // zod errors
+  if (err instanceof ZodError) {
+    type SimpleZodIssue = {
+      path: (string | number)[];
+      message: string;
+    };
+
+    const issues = err.issues as SimpleZodIssue[];
+
+    res.status(400).json({
+      status: 'error',
+      message: 'Validation failed!',
+      errors: issues.map((e: SimpleZodIssue) => ({
+        field: e.path.join('.'),
+        message: e.message,
+      })),
     });
 
     return;
