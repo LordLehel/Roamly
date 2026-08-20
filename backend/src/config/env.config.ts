@@ -8,10 +8,14 @@ interface Config {
   nodeEnv: string;
   r2: {
     endpoint: string;
-    accessKeyId: string;
-    secretAccessKey: string;
-    bucketName: string;
+    publicAccessKeyId: string;
+    publicSecretAccessKey: string;
+    publicBucketName: string;
     publicUrl: string;
+
+    privateAccessKeyId: string;
+    privateSecretAccessKey: string;
+    privateBucketName: string;
   };
 }
 
@@ -31,9 +35,13 @@ export const config: Config = {
   nodeEnv: getEnvVar('NODE_ENV', 'development'),
   r2: {
     endpoint: getEnvVar('R2_ENDPOINT'),
-    accessKeyId: getEnvVar('R2_ACCESS_KEY_ID'),
-    secretAccessKey: getEnvVar('R2_SECRET_ACCESS_KEY'),
-    bucketName: getEnvVar('R2_BUCKET_NAME'),
+    publicAccessKeyId: getEnvVar('R2_PUBLIC_ACCESS_KEY_ID'),
+    publicSecretAccessKey: getEnvVar('R2_PUBLIC_SECRET_ACCESS_KEY'),
+    publicBucketName: getEnvVar('R2_PUBLIC_BUCKET_NAME'),
     publicUrl: getEnvVar('R2_PUBLIC_URL'),
+
+    privateAccessKeyId: getEnvVar('R2_PRIVATE_ACCESS_KEY_ID'),
+    privateSecretAccessKey: getEnvVar('R2_PRIVATE_SECRET_ACCESS_KEY'),
+    privateBucketName: getEnvVar('R2_PRIVATE_BUCKET_NAME'),
   },
 };
