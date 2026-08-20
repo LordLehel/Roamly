@@ -4,7 +4,13 @@
     class="flex items-center justify-between px-6 py-4 bg-surface-500/70 backdrop-blur-md shadow-sm z-50 border-b border-dark-text/10 sticky top-0"
   >
     <!-- Bal oldal: Legördülő nézetválasztó -->
-    <div class="flex-1 flex items-center">
+    <div class="flex-1 flex items-center gap-4">
+      <UButton
+        icon="i-heroicons-arrow-left"
+        variant="glassIconButton"
+        class="shrink-0"
+        :to="selectedView"
+      />
       <USelect
         v-model="selectedView"
         :items="CONST_NAV_VIEWS"

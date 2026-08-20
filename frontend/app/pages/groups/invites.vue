@@ -1,17 +1,12 @@
 // frontend/app/pages/groups/invites.vue
 <template>
   <div class="w-full max-w-7xl mx-auto px-6 py-8 flex flex-col gap-8 relative">
-    <h1 class="text-3xl font-bold text-surface-500 tracking-wide text-center">
+    <h1 :class="appConfig.typography.pageTitle">
       {{ CONST_INVITES_HEADING }}
     </h1>
 
     <div class="flex items-center gap-4">
-      <UButton
-        icon="i-heroicons-funnel"
-        :label="CONST_FILTER_LABEL"
-        variant="glassButton"
-        class="px-8 rounded-full font-semibold justify-center"
-      />
+      <UButton icon="i-heroicons-funnel" :label="CONST_FILTER_LABEL" variant="glassButton" />
     </div>
 
     <ClientOnly>
@@ -32,20 +27,15 @@
             @click="openJoinModal(group)"
           >
             <div class="absolute top-4 right-4 z-10">
-              <UButton
-                icon="i-heroicons-x-mark"
-                variant="ghost"
-                class="text-dark-text/70 hover:text-error-500 transition-colors"
-                @click.stop="openDeclineModal(group)"
-              />
+              <UButton icon="i-heroicons-x-mark" variant="ghostDangerIconButton" @click.stop="openDeclineModal(group)" />
             </div>
 
             <div class="flex flex-col gap-6 w-full pt-2">
-              <h3 class="text-xl font-bold text-center tracking-wide text-dark-text">
+              <h3 :class="appConfig.typography.cardTitleCenter">
                 {{ group.name }}
               </h3>
               <p class="text-sm text-center text-dark-text/80 font-medium">
-                {{ CONST_ROLE_LABEL }} <span class="font-bold">{{ group.role }}</span>
+                {{ CONST_YOUR_ROLE_LABEL }} <span class="font-bold">{{ group.role }}</span>
               </p>
               <div
                 class="flex items-end justify-between w-full pt-4 border-t border-dark-text/10 text-xs text-dark-text/70"
@@ -152,6 +142,7 @@
 </template>
 
 <script setup lang="ts">
+import { useAppConfig } from '#imports';
 import { ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useIntersectionObserver } from '@vueuse/core';
@@ -164,7 +155,7 @@ import {
   CONST_INVITES_HEADING,
   CONST_FILTER_LABEL,
   CONST_CREATED_AT_LABEL,
-  CONST_ROLE_LABEL,
+  CONST_YOUR_ROLE_LABEL,
   CONST_JOIN_GROUP_TITLE,
   CONST_JOIN_GROUP_CONFIRM,
   CONST_JOIN_BTN,
@@ -182,6 +173,7 @@ definePageMeta({
   middleware: ['auth'],
 });
 
+const appConfig = useAppConfig();
 const router = useRouter();
 const { isAuthenticated } = useAuth();
 const groupsStore = useGroupsStore();
@@ -209,10 +201,14 @@ watch(
   () => invitesData.value,
   (newData) => {
     if (newData?.items) {
-      const newItems = newData.items.filter(
-        (newItem) => !invitesList.value.some((existing) => existing.uuid === newItem.uuid),
-      );
-      invitesList.value.push(...newItems);
+      if (!currentCursor.value) {
+        invitesList.value = [...newData.items];
+      } else {
+        const newItems = newData.items.filter(
+          (newItem) => !invitesList.value.some((existing) => existing.uuid === newItem.uuid),
+        );
+        invitesList.value.push(...newItems);
+      }
     }
   },
   { immediate: true },

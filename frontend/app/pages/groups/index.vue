@@ -1,29 +1,14 @@
 // frontend/app/pages/groups/index.vue
 <template>
   <div class="w-full max-w-7xl mx-auto px-6 py-8 flex flex-col gap-8 relative">
-    <h1 class="text-3xl font-bold text-surface-500 tracking-wide text-center">
+    <h1 :class="appConfig.typography.pageTitle">
       {{ CONST_GROUPS_HEADING }}
     </h1>
 
     <div class="flex items-center gap-4">
-      <UButton
-        icon="i-heroicons-funnel"
-        :label="CONST_FILTER_LABEL"
-        variant="glassButton"
-        class="px-8 rounded-full font-semibold justify-center"
-      />
-      <UButton
-        icon="i-heroicons-plus"
-        variant="glassButton"
-        class="w-10 h-10 rounded-full font-semibold flex items-center justify-center p-0"
-        @click="openCreateModal"
-      />
-      <UButton
-        icon="i-heroicons-envelope"
-        variant="glassButton"
-        class="w-10 h-10 rounded-full font-semibold flex items-center justify-center p-0"
-        to="/groups/invites"
-      />
+      <UButton icon="i-heroicons-funnel" :label="CONST_FILTER_LABEL" variant="glassButton" />
+      <UButton icon="i-heroicons-plus" variant="glassIconButton" @click="openCreateModal" />
+      <UButton icon="i-heroicons-envelope" variant="glassIconButton" to="/groups/invites" />
     </div>
 
     <ClientOnly>
@@ -39,33 +24,24 @@
           <UCard
             v-for="group in groupsList"
             :key="group.uuid"
-            variant="interactiveGlass"
+            variant="pointedGlass"
             class="relative flex flex-col justify-between"
+            @click="router.push(`/groups/${group.uuid}/members`)"
           >
             <div class="absolute top-4 left-4 z-10">
-              <UButton
-                icon="i-heroicons-arrow-right-on-rectangle"
-                variant="ghost"
-                class="text-dark-text/70 hover:text-error-500 transition-colors"
-                @click="openLeaveModal(group)"
-              />
+              <UButton icon="i-heroicons-arrow-right-on-rectangle" variant="ghostDangerIconButton" @click.stop="openLeaveModal(group)" />
             </div>
 
             <div class="absolute top-4 right-4 z-10">
-              <UButton
-                icon="i-heroicons-trash"
-                variant="ghost"
-                class="text-dark-text/70 hover:text-error-500 transition-colors"
-                @click="openDeleteModal(group)"
-              />
+              <UButton icon="i-heroicons-trash" variant="ghostDangerIconButton" @click.stop="openDeleteModal(group)" />
             </div>
 
             <div class="flex flex-col gap-6 w-full pt-2">
-              <h3 class="text-xl font-bold text-center tracking-wide text-dark-text">
+              <h3 :class="appConfig.typography.cardTitleCenter">
                 {{ group.name }}
               </h3>
               <p class="text-sm text-center text-dark-text/80 font-medium">
-                {{ CONST_ROLE_LABEL }} <span class="font-bold">{{ group.role }}</span>
+                {{ CONST_YOUR_ROLE_LABEL }} <span class="font-bold">{{ group.role }}</span>
               </p>
               <div
                 class="flex items-end justify-between w-full pt-4 border-t border-dark-text/10 text-xs text-dark-text/70"
@@ -233,6 +209,7 @@
 </template>
 
 <script setup lang="ts">
+import { useAppConfig } from '#imports';
 import { ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useIntersectionObserver } from '@vueuse/core';
@@ -251,7 +228,7 @@ import {
   CONST_GROUPS_HEADING,
   CONST_FILTER_LABEL,
   CONST_CREATED_AT_LABEL,
-  CONST_ROLE_LABEL,
+  CONST_YOUR_ROLE_LABEL,
   CONST_DELETE_GROUP_TITLE,
   CONST_DELETE_GROUP_CONFIRM,
   CONST_DELETE_BTN,
@@ -276,6 +253,7 @@ definePageMeta({
   middleware: ['auth'],
 });
 
+const appConfig = useAppConfig();
 const router = useRouter();
 const { isAuthenticated } = useAuth();
 const groupsStore = useGroupsStore();
@@ -304,10 +282,14 @@ watch(
   () => groupsData.value,
   (newData) => {
     if (newData?.items) {
-      const newItems = newData.items.filter(
-        (newItem) => !groupsList.value.some((existing) => existing.uuid === newItem.uuid),
-      );
-      groupsList.value.push(...newItems);
+      if (!currentCursor.value) {
+        groupsList.value = [...newData.items];
+      } else {
+        const newItems = newData.items.filter(
+          (newItem) => !groupsList.value.some((existing) => existing.uuid === newItem.uuid),
+        );
+        groupsList.value.push(...newItems);
+      }
     }
   },
   { immediate: true },

@@ -46,3 +46,33 @@ export const useLeaveGroupMutation = () => {
     },
   });
 };
+
+export const useUpdateGroupMutation = () => {
+  const queryCache = useQueryCache();
+  return useMutation({
+    mutation: ({ groupUuid, name }: { groupUuid: string; name: string }) =>
+      groupsService.updateGroup(groupUuid, { name }),
+    onSuccess: (data, variables) => {
+      queryCache.invalidateQueries({ key: ['groups'] });
+      queryCache.invalidateQueries({ key: ['groups', 'infos', variables.groupUuid] });
+    },
+  });
+};
+
+export const useInviteUserMutation = () => {
+  return useMutation({
+    mutation: ({ groupUuid, data }: { groupUuid: string; data: { invitedUserEmail: string; inviteWithRole: string } }) =>
+      groupsService.inviteUser(groupUuid, data),
+  });
+};
+
+export const useRemoveUserMutation = () => {
+  const queryCache = useQueryCache();
+  return useMutation({
+    mutation: ({ groupUuid, email }: { groupUuid: string; email: string }) =>
+      groupsService.removeUserFromGroup(groupUuid, email),
+    onSuccess: (data, variables) => {
+      queryCache.invalidateQueries({ key: ['groups', 'infos', variables.groupUuid] });
+    },
+  });
+};

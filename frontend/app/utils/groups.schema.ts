@@ -13,4 +13,15 @@ export const createGroupSchema = z.object({
     ),
 });
 
+export const updateGroupSchema = z.object({
+  groupName: z.string().trim().min(3, 'Minimum 3 characters required!').max(64, 'Maximum 64 characters allowed!'),
+});
+
+export const inviteUserSchema = z.object({
+  email: z.string().email('Invalid email format!'),
+  role: z.enum(['invitedMember', 'invitedLeader'], {
+    message: 'Please select a valid role!',
+  }),
+});
+
 export type CreateGroupInput = z.infer<typeof createGroupSchema>;

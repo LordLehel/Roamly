@@ -70,7 +70,7 @@ export const CONST_NAV_VIEWS = [
 export const CONST_GROUPS_HEADING = 'Your groups';
 export const CONST_FILTER_LABEL = 'Filter';
 export const CONST_CREATED_AT_LABEL = 'Created at:';
-export const CONST_ROLE_LABEL = 'Your role:';
+export const CONST_YOUR_ROLE_LABEL = 'Your role:';
 
 // Delete Group Modal
 export const CONST_DELETE_GROUP_TITLE = 'Delete group';
@@ -105,3 +105,19 @@ export const CONST_DECLINE_INVITE_TITLE = 'Decline invitation';
 export const CONST_DECLINE_INVITE_CONFIRM = 'Are you sure you want to decline this invitation?';
 export const CONST_DECLINE_BTN = 'Decline';
 export const CONST_NO_INVITES_MSG = 'You have no pending invitations.';
+
+// Group members
+export const CONST_EDIT_GROUP_TITLE = 'Edit group name';
+export const CONST_EDIT_BTN = 'Save';
+export const CONST_INVITE_USER_TITLE = 'Invite user';
+export const CONST_USER_EMAIL_LABEL = 'Email address';
+export const CONST_USER_EMAIL_PLACEHOLDER = 'user@example.com';
+export const CONST_ROLE_SELECTION_LABEL = 'Role';
+export const CONST_INVITE_BTN = 'Send invite';
+export const CONST_INVITE_SUCCESS_MSG = 'Invitation sent successfully!';
+export const CONST_REMOVE_USER_TITLE = 'Remove user';
+export const CONST_REMOVE_USER_CONFIRM = 'Are you sure you want to remove this user from the group?';
+export const CONST_REMOVE_BTN = 'Remove';
+export const CONST_JOINED_LABEL = 'Joined:';
+export const CONST_ROLE_LABEL = 'Role:';
+export const CONST_YOU_LABEL = 'You';

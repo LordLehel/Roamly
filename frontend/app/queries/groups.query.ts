@@ -19,3 +19,10 @@ export const usePendingInvitesQuery = (
     query: () => groupsService.getPendingInvites(limit, unref(cursor)),
   });
 };
+
+export const useGroupInfosQuery = (groupUuid: Ref<string> | string) => {
+  return useQuery({
+    key: () => ['groups', 'infos', unref(groupUuid)] as const,
+    query: () => groupsService.getGroupInfos(unref(groupUuid)),
+  });
+};

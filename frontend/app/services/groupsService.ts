@@ -1,5 +1,5 @@
 // frontend/app/services/groupsService.ts
-import type { GroupOutDto, RawGroupDto } from '~/types/groups.type';
+import type { GroupOutDto, RawGroupDto, GroupInfosOutDto } from '~/types/groups.type';
 import type { ApiResponse } from '~/types/api.type';
 import { useApi } from '~/composables/useApi';
 
@@ -100,5 +100,38 @@ export const groupsService = {
       ...response.data,
       items: response.data.items.map(mapGroupData),
     };
+  },
+
+  async getGroupInfos(groupUuid: string): Promise<GroupInfosOutDto> {
+    const api = useApi();
+    const response = await api<ApiResponse<GroupInfosOutDto>>(`/groups/${groupUuid}`, {
+      method: 'GET',
+    });
+    return response.data;
+  },
+
+  async updateGroup(groupUuid: string, data: { name: string }): Promise<GroupOutDto> {
+    const api = useApi();
+    const response = await api<ApiResponse<RawGroupDto>>(`/groups/${groupUuid}`, {
+      method: 'PATCH',
+      body: data,
+    });
+
+    return mapGroupData(response.data);
+  },
+
+  async inviteUser(groupUuid: string, data: { invitedUserEmail: string; inviteWithRole: string }): Promise<void> {
+    const api = useApi();
+    await api<ApiResponse<void>>(`/groups/${groupUuid}/invite`, {
+      method: 'POST',
+      body: data,
+    });
+  },
+
+  async removeUserFromGroup(groupUuid: string, email: string): Promise<void> {
+    const api = useApi();
+    await api<ApiResponse<void>>(`/groups/${groupUuid}/users/${email}`, {
+      method: 'DELETE',
+    });
   },
 };

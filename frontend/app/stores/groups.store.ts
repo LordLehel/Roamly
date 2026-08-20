@@ -7,15 +7,19 @@ export const useGroupsStore = defineStore('groups', () => {
   const isCreateModalOpen = ref(false);
   const isDeleteModalOpen = ref(false);
   const isLeaveModalOpen = ref(false);
+  const isJoinModalOpen = ref(false);
+  const isDeclineModalOpen = ref(false);
+  const isRemoveUserModalOpen = ref(false);
+  const isUpdateModalOpen = ref(false);
+  const isInviteModalOpen = ref(false);
 
   const selectedGroupToDelete = ref<GroupOutDto | null>(null);
   const selectedGroupToLeave = ref<GroupOutDto | null>(null);
-
-  const isJoinModalOpen = ref(false);
-  const isDeclineModalOpen = ref(false);
   const selectedGroupToJoin = ref<GroupOutDto | null>(null);
   const selectedGroupToDecline = ref<GroupOutDto | null>(null);
+  const selectedUserEmailToRemove = ref<string | null>(null);
 
+  // Create modal
   const openCreateModal = () => {
     isCreateModalOpen.value = true;
   };
@@ -24,6 +28,7 @@ export const useGroupsStore = defineStore('groups', () => {
     isCreateModalOpen.value = false;
   };
 
+  // Delete modal
   const openDeleteModal = (group: GroupOutDto) => {
     selectedGroupToDelete.value = group;
     isDeleteModalOpen.value = true;
@@ -34,6 +39,7 @@ export const useGroupsStore = defineStore('groups', () => {
     selectedGroupToDelete.value = null;
   };
 
+  // Leave modal
   const openLeaveModal = (group: GroupOutDto) => {
     selectedGroupToLeave.value = group;
     isLeaveModalOpen.value = true;
@@ -44,6 +50,7 @@ export const useGroupsStore = defineStore('groups', () => {
     selectedGroupToLeave.value = null;
   };
 
+  // Join modal
   const openJoinModal = (group: GroupOutDto) => {
     selectedGroupToJoin.value = group;
     isJoinModalOpen.value = true;
@@ -54,6 +61,7 @@ export const useGroupsStore = defineStore('groups', () => {
     selectedGroupToJoin.value = null;
   };
 
+  // Decline modal
   const openDeclineModal = (group: GroupOutDto) => {
     selectedGroupToDecline.value = group;
     isDeclineModalOpen.value = true;
@@ -64,16 +72,40 @@ export const useGroupsStore = defineStore('groups', () => {
     selectedGroupToDecline.value = null;
   };
 
+  // Update modal
+  const openUpdateModal = () => { isUpdateModalOpen.value = true; };
+  const closeUpdateModal = () => { isUpdateModalOpen.value = false; };
+
+  // Invite Modal
+  const openInviteModal = () => { isInviteModalOpen.value = true; };
+  const closeInviteModal = () => { isInviteModalOpen.value = false; };
+
+  // Remove User Modal
+  const openRemoveUserModal = (email: string) => {
+    selectedUserEmailToRemove.value = email;
+    isRemoveUserModalOpen.value = true;
+  };
+  const closeRemoveUserModal = () => {
+    isRemoveUserModalOpen.value = false;
+    selectedUserEmailToRemove.value = null;
+  };
+
   return {
     isCreateModalOpen,
     isDeleteModalOpen,
-    selectedGroupToDelete,
     isJoinModalOpen,
     isDeclineModalOpen,
     isLeaveModalOpen,
+    isUpdateModalOpen,
+    isInviteModalOpen,
+    isRemoveUserModalOpen,
+
     selectedGroupToLeave,
     selectedGroupToJoin,
     selectedGroupToDecline,
+    selectedGroupToDelete,
+    selectedUserEmailToRemove,
+
     openCreateModal,
     closeCreateModal,
     openDeleteModal,
@@ -84,5 +116,11 @@ export const useGroupsStore = defineStore('groups', () => {
     closeJoinModal,
     openDeclineModal,
     closeDeclineModal,
+    openUpdateModal,
+    closeUpdateModal,
+    openInviteModal,
+    closeInviteModal,
+    openRemoveUserModal,
+    closeRemoveUserModal,
   };
 });

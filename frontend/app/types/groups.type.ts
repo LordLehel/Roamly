@@ -23,3 +23,22 @@ export interface RawGroupDto {
     };
   }[];
 }
+
+export interface GroupProfileDto {
+  users: {
+    email: string;
+    username: string;
+  };
+  roles: {
+    type: string;
+  };
+  nickname: string | null;
+  description: string | null;
+}
+
+export interface GroupInfosOutDto {
+  name: string;
+  current_size: number;
+  created_at: string;
+  group_profiles: GroupProfileDto[];
+}

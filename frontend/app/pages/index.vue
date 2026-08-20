@@ -66,7 +66,7 @@
 
             <UButton
               variant="ghost"
-              class="font-bold tracking-wide hover:underline underline-offset-4 transition-colors duration-500"
+              class="font-bold tracking-wide hover:underline underline-offset-4 transition-colors duration-500 cursor-pointer"
               :class="activeCard === card.id ? 'text-white hover:text-white/80' : 'text-brand-500'"
               @click="toggleCard(card.id)"
             >
