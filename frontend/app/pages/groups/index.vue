@@ -1,3 +1,4 @@
+// frontend/app/pages/groups/index.vue
 <template>
   <div class="w-full max-w-7xl mx-auto px-6 py-8 flex flex-col gap-8 relative">
     <h1 class="text-3xl font-bold text-surface-500 tracking-wide text-center">
@@ -32,7 +33,7 @@
       <div v-else-if="error" class="text-center py-10 text-error-500">
         {{ CONST_FETCH_ERROR_TEXT }}
       </div>
-      
+
       <div v-else-if="groupsList.length > 0" class="flex flex-col gap-6 w-full">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
           <UCard
@@ -66,7 +67,9 @@
               <p class="text-sm text-center text-dark-text/80 font-medium">
                 {{ CONST_ROLE_LABEL }} <span class="font-bold">{{ group.role }}</span>
               </p>
-              <div class="flex items-end justify-between w-full pt-4 border-t border-dark-text/10 text-xs text-dark-text/70">
+              <div
+                class="flex items-end justify-between w-full pt-4 border-t border-dark-text/10 text-xs text-dark-text/70"
+              >
                 <div>
                   <p class="opacity-70">{{ CONST_CREATED_AT_LABEL }}</p>
                   <p class="font-semibold">{{ group.created_at }}</p>
@@ -79,12 +82,14 @@
             </div>
           </UCard>
         </div>
-        
+
         <div ref="loadMoreTrigger" class="h-10 w-full flex items-center justify-center">
-          <span v-if="isFetchingNextPage" class="text-dark-text/70 text-sm">További csoportok betöltése...</span>
+          <span v-if="isFetchingNextPage" class="text-dark-text/70 text-sm"
+            >További csoportok betöltése...</span
+          >
         </div>
       </div>
-      
+
       <div v-else class="text-center py-10 text-dark-text/70">
         {{ CONST_NO_GROUPS_MSG }}
       </div>
@@ -94,16 +99,16 @@
         :title="CONST_CREATE_GROUP_TITLE"
         :dismissible="false"
         :close="false"
-        :ui="{
-          overlay: 'fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm',
-          content: 'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] w-full max-w-md bg-white rounded-xl shadow-2xl ring-1 ring-black/5'
-        }"
       >
         <template #default>
           <div class="hidden"></div>
         </template>
         <template #body>
-          <form id="create-group-form" class="flex flex-col gap-4 py-2" @submit.prevent="handleCreateGroup">
+          <form
+            id="create-group-form"
+            class="flex flex-col gap-4 py-2"
+            @submit.prevent="handleCreateGroup"
+          >
             <div>
               <label class="block text-sm font-medium text-dark-text mb-1">
                 {{ CONST_GROUP_NAME_LABEL }}
@@ -143,10 +148,6 @@
         :title="CONST_DELETE_GROUP_TITLE"
         :dismissible="false"
         :close="false"
-        :ui="{
-          overlay: 'fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm',
-          content: 'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] w-full max-w-md bg-white rounded-xl shadow-2xl ring-1 ring-black/5'
-        }"
       >
         <template #default>
           <div class="hidden"></div>
@@ -154,7 +155,10 @@
         <template #body>
           <p class="text-sm text-dark-text/80 py-2">
             {{ CONST_DELETE_GROUP_CONFIRM }}
-            <span v-if="groupsStore.selectedGroupToDelete" class="block font-semibold mt-1 text-brand-500">
+            <span
+              v-if="groupsStore.selectedGroupToDelete"
+              class="block font-semibold mt-1 text-brand-500"
+            >
               „{{ groupsStore.selectedGroupToDelete.name }}”
             </span>
           </p>
@@ -181,10 +185,6 @@
         :title="CONST_LEAVE_GROUP_TITLE"
         :dismissible="false"
         :close="false"
-        :ui="{
-          overlay: 'fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm',
-          content: 'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] w-full max-w-md bg-white rounded-xl shadow-2xl ring-1 ring-black/5'
-        }"
       >
         <template #default>
           <div class="hidden"></div>
@@ -193,7 +193,10 @@
           <div class="flex flex-col gap-2 py-2">
             <p class="text-sm text-dark-text/80">
               {{ CONST_LEAVE_GROUP_CONFIRM }}
-              <span v-if="groupsStore.selectedGroupToLeave" class="block font-semibold mt-1 text-brand-500">
+              <span
+                v-if="groupsStore.selectedGroupToLeave"
+                class="block font-semibold mt-1 text-brand-500"
+              >
                 „{{ groupsStore.selectedGroupToLeave.name }}”
               </span>
             </p>
@@ -235,7 +238,11 @@ import { useRouter } from 'vue-router';
 import { useIntersectionObserver } from '@vueuse/core';
 import { useAuth } from '~/composables/useAuth';
 import { useGroupsQuery } from '~/queries/groups.query';
-import { useCreateGroupMutation, useDeleteGroupMutation, useLeaveGroupMutation } from '~/queries/groups.mutation';
+import {
+  useCreateGroupMutation,
+  useDeleteGroupMutation,
+  useLeaveGroupMutation,
+} from '~/queries/groups.mutation';
 import { createGroupSchema } from '~/utils/groups.schema';
 import { useGroupsStore } from '~/stores/groups.store';
 import type { GroupOutDto } from '~/types/groups.type';
@@ -250,6 +257,7 @@ import {
   CONST_DELETE_BTN,
   CONST_LEAVE_GROUP_TITLE,
   CONST_LEAVE_GROUP_CONFIRM,
+  CONST_LEAVE_GROUP_WARNING,
   CONST_LEAVE_BTN,
   CONST_CANCEL_BTN_TEXT,
   CONST_CREATE_GROUP_TITLE,
@@ -279,7 +287,7 @@ watch(
       router.push('/login');
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 const currentCursor = ref<string | undefined>(undefined);
@@ -297,12 +305,12 @@ watch(
   (newData) => {
     if (newData?.items) {
       const newItems = newData.items.filter(
-        (newItem) => !groupsList.value.some((existing) => existing.uuid === newItem.uuid)
+        (newItem) => !groupsList.value.some((existing) => existing.uuid === newItem.uuid),
       );
       groupsList.value.push(...newItems);
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 watch(
@@ -311,11 +319,15 @@ watch(
     if (!loading) {
       isFetchingNextPage.value = false;
     }
-  }
+  },
 );
 
 const fetchNextPage = () => {
-  if (groupsData.value?.meta.has_next_page && groupsData.value.meta.next_cursor && !isFetchingNextPage.value) {
+  if (
+    groupsData.value?.meta.has_next_page &&
+    groupsData.value.meta.next_cursor &&
+    !isFetchingNextPage.value
+  ) {
     isFetchingNextPage.value = true;
     currentCursor.value = groupsData.value.meta.next_cursor;
   }
@@ -331,7 +343,7 @@ useIntersectionObserver(
       fetchNextPage();
     }
   },
-  { rootMargin: '100px' } 
+  { rootMargin: '100px' },
 );
 
 const newGroupName = ref('');
@@ -360,7 +372,7 @@ const handleCreateGroup = async () => {
 
   try {
     await createGroup({ groupName: validationResult.data.groupName });
-    groupsList.value = []; 
+    groupsList.value = [];
     currentCursor.value = undefined;
     closeCreateModal();
   } catch (err: unknown) {

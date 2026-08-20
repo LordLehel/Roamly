@@ -10,7 +10,10 @@ export const useGroupsQuery = (limit: number = 15, cursor?: Ref<string | undefin
   });
 };
 
-export const usePendingInvitesQuery = (limit: number = 15, cursor?: Ref<string | undefined> | string) => {
+export const usePendingInvitesQuery = (
+  limit: number = 15,
+  cursor?: Ref<string | undefined> | string,
+) => {
   return useQuery({
     key: () => ['groups', 'invites', unref(cursor) ?? ''] as const,
     query: () => groupsService.getPendingInvites(limit, unref(cursor)),

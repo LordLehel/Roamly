@@ -54,11 +54,7 @@ import { ref, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useAuth } from '../composables/useAuth';
 import { useCurrentUserQuery } from '../queries/user.query';
-import {
-  CONST_BRAND_NAME,
-  CONST_LOGOUT_TITLE,
-  CONST_NAV_VIEWS,
-} from '../utils/constants';
+import { CONST_BRAND_NAME, CONST_LOGOUT_TITLE, CONST_NAV_VIEWS } from '../utils/constants';
 
 const router = useRouter();
 const route = useRoute();
@@ -66,7 +62,7 @@ const { isAuthenticated, logout } = useAuth();
 const { data: userProfile } = useCurrentUserQuery();
 
 const getCurrentViewValue = (path: string) => {
-  const found = CONST_NAV_VIEWS.find(item => item.value === path || path.includes(item.value));
+  const found = CONST_NAV_VIEWS.find((item) => item.value === path || path.includes(item.value));
   return found ? found.value : path;
 };
 
@@ -76,7 +72,7 @@ watch(
   () => route.path,
   (newPath) => {
     selectedView.value = getCurrentViewValue(newPath);
-  }
+  },
 );
 
 const onViewChange = (path: string | undefined) => {

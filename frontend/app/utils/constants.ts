@@ -93,7 +93,8 @@ export const CONST_CREATE_ERROR_GENERIC = 'An error occurred while creating the 
 export const CONST_LEAVE_GROUP_TITLE = 'Leave group';
 export const CONST_LEAVE_GROUP_CONFIRM = 'Are you sure you want to leave this group?';
 export const CONST_LEAVE_BTN = 'Leave';
-export const CONST_LEAVE_GROUP_WARNING = "This group has only one member. Leaving it will result in it's deletion with all it's data.";
+export const CONST_LEAVE_GROUP_WARNING =
+  "This group has only one member. Leaving it will result in it's deletion with all it's data.";
 
 // Invites
 export const CONST_INVITES_HEADING = 'Pending invitations';

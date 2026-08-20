@@ -16,11 +16,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRoute, useAppConfig } from '#imports';
-import {
-  CONST_COPYRIGHT_LABEL,
-  CONST_BG_GROUPS,
-  CONST_BG_PROFILE,
-} from '../utils/constants';
+import { CONST_COPYRIGHT_LABEL, CONST_BG_GROUPS, CONST_BG_PROFILE } from '../utils/constants';
 
 const route = useRoute();
 const appConfig = useAppConfig();

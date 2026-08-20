@@ -1,7 +1,7 @@
 // frontend/app/types/groups.type.ts
 export interface GroupInDto {
-    name: string;
-    role: string;
+  name: string;
+  role: string;
 }
 
 export interface GroupOutDto {

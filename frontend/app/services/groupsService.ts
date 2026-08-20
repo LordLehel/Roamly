@@ -38,25 +38,28 @@ export const groupsService = {
     if (cursor) {
       query.cursor = cursor;
     }
-    
+
     const response = await api<ApiResponse<RawPaginatedGroupsResponse>>('/groups', {
       method: 'GET',
       query,
     });
-    
+
     return {
       ...response.data,
       items: response.data.items.map(mapGroupData),
     };
   },
 
-  async createGroup(data: { groupName: string; initialInvites?: { email: string; role: string }[] }): Promise<GroupOutDto> {
+  async createGroup(data: {
+    groupName: string;
+    initialInvites?: { email: string; role: string }[];
+  }): Promise<GroupOutDto> {
     const api = useApi();
     const response = await api<ApiResponse<RawGroupDto>>('/groups', {
       method: 'POST',
       body: data,
     });
-    
+
     return mapGroupData(response.data);
   },
 
@@ -87,12 +90,12 @@ export const groupsService = {
     if (cursor) {
       query.cursor = cursor;
     }
-    
+
     const response = await api<ApiResponse<RawPaginatedGroupsResponse>>('/groups/invites', {
       method: 'GET',
       query,
     });
-    
+
     return {
       ...response.data,
       items: response.data.items.map(mapGroupData),

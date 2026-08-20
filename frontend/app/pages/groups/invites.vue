@@ -47,7 +47,9 @@
               <p class="text-sm text-center text-dark-text/80 font-medium">
                 {{ CONST_ROLE_LABEL }} <span class="font-bold">{{ group.role }}</span>
               </p>
-              <div class="flex items-end justify-between w-full pt-4 border-t border-dark-text/10 text-xs text-dark-text/70">
+              <div
+                class="flex items-end justify-between w-full pt-4 border-t border-dark-text/10 text-xs text-dark-text/70"
+              >
                 <div>
                   <p class="opacity-70">{{ CONST_CREATED_AT_LABEL }}</p>
                   <p class="font-semibold">{{ group.created_at }}</p>
@@ -62,7 +64,9 @@
         </div>
 
         <div ref="loadMoreTrigger" class="h-10 w-full flex items-center justify-center">
-          <span v-if="isFetchingNextPage" class="text-dark-text/70 text-sm">További meghívások betöltése...</span>
+          <span v-if="isFetchingNextPage" class="text-dark-text/70 text-sm"
+            >További meghívások betöltése...</span
+          >
         </div>
       </div>
 
@@ -75,10 +79,6 @@
         :title="CONST_JOIN_GROUP_TITLE"
         :dismissible="false"
         :close="false"
-        :ui="{
-          overlay: 'fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm',
-          content: 'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] w-full max-w-md bg-white rounded-xl shadow-2xl ring-1 ring-black/5'
-        }"
       >
         <template #default>
           <div class="hidden"></div>
@@ -86,7 +86,10 @@
         <template #body>
           <p class="text-sm text-dark-text/80 py-2">
             {{ CONST_JOIN_GROUP_CONFIRM }}
-            <span v-if="groupsStore.selectedGroupToJoin" class="block font-semibold mt-1 text-brand-500">
+            <span
+              v-if="groupsStore.selectedGroupToJoin"
+              class="block font-semibold mt-1 text-brand-500"
+            >
               „{{ groupsStore.selectedGroupToJoin.name }}”
             </span>
           </p>
@@ -113,10 +116,6 @@
         :title="CONST_DECLINE_INVITE_TITLE"
         :dismissible="false"
         :close="false"
-        :ui="{
-          overlay: 'fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm',
-          content: 'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] w-full max-w-md bg-white rounded-xl shadow-2xl ring-1 ring-black/5'
-        }"
       >
         <template #default>
           <div class="hidden"></div>
@@ -124,7 +123,10 @@
         <template #body>
           <p class="text-sm text-dark-text/80 py-2">
             {{ CONST_DECLINE_INVITE_CONFIRM }}
-            <span v-if="groupsStore.selectedGroupToDecline" class="block font-semibold mt-1 text-brand-500">
+            <span
+              v-if="groupsStore.selectedGroupToDecline"
+              class="block font-semibold mt-1 text-brand-500"
+            >
               „{{ groupsStore.selectedGroupToDecline.name }}”
             </span>
           </p>
@@ -191,7 +193,7 @@ watch(
       router.push('/login');
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 const currentCursor = ref<string | undefined>(undefined);
@@ -208,12 +210,12 @@ watch(
   (newData) => {
     if (newData?.items) {
       const newItems = newData.items.filter(
-        (newItem) => !invitesList.value.some((existing) => existing.uuid === newItem.uuid)
+        (newItem) => !invitesList.value.some((existing) => existing.uuid === newItem.uuid),
       );
       invitesList.value.push(...newItems);
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 watch(
@@ -222,11 +224,15 @@ watch(
     if (!loading) {
       isFetchingNextPage.value = false;
     }
-  }
+  },
 );
 
 const fetchNextPage = () => {
-  if (invitesData.value?.meta.has_next_page && invitesData.value.meta.next_cursor && !isFetchingNextPage.value) {
+  if (
+    invitesData.value?.meta.has_next_page &&
+    invitesData.value.meta.next_cursor &&
+    !isFetchingNextPage.value
+  ) {
     isFetchingNextPage.value = true;
     currentCursor.value = invitesData.value.meta.next_cursor;
   }
@@ -242,7 +248,7 @@ useIntersectionObserver(
       fetchNextPage();
     }
   },
-  { rootMargin: '100px' }
+  { rootMargin: '100px' },
 );
 
 // Join modal handlers

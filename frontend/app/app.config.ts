@@ -103,9 +103,19 @@ export default defineAppConfig({
       slots: {
         base: 'rounded-full text-brand-500 ring-1 ring-brand-500 bg-surface-500/70 backdrop-blur-md !px-4 !py-2 transition-colors text-xs font-semibold shadow-sm cursor-pointer justify-between min-w-36 flex-row-reverse',
         trailingIcon: 'absolute right-25 transition-transform pointer-events-none text-brand-500',
-        content: 'z-[100] bg-text backdrop-blur-xl rounded-2xl ring-1 ring-brand-500/30 shadow-xl text-dark-text mt-2 min-w-40',
+        content:
+          'z-[100] bg-text backdrop-blur-xl rounded-2xl ring-1 ring-brand-500/30 shadow-xl text-dark-text mt-2 min-w-40',
         viewport: 'p-1',
         item: 'flex items-center justify-center text-center py-2 px-4 hover:bg-brand-500/20 text-dark-text cursor-pointer data-[highlighted]:bg-brand-500/20 data-[highlighted]:text-dark-text font-medium text-xs rounded-xl mx-1 my-0.5',
+      },
+    },
+
+    // Modal
+    modal: {
+      slots: {
+        overlay: 'fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm',
+        content:
+          'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] w-full max-w-md bg-white/90 backdrop-blur-2xl !rounded-[25px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] ring-1 ring-black/10 focus:outline-none overflow-hidden',
       },
     },
   },
