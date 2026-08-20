@@ -6,7 +6,10 @@ import type { GroupOutDto } from '~/types/groups.type';
 export const useGroupsStore = defineStore('groups', () => {
   const isCreateModalOpen = ref(false);
   const isDeleteModalOpen = ref(false);
+  const isLeaveModalOpen = ref(false);
+
   const selectedGroupToDelete = ref<GroupOutDto | null>(null);
+  const selectedGroupToLeave = ref<GroupOutDto | null>(null);
 
   const isJoinModalOpen = ref(false);
   const isDeclineModalOpen = ref(false);
@@ -29,6 +32,16 @@ export const useGroupsStore = defineStore('groups', () => {
   const closeDeleteModal = () => {
     isDeleteModalOpen.value = false;
     selectedGroupToDelete.value = null;
+  };
+
+  const openLeaveModal = (group: GroupOutDto) => {
+    selectedGroupToLeave.value = group;
+    isLeaveModalOpen.value = true;
+  };
+
+  const closeLeaveModal = () => {
+    isLeaveModalOpen.value = false;
+    selectedGroupToLeave.value = null;
   };
 
   const openJoinModal = (group: GroupOutDto) => {
@@ -57,12 +70,16 @@ export const useGroupsStore = defineStore('groups', () => {
     selectedGroupToDelete,
     isJoinModalOpen,
     isDeclineModalOpen,
+    isLeaveModalOpen,
+    selectedGroupToLeave,
     selectedGroupToJoin,
     selectedGroupToDecline,
     openCreateModal,
     closeCreateModal,
     openDeleteModal,
     closeDeleteModal,
+    openLeaveModal,
+    closeLeaveModal,
     openJoinModal,
     closeJoinModal,
     openDeclineModal,

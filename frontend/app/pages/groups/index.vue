@@ -1,4 +1,3 @@
-// frontend/app/pages/groups/index.vue
 <template>
   <div class="w-full max-w-7xl mx-auto px-6 py-8 flex flex-col gap-8 relative">
     <h1 class="text-3xl font-bold text-surface-500 tracking-wide text-center">
@@ -42,6 +41,15 @@
             variant="interactiveGlass"
             class="relative flex flex-col justify-between"
           >
+            <div class="absolute top-4 left-4 z-10">
+              <UButton
+                icon="i-heroicons-arrow-right-on-rectangle"
+                variant="ghost"
+                class="text-dark-text/70 hover:text-error-500 transition-colors"
+                @click="openLeaveModal(group)"
+              />
+            </div>
+
             <div class="absolute top-4 right-4 z-10">
               <UButton
                 icon="i-heroicons-trash"
@@ -167,6 +175,56 @@
           </div>
         </template>
       </UModal>
+
+      <UModal
+        v-model:open="groupsStore.isLeaveModalOpen"
+        :title="CONST_LEAVE_GROUP_TITLE"
+        :dismissible="false"
+        :close="false"
+        :ui="{
+          overlay: 'fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm',
+          content: 'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] w-full max-w-md bg-white rounded-xl shadow-2xl ring-1 ring-black/5'
+        }"
+      >
+        <template #default>
+          <div class="hidden"></div>
+        </template>
+        <template #body>
+          <div class="flex flex-col gap-2 py-2">
+            <p class="text-sm text-dark-text/80">
+              {{ CONST_LEAVE_GROUP_CONFIRM }}
+              <span v-if="groupsStore.selectedGroupToLeave" class="block font-semibold mt-1 text-brand-500">
+                „{{ groupsStore.selectedGroupToLeave.name }}”
+              </span>
+            </p>
+
+            <p
+              v-if="
+                groupsStore.selectedGroupToLeave?.current_size === 1 &&
+                groupsStore.selectedGroupToLeave?.role?.toLowerCase() === 'leader'
+              "
+              class="text-xs font-semibold text-error-500 mt-2 bg-error-500/10 p-2 rounded border border-error-500/20"
+            >
+              {{ CONST_LEAVE_GROUP_WARNING }}
+            </p>
+          </div>
+        </template>
+        <template #footer>
+          <div class="flex items-center justify-between w-full">
+            <UButton
+              :label="CONST_CANCEL_BTN_TEXT"
+              variant="actionCancelButton"
+              @click="closeLeaveModal"
+            />
+            <UButton
+              :label="CONST_LEAVE_BTN"
+              variant="actionOkButton"
+              :loading="isLeaving"
+              @click="confirmLeave"
+            />
+          </div>
+        </template>
+      </UModal>
     </ClientOnly>
   </div>
 </template>
@@ -177,7 +235,7 @@ import { useRouter } from 'vue-router';
 import { useIntersectionObserver } from '@vueuse/core';
 import { useAuth } from '~/composables/useAuth';
 import { useGroupsQuery } from '~/queries/groups.query';
-import { useCreateGroupMutation, useDeleteGroupMutation } from '~/queries/groups.mutation';
+import { useCreateGroupMutation, useDeleteGroupMutation, useLeaveGroupMutation } from '~/queries/groups.mutation';
 import { createGroupSchema } from '~/utils/groups.schema';
 import { useGroupsStore } from '~/stores/groups.store';
 import type { GroupOutDto } from '~/types/groups.type';
@@ -190,6 +248,9 @@ import {
   CONST_DELETE_GROUP_TITLE,
   CONST_DELETE_GROUP_CONFIRM,
   CONST_DELETE_BTN,
+  CONST_LEAVE_GROUP_TITLE,
+  CONST_LEAVE_GROUP_CONFIRM,
+  CONST_LEAVE_BTN,
   CONST_CANCEL_BTN_TEXT,
   CONST_CREATE_GROUP_TITLE,
   CONST_GROUP_NAME_LABEL,
@@ -226,8 +287,8 @@ const { data: groupsData, isLoading, error } = useGroupsQuery(15, currentCursor)
 
 const { mutate: createGroup, isLoading: isCreating } = useCreateGroupMutation();
 const { mutate: deleteGroup, isLoading: isDeleting } = useDeleteGroupMutation();
+const { mutate: leaveGroup, isLoading: isLeaving } = useLeaveGroupMutation();
 
-// Végtelen görgetés adatkezelése
 const groupsList = ref<GroupOutDto[]>([]);
 const isFetchingNextPage = ref(false);
 
@@ -235,7 +296,6 @@ watch(
   () => groupsData.value,
   (newData) => {
     if (newData?.items) {
-      // Csak az új elemek hozzáadása (deduplikáció uuid alapján)
       const newItems = newData.items.filter(
         (newItem) => !groupsList.value.some((existing) => existing.uuid === newItem.uuid)
       );
@@ -300,20 +360,17 @@ const handleCreateGroup = async () => {
 
   try {
     await createGroup({ groupName: validationResult.data.groupName });
-    // Sikeres létrehozás után érdemes frissíteni a listát
     groupsList.value = []; 
     currentCursor.value = undefined;
     closeCreateModal();
   } catch (err: unknown) {
     const apiErr = err as ApiError;
     const msg = apiErr.response?._data?.message;
-
-    formError.value = typeof msg === 'string'
-      ? msg
-      : CONST_CREATE_ERROR_GENERIC;
+    formError.value = typeof msg === 'string' ? msg : CONST_CREATE_ERROR_GENERIC;
   }
 };
 
+// Delete Handlers
 const openDeleteModal = (group: GroupOutDto) => {
   groupsStore.openDeleteModal(group);
 };
@@ -327,12 +384,33 @@ const confirmDelete = async () => {
 
   try {
     await deleteGroup(groupsStore.selectedGroupToDelete.uuid);
-    // Sikeres törlés után a lista ürítése és újratöltése a legelső elemtől
     groupsList.value = [];
     currentCursor.value = undefined;
     closeDeleteModal();
   } catch (err: unknown) {
     console.error('Error during deletion:', err);
+  }
+};
+
+// Leave Handlers
+const openLeaveModal = (group: GroupOutDto) => {
+  groupsStore.openLeaveModal(group);
+};
+
+const closeLeaveModal = () => {
+  groupsStore.closeLeaveModal();
+};
+
+const confirmLeave = async () => {
+  if (!groupsStore.selectedGroupToLeave) return;
+
+  try {
+    await leaveGroup(groupsStore.selectedGroupToLeave.uuid);
+    groupsList.value = [];
+    currentCursor.value = undefined;
+    closeLeaveModal();
+  } catch (err: unknown) {
+    console.error('Error during leaving group:', err);
   }
 };
 </script>
