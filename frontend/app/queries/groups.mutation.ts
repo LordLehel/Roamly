@@ -24,3 +24,25 @@ export const useDeleteGroupMutation = () => {
     },
   });
 };
+
+export const useJoinGroupMutation = () => {
+  const queryCache = useQueryCache();
+
+  return useMutation({
+    mutation: (groupUuid: string) => groupsService.joinGroup(groupUuid),
+    onSuccess: () => {
+      queryCache.invalidateQueries({ key: ['groups'] });
+    },
+  });
+};
+
+export const useLeaveGroupMutation = () => {
+  const queryCache = useQueryCache();
+
+  return useMutation({
+    mutation: (groupUuid: string) => groupsService.leaveGroup(groupUuid),
+    onSuccess: () => {
+      queryCache.invalidateQueries({ key: ['groups'] });
+    },
+  });
+};

@@ -71,6 +71,8 @@ export const CONST_GROUPS_HEADING = 'Your groups';
 export const CONST_FILTER_LABEL = 'Filter';
 export const CONST_CREATED_AT_LABEL = 'Created at:';
 export const CONST_ROLE_LABEL = 'Your role:';
+
+// Delete Group Modal
 export const CONST_DELETE_GROUP_TITLE = 'Delete group';
 export const CONST_DELETE_GROUP_CONFIRM = 'Are you sure you want to delete this group?';
 export const CONST_DELETE_BTN = 'Delete';
@@ -86,3 +88,13 @@ export const CONST_LOADING_TEXT = 'Loading...';
 export const CONST_FETCH_ERROR_TEXT = 'An error occurred while loading data.';
 export const CONST_INVALID_DATA_ERROR = 'Invalid data!';
 export const CONST_CREATE_ERROR_GENERIC = 'An error occurred while creating the group!';
+
+// Invites
+export const CONST_INVITES_HEADING = 'Pending invitations';
+export const CONST_JOIN_GROUP_TITLE = 'Join group';
+export const CONST_JOIN_GROUP_CONFIRM = 'Are you sure you want to join this group?';
+export const CONST_JOIN_BTN = 'Join';
+export const CONST_DECLINE_INVITE_TITLE = 'Decline invitation';
+export const CONST_DECLINE_INVITE_CONFIRM = 'Are you sure you want to decline this invitation?';
+export const CONST_DECLINE_BTN = 'Decline';
+export const CONST_NO_INVITES_MSG = 'You have no pending invitations.';

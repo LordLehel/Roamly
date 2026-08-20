@@ -1,3 +1,4 @@
+// frontend/app/services/groupsService.ts
 import type { GroupOutDto, RawGroupDto } from '~/types/groups.type';
 import type { ApiResponse } from '~/types/api.type';
 import { useApi } from '~/composables/useApi';
@@ -22,7 +23,6 @@ interface RawPaginatedGroupsResponse {
   };
 }
 
-// Mapping függvény szigorú típusokkal
 const mapGroupData = (item: RawGroupDto): GroupOutDto => ({
   uuid: item.uuid,
   name: item.name,
@@ -63,6 +63,20 @@ export const groupsService = {
   async deleteGroup(groupUuid: string): Promise<void> {
     const api = useApi();
     await api<ApiResponse<void>>(`/groups/${groupUuid}`, {
+      method: 'DELETE',
+    });
+  },
+
+  async joinGroup(groupUuid: string): Promise<void> {
+    const api = useApi();
+    await api<ApiResponse<void>>(`/groups/${groupUuid}/join`, {
+      method: 'POST',
+    });
+  },
+
+  async leaveGroup(groupUuid: string): Promise<void> {
+    const api = useApi();
+    await api<ApiResponse<void>>(`/groups/${groupUuid}/leave`, {
       method: 'DELETE',
     });
   },
