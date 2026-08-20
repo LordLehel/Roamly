@@ -10,7 +10,6 @@
         :items="CONST_NAV_VIEWS"
         label-key="label"
         value-key="value"
-        class="w-48"
         @update:model-value="onViewChange"
       />
     </div>
@@ -66,13 +65,17 @@ const route = useRoute();
 const { isAuthenticated, logout } = useAuth();
 const { data: userProfile } = useCurrentUserQuery();
 
-// A legördülő kezdeti értéke az aktuális útvonal legyen
-const selectedView = ref(route.path);
+const getCurrentViewValue = (path: string) => {
+  const found = CONST_NAV_VIEWS.find(item => item.value === path || path.includes(item.value));
+  return found ? found.value : path;
+};
+
+const selectedView = ref(getCurrentViewValue(route.path));
 
 watch(
   () => route.path,
   (newPath) => {
-    selectedView.value = newPath;
+    selectedView.value = getCurrentViewValue(newPath);
   }
 );
 

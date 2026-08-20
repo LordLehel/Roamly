@@ -97,16 +97,18 @@ export default defineAppConfig({
         size: 'header',
       },
     },
-  },
 
-  // Select
-  select: {
+    // Select
+    select: {
       slots: {
-        base: 'w-full bg-input-bg text-dark-text rounded-xl ring-1 ring-input-border placeholder:text-text-muted focus:ring-2 focus:ring-brand-500 transition-colors h-11 px-4 shadow-none cursor-pointer',
-        content: 'bg-surface-500/90 backdrop-blur-xl rounded-xl ring-1 ring-dark-text/10 shadow-lg text-dark-text',
-        item: 'hover:bg-brand-500/20 text-dark-text cursor-pointer data-[highlighted]:bg-brand-500/20 data-[highlighted]:text-dark-text',
+        base: 'rounded-full text-brand-500 ring-1 ring-brand-500 bg-surface-500/70 backdrop-blur-md !px-4 !py-2 transition-colors text-xs font-semibold shadow-sm cursor-pointer justify-between min-w-36 flex-row-reverse',
+        trailingIcon: 'absolute right-25 transition-transform pointer-events-none text-brand-500',
+        content: 'z-[100] bg-text backdrop-blur-xl rounded-2xl ring-1 ring-brand-500/30 shadow-xl text-dark-text mt-2 min-w-40',
+        viewport: 'p-1',
+        item: 'flex items-center justify-center text-center py-2 px-4 hover:bg-brand-500/20 text-dark-text cursor-pointer data-[highlighted]:bg-brand-500/20 data-[highlighted]:text-dark-text font-medium text-xs rounded-xl mx-1 my-0.5',
       },
     },
+  },
 
   // Layout
   layout: {

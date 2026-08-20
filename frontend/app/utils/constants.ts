@@ -14,8 +14,8 @@ export const CONST_COPYRIGHT_LABEL = '© Copyright - Roamly Co. 2026 | All right
 // Backgrounds
 export const CONST_BG_AUTH = "bg-[url('/register/register-background.jpg')]";
 export const CONST_BG_HOME = "bg-[url('/home/home-background.jpg')]";
-export const CONST_BG_ABOUT = "bg-[url('/about/about-background.jpg')]";
-export const CONST_BG_SUPPORT = "bg-[url('/support/support-background.jpg')]";
+export const CONST_BG_GROUPS = "bg-[url('/groups/groups-background.jpg')]";
+export const CONST_BG_PROFILE = "bg-[url('/profile/profile-background.jpg')]";
 
 // Form
 export const CONST_LOGIN_HEADING = 'Log into your account';
@@ -75,3 +75,14 @@ export const CONST_DELETE_GROUP_TITLE = 'Delete group';
 export const CONST_DELETE_GROUP_CONFIRM = 'Are you sure you want to delete this group?';
 export const CONST_DELETE_BTN = 'Delete';
 export const CONST_CANCEL_BTN_TEXT = 'Cancel';
+
+// Create Group Modal
+export const CONST_CREATE_GROUP_TITLE = 'Create new group';
+export const CONST_GROUP_NAME_LABEL = 'Group name';
+export const CONST_GROUP_NAME_PLACEHOLDER = 'e.g. Summer Vacation';
+export const CONST_CREATE_BTN = 'Create';
+export const CONST_NO_GROUPS_MSG = 'You are not a member of any group yet.';
+export const CONST_LOADING_TEXT = 'Loading...';
+export const CONST_FETCH_ERROR_TEXT = 'An error occurred while loading data.';
+export const CONST_INVALID_DATA_ERROR = 'Invalid data!';
+export const CONST_CREATE_ERROR_GENERIC = 'An error occurred while creating the group!';

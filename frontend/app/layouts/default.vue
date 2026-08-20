@@ -16,12 +16,7 @@
 import { computed, watch } from 'vue';
 import { useRoute, useRouter, useAppConfig } from '#imports';
 import { useAuth } from '~/composables/useAuth';
-import {
-  CONST_COPYRIGHT_LABEL,
-  CONST_BG_HOME,
-  CONST_BG_ABOUT,
-  CONST_BG_SUPPORT,
-} from '../utils/constants';
+import { CONST_COPYRIGHT_LABEL, CONST_BG_HOME } from '../utils/constants';
 
 const route = useRoute();
 const router = useRouter();
@@ -50,10 +45,6 @@ watch(
 // background logic
 const bgClass = computed(() => {
   switch (pageName.value) {
-    case 'about':
-      return CONST_BG_ABOUT;
-    case 'support':
-      return CONST_BG_SUPPORT;
     default:
       return CONST_BG_HOME;
   }
