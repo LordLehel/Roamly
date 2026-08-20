@@ -1,5 +1,6 @@
 // frontend/app/queries/groups.query.ts
 import { useQuery } from '@pinia/colada';
+import { unref, type Ref } from 'vue';
 import { groupsService } from '~/services/groupsService';
 
 export const useGroupsQuery = (limit: number = 15, cursor?: Ref<string | undefined> | string) => {

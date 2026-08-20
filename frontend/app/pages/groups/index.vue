@@ -25,48 +25,56 @@
     </div>
 
     <ClientOnly>
-      <div v-if="isLoading" class="text-center py-10 text-dark-text/70">
+      <div v-if="isLoading && groupsList.length === 0" class="text-center py-10 text-dark-text/70">
         {{ CONST_LOADING_TEXT }}
       </div>
       <div v-else-if="error" class="text-center py-10 text-error-500">
         {{ CONST_FETCH_ERROR_TEXT }}
       </div>
-      <div v-else-if="groupsList.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-        <UCard
-          v-for="group in groupsList"
-          :key="group.uuid"
-          variant="interactiveGlass"
-          class="relative flex flex-col justify-between"
-        >
-          <div class="absolute top-4 right-4 z-10">
-            <UButton
-              icon="i-heroicons-trash"
-              variant="ghost"
-              class="text-dark-text/70 hover:text-error-500 transition-colors"
-              @click="openDeleteModal(group)"
-            />
-          </div>
+      
+      <div v-else-if="groupsList.length > 0" class="flex flex-col gap-6 w-full">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+          <UCard
+            v-for="group in groupsList"
+            :key="group.uuid"
+            variant="interactiveGlass"
+            class="relative flex flex-col justify-between"
+          >
+            <div class="absolute top-4 right-4 z-10">
+              <UButton
+                icon="i-heroicons-trash"
+                variant="ghost"
+                class="text-dark-text/70 hover:text-error-500 transition-colors"
+                @click="openDeleteModal(group)"
+              />
+            </div>
 
-          <div class="flex flex-col gap-6 w-full pt-2">
-            <h3 class="text-xl font-bold text-center tracking-wide text-dark-text">
-              {{ group.name }}
-            </h3>
-            <p class="text-sm text-center text-dark-text/80 font-medium">
-              {{ CONST_ROLE_LABEL }} <span class="font-bold">{{ group.role }}</span>
-            </p>
-            <div class="flex items-end justify-between w-full pt-4 border-t border-dark-text/10 text-xs text-dark-text/70">
-              <div>
-                <p class="opacity-70">{{ CONST_CREATED_AT_LABEL }}</p>
-                <p class="font-semibold">{{ group.created_at }}</p>
-              </div>
-              <div class="flex items-center gap-1.5 font-semibold">
-                <span>{{ group.current_size }}</span>
-                <UIcon name="i-heroicons-user" class="w-5 h-5 text-brand-500" />
+            <div class="flex flex-col gap-6 w-full pt-2">
+              <h3 class="text-xl font-bold text-center tracking-wide text-dark-text">
+                {{ group.name }}
+              </h3>
+              <p class="text-sm text-center text-dark-text/80 font-medium">
+                {{ CONST_ROLE_LABEL }} <span class="font-bold">{{ group.role }}</span>
+              </p>
+              <div class="flex items-end justify-between w-full pt-4 border-t border-dark-text/10 text-xs text-dark-text/70">
+                <div>
+                  <p class="opacity-70">{{ CONST_CREATED_AT_LABEL }}</p>
+                  <p class="font-semibold">{{ group.created_at }}</p>
+                </div>
+                <div class="flex items-center gap-1.5 font-semibold">
+                  <span>{{ group.current_size }}</span>
+                  <UIcon name="i-heroicons-user" class="w-5 h-5 text-brand-500" />
+                </div>
               </div>
             </div>
-          </div>
-        </UCard>
+          </UCard>
+        </div>
+        
+        <div ref="loadMoreTrigger" class="h-10 w-full flex items-center justify-center">
+          <span v-if="isFetchingNextPage" class="text-dark-text/70 text-sm">További csoportok betöltése...</span>
+        </div>
       </div>
+      
       <div v-else class="text-center py-10 text-dark-text/70">
         {{ CONST_NO_GROUPS_MSG }}
       </div>
@@ -162,8 +170,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { useIntersectionObserver } from '@vueuse/core';
 import { useAuth } from '~/composables/useAuth';
 import { useGroupsQuery } from '~/queries/groups.query';
 import { useCreateGroupMutation, useDeleteGroupMutation } from '~/queries/groups.mutation';
@@ -210,17 +219,62 @@ watch(
   { immediate: true }
 );
 
-const { data: groupsData, isLoading, error } = useGroupsQuery();
+const currentCursor = ref<string | undefined>(undefined);
+const { data: groupsData, isLoading, error } = useGroupsQuery(15, currentCursor);
+
 const { mutate: createGroup, isLoading: isCreating } = useCreateGroupMutation();
 const { mutate: deleteGroup, isLoading: isDeleting } = useDeleteGroupMutation();
 
-// We use Pinia's cache to keep the list of groups up to date
-const groupsList = computed<GroupOutDto[]>(() => groupsData.value?.items ?? []);
+// Végtelen görgetés adatkezelése
+const groupsList = ref<GroupOutDto[]>([]);
+const isFetchingNextPage = ref(false);
+
+watch(
+  () => groupsData.value,
+  (newData) => {
+    if (newData?.items) {
+      // Csak az új elemek hozzáadása (deduplikáció uuid alapján)
+      const newItems = newData.items.filter(
+        (newItem) => !groupsList.value.some((existing) => existing.uuid === newItem.uuid)
+      );
+      groupsList.value.push(...newItems);
+    }
+  },
+  { immediate: true }
+);
+
+watch(
+  () => isLoading.value,
+  (loading) => {
+    if (!loading) {
+      isFetchingNextPage.value = false;
+    }
+  }
+);
+
+const fetchNextPage = () => {
+  if (groupsData.value?.meta.has_next_page && groupsData.value.meta.next_cursor && !isFetchingNextPage.value) {
+    isFetchingNextPage.value = true;
+    currentCursor.value = groupsData.value.meta.next_cursor;
+  }
+};
+
+const loadMoreTrigger = ref<HTMLElement | null>(null);
+
+useIntersectionObserver(
+  loadMoreTrigger,
+  (entries) => {
+    const entry = entries[0];
+    if (entry?.isIntersecting) {
+      fetchNextPage();
+    }
+  },
+  { rootMargin: '100px' } 
+);
 
 const newGroupName = ref('');
 const formError = ref('');
 
-// Create modal
 const openCreateModal = () => {
   newGroupName.value = '';
   formError.value = '';
@@ -244,6 +298,9 @@ const handleCreateGroup = async () => {
 
   try {
     await createGroup({ groupName: validationResult.data.groupName });
+    // Sikeres létrehozás után érdemes frissíteni a listát
+    groupsList.value = []; 
+    currentCursor.value = undefined;
     closeCreateModal();
   } catch (err: unknown) {
     const apiErr = err as ApiError;
@@ -255,7 +312,6 @@ const handleCreateGroup = async () => {
   }
 };
 
-// Delete modal
 const openDeleteModal = (group: GroupOutDto) => {
   groupsStore.openDeleteModal(group);
 };
@@ -269,6 +325,9 @@ const confirmDelete = async () => {
 
   try {
     await deleteGroup(groupsStore.selectedGroupToDelete.uuid);
+    // Sikeres törlés után a lista ürítése és újratöltése a legelső elemtől
+    groupsList.value = [];
+    currentCursor.value = undefined;
     closeDeleteModal();
   } catch (err: unknown) {
     console.error('Error during deletion:', err);
