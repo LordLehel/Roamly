@@ -130,7 +130,7 @@ export default defineAppConfig({
       slots: {
         overlay: 'fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm',
         content:
-          'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] !w-full max-w-md bg-white/90 backdrop-blur-2xl !rounded-[25px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] ring-1 ring-black/10 focus:outline-none overflow-hidden',
+          'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] !w-[calc(100%-2rem)] !sm:max-w-md bg-white/90 backdrop-blur-2xl !rounded-[25px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] ring-1 ring-black/10 focus:outline-none overflow-hidden',
       },
     },
   },

@@ -78,7 +78,7 @@
 
       <div class="flex items-center justify-between pt-6">
         <UButton
-          :label="CONST_CANCEL_BTN"
+          :label="CONST_CANCEL_BTN_TEXT"
           variant="actionCancelButton"
           :disabled="isLoading"
           @click="clearForm"
@@ -99,20 +99,9 @@
 import { reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import type { FormSubmitEvent } from '#ui/types';
-import { registerSchema, type RegisterFormState } from '../utils/register.schema';
+import { registerSchema, type RegisterFormState } from '../utils/schemas/register.schema';
 import { useCreateUserMutation } from '../queries/user.mutation';
 import { getErrorMessage } from '../utils/error.utils';
-import {
-  CONST_REGISTER_HEADING,
-  CONST_EMAIL_LABEL,
-  CONST_USERNAME_LABEL,
-  CONST_PHONE_LABEL,
-  CONST_PASSWORD_LABEL,
-  CONST_REPEAT_PASSWORD_LABEL,
-  CONST_REGISTER_SUCCESS,
-  CONST_CANCEL_BTN,
-  CONST_REGISTER_TITLE,
-} from '../utils/constants';
 
 definePageMeta({
   layout: 'auth',

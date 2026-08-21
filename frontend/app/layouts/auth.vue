@@ -16,7 +16,6 @@
 import { watch } from 'vue';
 import { useAppConfig, useRouter } from '#imports';
 import { useAuth } from '~/composables/useAuth';
-import { CONST_COPYRIGHT_LABEL, CONST_BG_AUTH } from '../utils/constants';
 
 const appConfig = useAppConfig();
 const router = useRouter();

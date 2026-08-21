@@ -77,14 +77,6 @@
 import { watch } from 'vue';
 import { useAuth } from '../composables/useAuth';
 import { useCurrentUserQuery } from '../queries/user.query';
-import {
-  CONST_BRAND_NAME,
-  CONST_HOME_TITLE,
-  CONST_ABOUT_TITLE,
-  CONST_SUPPORT_TITLE,
-  CONST_LOGIN_TITLE,
-  CONST_LOGOUT_TITLE,
-} from '../utils/constants';
 
 const { isAuthenticated, logout } = useAuth();
 const { data: userProfile, error } = useCurrentUserQuery();

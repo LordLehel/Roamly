@@ -6,48 +6,14 @@ import type {
   GroupInvitesOutDto,
   RawGroupInvitesDto,
 } from '~/types/groups.type';
+import type {
+  PaginatedGroupsResponse,
+  RawPaginatedGroupsResponse,
+  PaginatedGroupInvitesResponse,
+  RawPaginatedGroupInvitesResponse,
+} from '~/types/paginatedGroups.type';
 import type { ApiResponse } from '~/types/api.type';
 import { useApi } from '~/composables/useApi';
-
-interface PaginatedGroupsResponse {
-  items: GroupOutDto[];
-  meta: {
-    next_cursor: string | null;
-    has_next_page: boolean;
-    limit: number;
-    count: number;
-  };
-}
-
-interface PaginatedGroupInvitesResponse {
-  items: GroupInvitesOutDto[];
-  meta: {
-    next_cursor: string | null;
-    has_next_page: boolean;
-    limit: number;
-    count: number;
-  };
-}
-
-interface RawPaginatedGroupsResponse {
-  items: RawGroupDto[];
-  meta: {
-    next_cursor: string | null;
-    has_next_page: boolean;
-    limit: number;
-    count: number;
-  };
-}
-
-interface RawPaginatedGroupInvitesResponse {
-  items: RawGroupInvitesDto[];
-  meta: {
-    next_cursor: string | null;
-    has_next_page: boolean;
-    limit: number;
-    count: number;
-  };
-}
 
 const mapGroupData = (item: RawGroupDto): GroupOutDto => ({
   uuid: item.uuid,

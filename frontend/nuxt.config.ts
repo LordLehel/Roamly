@@ -12,6 +12,10 @@ export default defineNuxtConfig({
     '@nuxtjs/google-fonts',
   ],
 
+  imports: {
+    dirs: ['utils/constants', 'utils/schemas'],
+  },
+
   postcss: {
     plugins: {
       '@tailwindcss/postcss': {},

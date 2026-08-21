@@ -1,0 +1,34 @@
+// frontend/app/utils/constants/auth.constants.ts
+export const CONST_HOME_TITLE = 'Home';
+export const CONST_ABOUT_TITLE = 'About';
+export const CONST_SUPPORT_TITLE = 'Support';
+export const CONST_LEARN_MORE = 'Learn more';
+export const CONST_SHOW_LESS = 'Show less';
+export const CONST_GET_STARTED = 'Get Started';
+export const CONST_DOCUMENT_MANAGEMENT = 'Document Management';
+export const CONST_EVENT_CALENDAR = 'Event Calendar';
+export const CONST_GROUP_GALLERY = 'Group Gallery';
+export const CONST_HOME_DESCRIPTION =
+  "Welcome to Roamly, your ultimate companion for seamless travel planning and unforgettable group adventures. Organize your documents, coordinate schedules, and share your journey's best moments all in one harmonious space.";
+export const CONST_DOCUMENT_MANAGEMENT_DESCRIPTION =
+  'Easily organize, store, and access all your travel documents and itineraries in one secure place.';
+export const CONST_DOCUMENT_MANAGEMENT_EXTENDED =
+  'There will be a document feature description here.';
+export const CONST_EVENT_CALENDAR_DESCRIPTION =
+  'Keep track of your upcoming trips, group meetups, and schedules without missing a single beat.';
+export const CONST_EVENT_CALENDAR_EXTENDED = 'There will be a calendar feature description here.';
+export const CONST_GROUP_GALLERY_DESCRIPTION =
+  'Share memorable moments and browse through community photo collections from past adventures.';
+export const CONST_GROUP_GALLERY_EXTENDED =
+  'There will be a group gallery feature description here.';
+
+// About
+export const CONST_ABOUT_HERO = 'About Roamly';
+export const CONST_ABOUT_DESCRIPTION =
+  'Our team is dedicated to providing the best experience for travelers. We are passionate about helping groups plan their trips efficiently and enjoyably. Our goal is to make travel planning a breeze, so you can focus on creating unforgettable memories.';
+
+// Support
+export const CONST_SUPPORT_HERO = 'How can we help you?';
+export const CONST_SUPPORT_DESCRIPTION =
+  'Need assistance with your travel documents, calendar syncing, or account settings? Our support team is here to ensure your Roamly experience is smooth and effortless.';
+export const CONST_SUPPORT_PICTURE_PATH = '/support/json-statham.jpg';

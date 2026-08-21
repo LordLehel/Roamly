@@ -3,7 +3,7 @@
   <header
     class="flex items-center justify-between px-6 py-4 bg-surface-500/70 backdrop-blur-md shadow-sm z-50 border-b border-dark-text/10 sticky top-0"
   >
-    <!-- Bal oldal: Legördülő nézetválasztó -->
+    <!-- Left side: Select -->
     <div class="flex-1 flex items-center gap-4">
       <UButton
         icon="i-heroicons-arrow-left"
@@ -20,7 +20,7 @@
       />
     </div>
 
-    <!-- Közép: Logo -->
+    <!-- Center: Logo -->
     <div class="flex-1 flex justify-center">
       <NuxtLink
         to="/"
@@ -31,7 +31,7 @@
       </NuxtLink>
     </div>
 
-    <!-- Jobb oldal: Profil / Log out -->
+    <!-- Right side: Profil / Log out -->
     <div class="flex-1 flex justify-end items-center gap-4">
       <ClientOnly>
         <div class="flex items-center gap-4">
@@ -60,7 +60,6 @@ import { ref, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useAuth } from '../composables/useAuth';
 import { useCurrentUserQuery } from '../queries/user.query';
-import { CONST_BRAND_NAME, CONST_LOGOUT_TITLE, CONST_NAV_VIEWS } from '../utils/constants';
 
 const router = useRouter();
 const route = useRoute();

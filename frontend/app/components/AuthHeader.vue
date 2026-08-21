@@ -23,7 +23,6 @@
 
 <script setup lang="ts">
 import { useAuth } from '../composables/useAuth';
-import { CONST_BRAND_NAME } from '../utils/constants';
 
 const { isAuthenticated } = useAuth();
 </script>

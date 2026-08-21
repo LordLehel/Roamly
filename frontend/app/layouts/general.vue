@@ -10,13 +10,19 @@
     <footer :class="appConfig.footer.base">
       <div :class="appConfig.footer.text">{{ CONST_COPYRIGHT_LABEL }}</div>
     </footer>
+
+    <GroupModals />
+    <GroupInvitesModals />
+    <GroupMembersModals />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRoute, useAppConfig } from '#imports';
-import { CONST_COPYRIGHT_LABEL, CONST_BG_GROUPS, CONST_BG_PROFILE } from '../utils/constants';
+import GroupModals from '~/components/modals/GroupModals.vue';
+import GroupInvitesModals from '~/components/modals/GroupInvitesModals.vue';
+import GroupMembersModals from '~/components/modals/GroupMembersModals.vue';
 
 const route = useRoute();
 const appConfig = useAppConfig();

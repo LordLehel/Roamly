@@ -12,6 +12,7 @@ export const useGroupsStore = defineStore('groups', () => {
   const isRemoveUserModalOpen = ref(false);
   const isUpdateModalOpen = ref(false);
   const isInviteModalOpen = ref(false);
+  const groupNameToUpdate = ref('');
 
   const selectedGroupToDelete = ref<GroupOutDto | null>(null);
   const selectedGroupToLeave = ref<GroupOutDto | null>(null);
@@ -73,9 +74,11 @@ export const useGroupsStore = defineStore('groups', () => {
   };
 
   // Update modal
-  const openUpdateModal = () => {
+  const openUpdateModal = (currentName: string) => {
+    groupNameToUpdate.value = currentName;
     isUpdateModalOpen.value = true;
   };
+
   const closeUpdateModal = () => {
     isUpdateModalOpen.value = false;
   };
@@ -107,6 +110,7 @@ export const useGroupsStore = defineStore('groups', () => {
     isUpdateModalOpen,
     isInviteModalOpen,
     isRemoveUserModalOpen,
+    groupNameToUpdate,
 
     selectedGroupToLeave,
     selectedGroupToJoin,
