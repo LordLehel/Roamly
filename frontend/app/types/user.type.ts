@@ -1,10 +1,11 @@
+// frontend/app/types/user.type.ts
 export interface UserOutDto {
-  id: string;
   username: string;
   email: string;
   phone_number: string;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: string | Date;
+  updated_at: string | Date;
+  profile_image_url?: string | null;
 }
 
 export interface UserInDto {
