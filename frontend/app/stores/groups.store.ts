@@ -73,12 +73,20 @@ export const useGroupsStore = defineStore('groups', () => {
   };
 
   // Update modal
-  const openUpdateModal = () => { isUpdateModalOpen.value = true; };
-  const closeUpdateModal = () => { isUpdateModalOpen.value = false; };
+  const openUpdateModal = () => {
+    isUpdateModalOpen.value = true;
+  };
+  const closeUpdateModal = () => {
+    isUpdateModalOpen.value = false;
+  };
 
   // Invite Modal
-  const openInviteModal = () => { isInviteModalOpen.value = true; };
-  const closeInviteModal = () => { isInviteModalOpen.value = false; };
+  const openInviteModal = () => {
+    isInviteModalOpen.value = true;
+  };
+  const closeInviteModal = () => {
+    isInviteModalOpen.value = false;
+  };
 
   // Remove User Modal
   const openRemoveUserModal = (email: string) => {

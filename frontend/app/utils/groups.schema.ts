@@ -14,7 +14,11 @@ export const createGroupSchema = z.object({
 });
 
 export const updateGroupSchema = z.object({
-  groupName: z.string().trim().min(3, 'Minimum 3 characters required!').max(64, 'Maximum 64 characters allowed!'),
+  groupName: z
+    .string()
+    .trim()
+    .min(3, 'Minimum 3 characters required!')
+    .max(64, 'Maximum 64 characters allowed!'),
 });
 
 export const inviteUserSchema = z.object({

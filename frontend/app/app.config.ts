@@ -32,7 +32,7 @@ export default defineAppConfig({
             'w-10 h-10 rounded-full font-semibold flex items-center justify-center p-0 cursor-pointer bg-surface-500/70 backdrop-blur-xl text-dark-text ring-1 ring-dark-text/10 hover:bg-error-500 hover:text-white transition-colors',
           glassIconButtonBrand:
             'w-10 h-10 rounded-full font-semibold flex items-center justify-center p-0 cursor-pointer bg-surface-500/70 backdrop-blur-xl text-brand-500 ring-1 ring-dark-text/10 hover:bg-brand-50 transition-colors',
-          
+
           ghostDangerIconButton:
             'text-dark-text/70 hover:text-error-500 transition-colors p-0 cursor-pointer',
           ghostBrandIconButton:
@@ -63,7 +63,7 @@ export default defineAppConfig({
           pointedGlass: {
             root: 'bg-surface-500/70 backdrop-blur-xl rounded-[25px] shadow-[0_15px_40px_rgba(47,62,50,0.15)] border-0 ring-1 ring-surface-500/50 text-dark-text transition-transform hover:-translate-y-1 cursor-pointer',
             body: 'flex flex-col items-center justify-center h-full text-center p-8',
-          }
+          },
         },
       },
     },
@@ -153,5 +153,5 @@ export default defineAppConfig({
     pageSubtitle: 'text-sm opacity-80 capitalize text-surface-500 font-semibold mt-1',
     cardTitle: 'text-xl font-bold tracking-wide text-dark-text truncate pr-2',
     cardTitleCenter: 'text-xl font-bold text-center tracking-wide text-dark-text truncate pr-2',
-  }
+  },
 });

@@ -61,8 +61,13 @@ export const useUpdateGroupMutation = () => {
 
 export const useInviteUserMutation = () => {
   return useMutation({
-    mutation: ({ groupUuid, data }: { groupUuid: string; data: { invitedUserEmail: string; inviteWithRole: string } }) =>
-      groupsService.inviteUser(groupUuid, data),
+    mutation: ({
+      groupUuid,
+      data,
+    }: {
+      groupUuid: string;
+      data: { invitedUserEmail: string; inviteWithRole: string };
+    }) => groupsService.inviteUser(groupUuid, data),
   });
 };
 

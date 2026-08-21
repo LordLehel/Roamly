@@ -118,7 +118,8 @@ export const CONST_ROLE_SELECTION_LABEL = 'Role';
 export const CONST_INVITE_BTN = 'Send invite';
 export const CONST_INVITE_SUCCESS_MSG = 'Invitation sent successfully!';
 export const CONST_REMOVE_USER_TITLE = 'Remove user';
-export const CONST_REMOVE_USER_CONFIRM = 'Are you sure you want to remove this user from the group?';
+export const CONST_REMOVE_USER_CONFIRM =
+  'Are you sure you want to remove this user from the group?';
 export const CONST_REMOVE_BTN = 'Remove';
 export const CONST_JOINED_LABEL = 'Joined:';
 export const CONST_ROLE_LABEL = 'Role:';

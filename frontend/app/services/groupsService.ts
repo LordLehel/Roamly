@@ -1,5 +1,11 @@
 // frontend/app/services/groupsService.ts
-import type { GroupOutDto, RawGroupDto, GroupInfosOutDto, GroupInvitesOutDto, RawGroupInvitesDto } from '~/types/groups.type';
+import type {
+  GroupOutDto,
+  RawGroupDto,
+  GroupInfosOutDto,
+  GroupInvitesOutDto,
+  RawGroupInvitesDto,
+} from '~/types/groups.type';
 import type { ApiResponse } from '~/types/api.type';
 import { useApi } from '~/composables/useApi';
 
@@ -52,9 +58,10 @@ const mapGroupData = (item: RawGroupDto): GroupOutDto => ({
 });
 
 const mapGroupInviteData = (item: RawGroupInvitesDto): GroupInvitesOutDto => {
-  const leaders = item.group_profiles
-    ?.filter(p => p.roles?.type?.toLowerCase() === 'leader')
-    .map(p => p.users?.username ?? 'Unknown') ?? [];
+  const leaders =
+    item.group_profiles
+      ?.filter((p) => p.roles?.type?.toLowerCase() === 'leader')
+      .map((p) => p.users?.username ?? 'Unknown') ?? [];
 
   return {
     uuid: item.uuid,
@@ -118,7 +125,10 @@ export const groupsService = {
     });
   },
 
-  async getPendingInvites(limit: number = 15, cursor?: string): Promise<PaginatedGroupInvitesResponse> {
+  async getPendingInvites(
+    limit: number = 15,
+    cursor?: string,
+  ): Promise<PaginatedGroupInvitesResponse> {
     const api = useApi();
     const query: Record<string, string | number> = { limit };
     if (cursor) {
@@ -154,7 +164,10 @@ export const groupsService = {
     return mapGroupData(response.data);
   },
 
-  async inviteUser(groupUuid: string, data: { invitedUserEmail: string; inviteWithRole: string }): Promise<void> {
+  async inviteUser(
+    groupUuid: string,
+    data: { invitedUserEmail: string; inviteWithRole: string },
+  ): Promise<void> {
     const api = useApi();
     await api<ApiResponse<void>>(`/groups/${groupUuid}/invite`, {
       method: 'POST',

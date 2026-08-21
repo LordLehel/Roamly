@@ -3,7 +3,7 @@
     <div class="flex flex-col md:flex-row justify-between items-center w-full gap-6">
       <div class="flex items-center gap-4">
         <UButton icon="i-heroicons-funnel" :label="CONST_FILTER_LABEL" variant="glassButton" />
-        
+
         <UButton
           v-if="isCurrentUserLeader"
           icon="i-heroicons-user-plus"
@@ -352,7 +352,6 @@
           </div>
         </template>
       </UModal>
-
     </ClientOnly>
   </div>
 </template>
@@ -369,7 +368,7 @@ import {
   useInviteUserMutation,
   useRemoveUserMutation,
   useLeaveGroupMutation,
-  useDeleteGroupMutation
+  useDeleteGroupMutation,
 } from '~/queries/groups.mutation';
 import { updateGroupSchema, inviteUserSchema } from '~/utils/groups.schema';
 import { useGroupsStore } from '~/stores/groups.store';
@@ -403,7 +402,7 @@ import {
   CONST_YOU_LABEL,
   CONST_DELETE_GROUP_TITLE,
   CONST_DELETE_GROUP_CONFIRM,
-  CONST_DELETE_BTN
+  CONST_DELETE_BTN,
 } from '~/utils/constants';
 
 definePageMeta({
@@ -438,7 +437,7 @@ const { data: groupInfos, isLoading, error } = useGroupInfosQuery(groupUuid);
 
 const isCurrentUserLeader = computed(() => {
   const profile = groupInfos.value?.group_profiles?.find(
-    (p) => p.users.email === currentUser.value?.email
+    (p) => p.users.email === currentUser.value?.email,
   );
   return profile?.roles.type.toLowerCase() === 'leader';
 });

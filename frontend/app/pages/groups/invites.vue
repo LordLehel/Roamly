@@ -27,7 +27,11 @@
             @click="openJoinModal(group)"
           >
             <div class="absolute top-4 right-4 z-10">
-              <UButton icon="i-heroicons-x-mark" variant="ghostDangerIconButton" @click.stop="openDeclineModal(group)" />
+              <UButton
+                icon="i-heroicons-x-mark"
+                variant="ghostDangerIconButton"
+                @click.stop="openDeclineModal(group)"
+              />
             </div>
 
             <div class="flex flex-col gap-6 w-full pt-2">
@@ -36,7 +40,7 @@
               </h3>
 
               <p class="text-sm text-center text-dark-text/80 font-medium">
-                {{ group.leaders.length > 1 ? CONST_LEADERS_LABEL : CONST_LEADER_LABEL }} 
+                {{ group.leaders.length > 1 ? CONST_LEADERS_LABEL : CONST_LEADER_LABEL }}
                 <span class="font-bold">{{ group.leaders.join(', ') }}</span>
               </p>
               <div
