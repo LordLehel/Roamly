@@ -23,7 +23,7 @@ export default defineAppConfig({
             'rounded-full !px-10 justify-center bg-transparent ring-1 ring-accent-500 text-accent-500 hover:bg-accent-500 hover:text-surface-500 h-11 font-bold tracking-wide transition-colors cursor-pointer',
 
           glassButton:
-            'h-10 px-8 text-md bg-surface-500/70 backdrop-blur-xl text-dark-text ring-1 ring-dark-text/10 hover:bg-surface-500/90 transition-colors cursor-pointer',
+            'h-10 px-8 rounded-full !min-w-18 flex items-center justify-center text-md bg-surface-500/70 backdrop-blur-xl text-dark-text ring-1 ring-dark-text/10 hover:bg-surface-500/90 transition-colors cursor-pointer',
           glassOutlineButton:
             'border border-brand-500/50 px-6 py-2.5 rounded-md bg-light-bg/70 hover:bg-light-bg text-dark-text transition-colors backdrop-blur-md cursor-pointer',
           glassIconButton:
@@ -34,9 +34,9 @@ export default defineAppConfig({
             'w-10 h-10 rounded-full font-semibold flex items-center justify-center p-0 cursor-pointer bg-surface-500/70 backdrop-blur-xl text-brand-500 ring-1 ring-dark-text/10 hover:bg-brand-50 transition-colors',
           
           ghostDangerIconButton:
-            'text-dark-text/70 hover:text-error-500 transition-colors p-0',
+            'text-dark-text/70 hover:text-error-500 transition-colors p-0 cursor-pointer',
           ghostBrandIconButton:
-            'text-surface-500 hover:text-brand-500 p-1 transition-colors',
+            'text-surface-500 hover:text-brand-500 p-1 transition-colors cursor-pointer',
         },
       },
     },

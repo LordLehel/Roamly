@@ -1,7 +1,7 @@
 // frontend/app/stores/groups.store.ts
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import type { GroupOutDto } from '~/types/groups.type';
+import type { GroupOutDto, GroupInvitesOutDto } from '~/types/groups.type';
 
 export const useGroupsStore = defineStore('groups', () => {
   const isCreateModalOpen = ref(false);
@@ -15,8 +15,8 @@ export const useGroupsStore = defineStore('groups', () => {
 
   const selectedGroupToDelete = ref<GroupOutDto | null>(null);
   const selectedGroupToLeave = ref<GroupOutDto | null>(null);
-  const selectedGroupToJoin = ref<GroupOutDto | null>(null);
-  const selectedGroupToDecline = ref<GroupOutDto | null>(null);
+  const selectedGroupToJoin = ref<GroupInvitesOutDto | null>(null);
+  const selectedGroupToDecline = ref<GroupInvitesOutDto | null>(null);
   const selectedUserEmailToRemove = ref<string | null>(null);
 
   // Create modal
@@ -51,7 +51,7 @@ export const useGroupsStore = defineStore('groups', () => {
   };
 
   // Join modal
-  const openJoinModal = (group: GroupOutDto) => {
+  const openJoinModal = (group: GroupInvitesOutDto) => {
     selectedGroupToJoin.value = group;
     isJoinModalOpen.value = true;
   };
@@ -62,7 +62,7 @@ export const useGroupsStore = defineStore('groups', () => {
   };
 
   // Decline modal
-  const openDeclineModal = (group: GroupOutDto) => {
+  const openDeclineModal = (group: GroupInvitesOutDto) => {
     selectedGroupToDecline.value = group;
     isDeclineModalOpen.value = true;
   };

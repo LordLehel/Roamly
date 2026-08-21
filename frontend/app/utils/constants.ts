@@ -98,6 +98,8 @@ export const CONST_LEAVE_GROUP_WARNING =
 
 // Invites
 export const CONST_INVITES_HEADING = 'Pending invitations';
+export const CONST_LEADER_LABEL = 'Leader:';
+export const CONST_LEADERS_LABEL = 'Leaders:';
 export const CONST_JOIN_GROUP_TITLE = 'Join group';
 export const CONST_JOIN_GROUP_CONFIRM = 'Are you sure you want to join this group?';
 export const CONST_JOIN_BTN = 'Join';

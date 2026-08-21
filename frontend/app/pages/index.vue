@@ -105,13 +105,6 @@
       <p class="mt-8 text-lg text-surface-500 font-medium opacity-90 leading-relaxed">
         {{ CONST_SUPPORT_DESCRIPTION }}
       </p>
-      <div class="flex justify-center my-8 transition-transform hover:-translate-y-1">
-        <img
-          :src="CONST_SUPPORT_PICTURE_PATH"
-          alt="Support Mascot"
-          class="w-full max-w-lg rounded-[25px] shadow-[0_15px_40px_rgba(47,62,50,0.15)] object-cover ring-1 ring-dark-text/20"
-        />
-      </div>
     </section>
   </div>
 </template>
@@ -137,7 +130,6 @@ import {
   CONST_ABOUT_DESCRIPTION,
   CONST_SUPPORT_HERO,
   CONST_SUPPORT_DESCRIPTION,
-  CONST_SUPPORT_PICTURE_PATH,
 } from '../utils/constants';
 
 definePageMeta({ layout: 'default' });

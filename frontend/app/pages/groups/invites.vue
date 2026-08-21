@@ -34,8 +34,10 @@
               <h3 :class="appConfig.typography.cardTitleCenter">
                 {{ group.name }}
               </h3>
+
               <p class="text-sm text-center text-dark-text/80 font-medium">
-                {{ CONST_YOUR_ROLE_LABEL }} <span class="font-bold">{{ group.role }}</span>
+                {{ group.leaders.length > 1 ? CONST_LEADERS_LABEL : CONST_LEADER_LABEL }} 
+                <span class="font-bold">{{ group.leaders.join(', ') }}</span>
               </p>
               <div
                 class="flex items-end justify-between w-full pt-4 border-t border-dark-text/10 text-xs text-dark-text/70"
@@ -150,12 +152,13 @@ import { useAuth } from '~/composables/useAuth';
 import { usePendingInvitesQuery } from '~/queries/groups.query';
 import { useJoinGroupMutation, useLeaveGroupMutation } from '~/queries/groups.mutation';
 import { useGroupsStore } from '~/stores/groups.store';
-import type { GroupOutDto } from '~/types/groups.type';
+import type { GroupInvitesOutDto } from '~/types/groups.type';
 import {
   CONST_INVITES_HEADING,
   CONST_FILTER_LABEL,
   CONST_CREATED_AT_LABEL,
-  CONST_YOUR_ROLE_LABEL,
+  CONST_LEADER_LABEL,
+  CONST_LEADERS_LABEL,
   CONST_JOIN_GROUP_TITLE,
   CONST_JOIN_GROUP_CONFIRM,
   CONST_JOIN_BTN,
@@ -194,7 +197,7 @@ const { data: invitesData, isLoading, error } = usePendingInvitesQuery(15, curre
 const { mutate: joinGroup, isLoading: isJoining } = useJoinGroupMutation();
 const { mutate: leaveGroup, isLoading: isLeaving } = useLeaveGroupMutation();
 
-const invitesList = ref<GroupOutDto[]>([]);
+const invitesList = ref<GroupInvitesOutDto[]>([]);
 const isFetchingNextPage = ref(false);
 
 watch(
@@ -248,7 +251,7 @@ useIntersectionObserver(
 );
 
 // Join modal handlers
-const openJoinModal = (group: GroupOutDto) => {
+const openJoinModal = (group: GroupInvitesOutDto) => {
   groupsStore.openJoinModal(group);
 };
 
@@ -270,7 +273,7 @@ const confirmJoin = async () => {
 };
 
 // Decline modal handlers
-const openDeclineModal = (group: GroupOutDto) => {
+const openDeclineModal = (group: GroupInvitesOutDto) => {
   groupsStore.openDeclineModal(group);
 };
 

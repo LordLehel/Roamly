@@ -1,10 +1,20 @@
 // frontend/app/services/groupsService.ts
-import type { GroupOutDto, RawGroupDto, GroupInfosOutDto } from '~/types/groups.type';
+import type { GroupOutDto, RawGroupDto, GroupInfosOutDto, GroupInvitesOutDto, RawGroupInvitesDto } from '~/types/groups.type';
 import type { ApiResponse } from '~/types/api.type';
 import { useApi } from '~/composables/useApi';
 
 interface PaginatedGroupsResponse {
   items: GroupOutDto[];
+  meta: {
+    next_cursor: string | null;
+    has_next_page: boolean;
+    limit: number;
+    count: number;
+  };
+}
+
+interface PaginatedGroupInvitesResponse {
+  items: GroupInvitesOutDto[];
   meta: {
     next_cursor: string | null;
     has_next_page: boolean;
@@ -23,6 +33,16 @@ interface RawPaginatedGroupsResponse {
   };
 }
 
+interface RawPaginatedGroupInvitesResponse {
+  items: RawGroupInvitesDto[];
+  meta: {
+    next_cursor: string | null;
+    has_next_page: boolean;
+    limit: number;
+    count: number;
+  };
+}
+
 const mapGroupData = (item: RawGroupDto): GroupOutDto => ({
   uuid: item.uuid,
   name: item.name,
@@ -30,6 +50,20 @@ const mapGroupData = (item: RawGroupDto): GroupOutDto => ({
   created_at: item.created_at ? new Date(item.created_at).toLocaleDateString() : '',
   current_size: item.current_size ?? 0,
 });
+
+const mapGroupInviteData = (item: RawGroupInvitesDto): GroupInvitesOutDto => {
+  const leaders = item.group_profiles
+    ?.filter(p => p.roles?.type?.toLowerCase() === 'leader')
+    .map(p => p.users?.username ?? 'Unknown') ?? [];
+
+  return {
+    uuid: item.uuid,
+    name: item.name,
+    leaders,
+    created_at: item.created_at ? new Date(item.created_at).toLocaleDateString() : '',
+    current_size: item.current_size ?? 0,
+  };
+};
 
 export const groupsService = {
   async listGroups(limit: number = 15, cursor?: string): Promise<PaginatedGroupsResponse> {
@@ -84,21 +118,21 @@ export const groupsService = {
     });
   },
 
-  async getPendingInvites(limit: number = 15, cursor?: string): Promise<PaginatedGroupsResponse> {
+  async getPendingInvites(limit: number = 15, cursor?: string): Promise<PaginatedGroupInvitesResponse> {
     const api = useApi();
     const query: Record<string, string | number> = { limit };
     if (cursor) {
       query.cursor = cursor;
     }
 
-    const response = await api<ApiResponse<RawPaginatedGroupsResponse>>('/groups/invites', {
+    const response = await api<ApiResponse<RawPaginatedGroupInvitesResponse>>('/groups/invites', {
       method: 'GET',
       query,
     });
 
     return {
       ...response.data,
-      items: response.data.items.map(mapGroupData),
+      items: response.data.items.map(mapGroupInviteData),
     };
   },
 
