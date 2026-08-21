@@ -102,15 +102,15 @@ export const uploadPrivateFileToCloud = async (
   return uniqueFileName;
 };
 
-// get a URL that let's the user check his private document for 5 minutes
+// get a URL that let's the user check his private document for 1 day
 export const getPrivatePresignedUrl = async (fileKey: string): Promise<string> => {
   const command = new GetObjectCommand({
     Bucket: config.r2.privateBucketName,
     Key: fileKey,
   });
 
-  // URL is live for 5 minutes
-  return await getSignedUrl(privateS3Client, command, { expiresIn: 300 });
+  // URL is live for 1 day
+  return await getSignedUrl(privateS3Client, command, { expiresIn: 60 * 60 * 24 });
 };
 
 // delete file from cloud

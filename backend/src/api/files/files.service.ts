@@ -1,21 +1,37 @@
-import { files, file_shares } from '@prisma/client';
+import { files, file_shares, Prisma } from '@prisma/client';
 import prisma from '../../prisma';
 import * as cloudOperations from '../../utils/storage.util';
-import { ForbiddenError } from '../../utils/ServerError';
-import { privateDocumentMetadata } from '../../types/files.types';
+import { BadRequestError, ConflictError, ForbiddenError } from '../../utils/ServerError';
+import { docSharedWithGroups, privateDocumentMetadata } from '../../types/files.types';
 
 export const uploadPrivateDocument = async (
   userUuid: string,
   fileData: Express.Multer.File,
   document_type: string,
-  issue_date: string,
-  expiry_date: string,
+  issue_date?: string,
+  expiry_date?: string,
 ): Promise<files> => {
   const user = await prisma.users.findUniqueOrThrow({
     where: {
       uuid: userUuid,
     },
   });
+
+  const existingDocsCount = await prisma.files.count({
+    where: {
+      user_id: user.user_id,
+      ownership_type: 'PRIVATE',
+      documents: {
+        document_type: document_type,
+      },
+    },
+  });
+
+  if (existingDocsCount >= 3) {
+    throw new BadRequestError(
+      `You already uploaded 3 files of type: ${document_type}, if you want to replace one, try the replace option!`,
+    );
+  }
 
   const fileKey = await cloudOperations.uploadPrivateFileToCloud(fileData, 'document');
 
@@ -151,4 +167,278 @@ export const getAllPrivateDocumentsMetadataOfAUser = async (
   });
 
   return privateDocumentsMetadata;
+};
+
+export const replacePrivateDocument = async (
+  userUuid: string,
+  fileId: number,
+  document_type: string,
+  fileData?: Express.Multer.File,
+  issue_date?: string,
+  expiry_date?: string,
+): Promise<files> => {
+  const user = await prisma.users.findUniqueOrThrow({
+    where: {
+      uuid: userUuid,
+    },
+  });
+
+  const file = await prisma.files.findUniqueOrThrow({
+    where: {
+      file_id: fileId,
+    },
+  });
+
+  // validate authorization
+  if (file.user_id !== user.user_id) {
+    throw new ForbiddenError('Users can only replace their own files!');
+  }
+
+  const updateData: Prisma.filesUpdateInput = {
+    documents: {
+      update: {
+        document_type: document_type,
+        issue_date: issue_date ? new Date(issue_date) : null,
+        expiry_date: expiry_date ? new Date(expiry_date) : null,
+      },
+    },
+  };
+
+  if (fileData) {
+    // deleting old file from Cloud
+    await cloudOperations.deletePrivateFilesFromCloud([file.file_url]);
+
+    const fileKey = await cloudOperations.uploadPrivateFileToCloud(fileData, 'document');
+
+    updateData.file_name = fileData.originalname;
+    updateData.file_url = fileKey;
+    updateData.file_size = fileData.size;
+    updateData.mime_type = fileData.mimetype;
+  }
+
+  const updatedFile = await prisma.files.update({
+    where: {
+      file_id: fileId,
+    },
+    data: updateData,
+    include: {
+      documents: true,
+    },
+  });
+
+  return updatedFile;
+};
+
+export const shareDocumentsWithGroup = async (
+  userUuid: string,
+  groupUuid: string,
+  fileId: number,
+  accessLevel: string,
+): Promise<file_shares> => {
+  const user = await prisma.users.findUniqueOrThrow({
+    where: {
+      uuid: userUuid,
+    },
+  });
+
+  const group = await prisma.groups.findUniqueOrThrow({
+    where: {
+      uuid: groupUuid,
+    },
+  });
+
+  const file = await prisma.files.findUniqueOrThrow({
+    where: {
+      file_id: fileId,
+    },
+  });
+
+  // validate authorization
+  if (file.user_id !== user.user_id) {
+    throw new ForbiddenError('Users can only share their own files!');
+  }
+
+  // validate membership in group
+  const isPartOfTheGroup = await prisma.group_profiles.findFirst({
+    where: {
+      user_id: user.user_id,
+      group_id: group.group_id,
+    },
+  });
+
+  if (!isPartOfTheGroup) {
+    throw new ForbiddenError('Users can only share files to groups they are part of!');
+  }
+
+  if (file.ownership_type !== 'PRIVATE') {
+    throw new BadRequestError('Users can share only their private files with other groups!');
+  }
+
+  // is the file already shared
+  const alreadyShared = await prisma.file_shares.findFirst({
+    where: {
+      file_id: file.file_id,
+      group_id: group.group_id,
+    },
+  });
+
+  if (alreadyShared) {
+    throw new ConflictError('File already shared with group!');
+  }
+
+  const sharingData = await prisma.file_shares.create({
+    data: {
+      file_id: file.file_id,
+      group_id: group.group_id,
+      shared_by: user.user_id,
+      access_level: accessLevel,
+    },
+  });
+
+  return sharingData;
+};
+
+export const deleteSharing = async (
+  userUuid: string,
+  groupUuid: string,
+  fileId: number,
+): Promise<void> => {
+  const user = await prisma.users.findUniqueOrThrow({
+    where: {
+      uuid: userUuid,
+    },
+  });
+
+  const group = await prisma.groups.findUniqueOrThrow({
+    where: {
+      uuid: groupUuid,
+    },
+  });
+
+  const file = await prisma.files.findUniqueOrThrow({
+    where: {
+      file_id: fileId,
+    },
+  });
+
+  // validate authorization
+  if (file.user_id !== user.user_id) {
+    throw new ForbiddenError('Users can only delete sharing of their own files!');
+  }
+
+  const isShared = await prisma.file_shares.findFirst({
+    where: {
+      file_id: file.file_id,
+      group_id: group.group_id,
+    },
+  });
+
+  if (!isShared) {
+    throw new BadRequestError('File must be shared before revoking the sharing!');
+  }
+
+  await prisma.file_shares.delete({
+    where: {
+      file_id_group_id: {
+        file_id: file.file_id,
+        group_id: group.group_id,
+      },
+    },
+  });
+};
+
+export const updateSharingConditions = async (
+  userUuid: string,
+  groupUuid: string,
+  fileId: number,
+  accessLevel: string,
+): Promise<file_shares> => {
+  const user = await prisma.users.findUniqueOrThrow({
+    where: {
+      uuid: userUuid,
+    },
+  });
+
+  const group = await prisma.groups.findUniqueOrThrow({
+    where: {
+      uuid: groupUuid,
+    },
+  });
+
+  const file = await prisma.files.findUniqueOrThrow({
+    where: {
+      file_id: fileId,
+    },
+  });
+
+  // validate authorization
+  if (file.user_id !== user.user_id) {
+    throw new ForbiddenError('Users can only update sharing conditions of their own files!');
+  }
+
+  const isShared = await prisma.file_shares.findFirst({
+    where: {
+      file_id: file.file_id,
+      group_id: group.group_id,
+    },
+  });
+
+  if (!isShared) {
+    throw new BadRequestError('File must be shared before updating the sharing conditions!');
+  }
+
+  const updatedSharingConditions = await prisma.file_shares.update({
+    where: {
+      file_id_group_id: {
+        file_id: file.file_id,
+        group_id: group.group_id,
+      },
+    },
+    data: {
+      access_level: accessLevel,
+    },
+  });
+
+  return updatedSharingConditions;
+};
+
+export const listAllGroupsADocumentIsSharedWith = async (
+  userUuid: string,
+  fileId: number,
+): Promise<docSharedWithGroups[]> => {
+  const user = await prisma.users.findUniqueOrThrow({
+    where: {
+      uuid: userUuid,
+    },
+  });
+
+  const file = await prisma.files.findUniqueOrThrow({
+    where: {
+      file_id: fileId,
+    },
+  });
+
+  // validate authorization
+  if (file.user_id !== user.user_id) {
+    throw new ForbiddenError('Users can only list sharing data of their own files!');
+  }
+
+  const docSharedWithGroups = await prisma.file_shares.findMany({
+    where: {
+      file_id: file.file_id,
+    },
+    select: {
+      shared_by: true,
+      shared_at: true,
+      access_level: true,
+
+      groups: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  });
+
+  return docSharedWithGroups;
 };

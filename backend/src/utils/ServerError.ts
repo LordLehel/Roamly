@@ -38,7 +38,7 @@ export class ConflictError extends ServerError {
   }
 }
 
-// (Opcionális) 404 Not Found
+// 404 Not Found
 export class NotFoundError extends ServerError {
   constructor(message: string) {
     super(message, 404);

@@ -10,21 +10,59 @@ const router = Router();
 router.use(requireAuth);
 
 router.post(
-  '/document',
+  '/documents',
   uploadDocument.single('file'),
-  validateData(zodSchemas.uploadPrivateDocumentSchema, 'body'),
+  validateData(zodSchemas.privateDocumentDataSchema, 'body'),
   filesController.uploadPrivateDocument,
 );
 router.get(
-  '/document/:fileId',
+  '/documents/:fileId',
   validateData(zodSchemas.fileIdValidationSchema, 'params'),
   filesController.getPrivateDocumentUrl,
 );
 router.delete(
-  '/document/:fileId',
+  '/documents/:fileId',
   validateData(zodSchemas.fileIdValidationSchema, 'params'),
   filesController.deletePrivateDocument,
 );
 router.get('/documents', filesController.getAllPrivateDocumentsMetadataOfAUser);
+router.patch(
+  '/documents/:fileId',
+  uploadDocument.single('file'),
+  validateData(zodSchemas.fileIdValidationSchema, 'params'),
+  validateData(zodSchemas.privateDocumentDataSchema, 'body'),
+  filesController.replacePrivateDocument,
+);
+router.post(
+  '/documents/share/:fileId',
+  validateData(zodSchemas.fileIdValidationSchema, 'params'),
+  validateData(
+    zodSchemas.groupUuidValidationSchema.extend(zodSchemas.sharingUpdateSchema.shape),
+    'body',
+  ),
+  filesController.shareDocumentsWithGroup,
+);
+router.delete(
+  '/documents/share/:fileId/:groupUuid',
+  validateData(
+    zodSchemas.fileIdValidationSchema.extend(zodSchemas.groupUuidValidationSchema.shape),
+    'params',
+  ),
+  filesController.deleteSharing,
+);
+router.patch(
+  '/documents/share/:fileId/:groupUuid',
+  validateData(
+    zodSchemas.fileIdValidationSchema.extend(zodSchemas.groupUuidValidationSchema.shape),
+    'params',
+  ),
+  validateData(zodSchemas.sharingUpdateSchema, 'body'),
+  filesController.updateSharingConditions,
+);
+router.get(
+  '/documents/:fileId/shares',
+  validateData(zodSchemas.fileIdValidationSchema, 'params'),
+  filesController.listAllGroupsADocumentIsSharedWith,
+);
 
 export default router;
