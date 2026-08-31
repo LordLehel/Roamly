@@ -12,20 +12,18 @@
       <template #body>
         <form
           id="edit-username-form"
-          class="flex flex-col gap-4 py-2"
+          :class="appConfig.layout.modalForm"
           @submit.prevent="handleUpdateUsername"
         >
           <div>
-            <label class="block text-sm font-medium text-dark-text mb-1">{{
-              CONST_USERNAME_LABEL
-            }}</label>
-            <UInput v-model="editFormData.username" class="w-full" />
-            <p v-if="usernameError" class="text-xs text-error-500 mt-1">{{ usernameError }}</p>
+            <label :class="appConfig.typography.inputLabel">{{ CONST_USERNAME_LABEL }}</label>
+            <UInput v-model="editFormData.username" variant="glass" class="w-full" />
+            <p v-if="usernameError" :class="appConfig.typography.inputError">{{ usernameError }}</p>
           </div>
         </form>
       </template>
       <template #footer>
-        <div class="flex items-center justify-between w-full">
+        <div :class="appConfig.layout.modalActions">
           <UButton
             :label="CONST_CANCEL_BTN_TEXT"
             variant="actionCancelButton"
@@ -53,20 +51,18 @@
       <template #body>
         <form
           id="edit-email-form"
-          class="flex flex-col gap-4 py-2"
+          :class="appConfig.layout.modalForm"
           @submit.prevent="handleUpdateEmail"
         >
           <div>
-            <label class="block text-sm font-medium text-dark-text mb-1">{{
-              CONST_EMAIL_LABEL
-            }}</label>
-            <UInput v-model="editFormData.email" type="email" class="w-full" />
-            <p v-if="emailError" class="text-xs text-error-500 mt-1">{{ emailError }}</p>
+            <label :class="appConfig.typography.inputLabel">{{ CONST_EMAIL_LABEL }}</label>
+            <UInput v-model="editFormData.email" type="email" variant="glass" class="w-full" />
+            <p v-if="emailError" :class="appConfig.typography.inputError">{{ emailError }}</p>
           </div>
         </form>
       </template>
       <template #footer>
-        <div class="flex items-center justify-between w-full">
+        <div :class="appConfig.layout.modalActions">
           <UButton
             :label="CONST_CANCEL_BTN_TEXT"
             variant="actionCancelButton"
@@ -94,26 +90,22 @@
       <template #body>
         <form
           id="change-pwd-form"
-          class="flex flex-col gap-4 py-2"
+          :class="appConfig.layout.modalForm"
           @submit.prevent="handleChangePassword"
         >
           <div>
-            <label class="block text-sm font-medium text-dark-text mb-1">{{
-              CONST_OLD_PASSWORD_LABEL
-            }}</label>
-            <UInput v-model="pwdData.oldPassword" type="password" class="w-full" />
+            <label :class="appConfig.typography.inputLabel">{{ CONST_OLD_PASSWORD_LABEL }}</label>
+            <UInput v-model="pwdData.oldPassword" type="password" variant="glass" class="w-full" />
           </div>
           <div>
-            <label class="block text-sm font-medium text-dark-text mb-1">{{
-              CONST_NEW_PASSWORD_LABEL
-            }}</label>
-            <UInput v-model="pwdData.newPassword" type="password" class="w-full" />
+            <label :class="appConfig.typography.inputLabel">{{ CONST_NEW_PASSWORD_LABEL }}</label>
+            <UInput v-model="pwdData.newPassword" type="password" variant="glass" class="w-full" />
           </div>
-          <p v-if="passwordError" class="text-xs text-error-500 mt-1">{{ passwordError }}</p>
+          <p v-if="passwordError" :class="appConfig.typography.inputError">{{ passwordError }}</p>
         </form>
       </template>
       <template #footer>
-        <div class="flex items-center justify-between w-full">
+        <div :class="appConfig.layout.modalActions">
           <UButton
             :label="CONST_CANCEL_BTN_TEXT"
             variant="actionCancelButton"
@@ -139,11 +131,11 @@
     >
       <template #default><div class="hidden"></div></template>
       <template #body>
-        <p class="text-sm text-dark-text/80 py-2">{{ CONST_DELETE_ACCOUNT_CONFIRM }}</p>
-        <p v-if="deleteError" class="text-xs text-error-500 mt-1">{{ deleteError }}</p>
+        <p :class="appConfig.typography.modalText">{{ CONST_DELETE_ACCOUNT_CONFIRM }}</p>
+        <p v-if="deleteError" :class="appConfig.typography.inputError">{{ deleteError }}</p>
       </template>
       <template #footer>
-        <div class="flex items-center justify-between w-full">
+        <div :class="appConfig.layout.modalActions">
           <UButton
             :label="CONST_CANCEL_BTN_TEXT"
             variant="actionCancelButton"
@@ -170,25 +162,25 @@
       <template #body>
         <form
           id="upload-pic-form"
-          class="flex flex-col gap-4 py-2"
+          :class="appConfig.layout.modalForm"
           @submit.prevent="handleUploadPicture"
         >
           <div>
-            <label class="block text-sm font-medium text-dark-text mb-1">{{
-              CONST_SELECT_FILE_LABEL
-            }}</label>
+            <label :class="appConfig.typography.inputLabel">{{ CONST_SELECT_FILE_LABEL }}</label>
             <input
               type="file"
-              class="w-full text-sm text-dark-text/70 file:mr-4 file:py-2 file:px-6 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-transparent file:text-brand-500 file:ring-1 file:ring-brand-500/40 hover:file:bg-brand-500/20 file:transition-colors file:cursor-pointer cursor-pointer"
+              :class="appConfig.layout.fileInput"
               accept="image/*"
               @change="onPictureSelected"
             />
-            <p v-if="uploadPicError" class="text-xs text-error-500 mt-1">{{ uploadPicError }}</p>
+            <p v-if="uploadPicError" :class="appConfig.typography.inputError">
+              {{ uploadPicError }}
+            </p>
           </div>
         </form>
       </template>
       <template #footer>
-        <div class="flex items-center justify-between w-full">
+        <div :class="appConfig.layout.modalActions">
           <UButton
             :label="CONST_CANCEL_BTN_TEXT"
             variant="actionCancelButton"
@@ -248,22 +240,15 @@
       <template #body>
         <form
           id="upload-doc-form"
-          class="flex flex-col gap-4 py-2"
+          :class="appConfig.layout.modalForm"
           @submit.prevent="profileStore.closeUploadDocumentModal()"
         >
           <div>
-            <label class="block text-sm font-medium text-dark-text mb-1">{{
-              CONST_SELECT_FILE_LABEL
-            }}</label>
-            <input
-              type="file"
-              class="w-full text-sm text-dark-text/70 file:mr-4 file:py-2 file:px-6 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-transparent file:text-brand-500 file:ring-1 file:ring-brand-500/40 hover:file:bg-brand-500/20 file:transition-colors file:cursor-pointer cursor-pointer"
-            />
+            <label :class="appConfig.typography.inputLabel">{{ CONST_SELECT_FILE_LABEL }}</label>
+            <input type="file" :class="appConfig.layout.fileInput" />
           </div>
           <div>
-            <label class="block text-sm font-medium text-dark-text mb-1">{{
-              CONST_DOCUMENT_TYPE_LABEL
-            }}</label>
+            <label :class="appConfig.typography.inputLabel">{{ CONST_DOCUMENT_TYPE_LABEL }}</label>
             <USelect
               :items="[
                 { label: 'ID Card', value: 'id' },
@@ -275,22 +260,18 @@
           </div>
           <div class="flex gap-4">
             <div class="flex-1">
-              <label class="block text-sm font-medium text-dark-text mb-1">{{
-                CONST_ISSUED_AT_LABEL
-              }}</label>
-              <UInput type="date" class="w-full" />
+              <label :class="appConfig.typography.inputLabel">{{ CONST_ISSUED_AT_LABEL }}</label>
+              <UInput type="date" variant="glass" class="w-full" />
             </div>
             <div class="flex-1">
-              <label class="block text-sm font-medium text-dark-text mb-1">{{
-                CONST_ENDS_AT_LABEL
-              }}</label>
-              <UInput type="date" class="w-full" />
+              <label :class="appConfig.typography.inputLabel">{{ CONST_ENDS_AT_LABEL }}</label>
+              <UInput type="date" variant="glass" class="w-full" />
             </div>
           </div>
         </form>
       </template>
       <template #footer>
-        <div class="flex items-center justify-between w-full">
+        <div :class="appConfig.layout.modalActions">
           <UButton
             :label="CONST_CANCEL_BTN_TEXT"
             variant="actionCancelButton"
@@ -325,7 +306,9 @@ import {
   changePasswordSchema,
 } from '~/utils/schemas/users.validation';
 import type { ApiError } from '~/types/apiError.type';
+import { useAppConfig } from '#imports';
 
+const appConfig = useAppConfig();
 const profileStore = useProfileStore();
 const router = useRouter();
 const { logout } = useAuth();

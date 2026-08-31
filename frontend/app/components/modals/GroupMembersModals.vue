@@ -12,24 +12,23 @@
       <template #body>
         <form
           id="update-group-form"
-          class="flex flex-col gap-4 py-2"
+          :class="appConfig.layout.modalForm"
           @submit.prevent="handleUpdateGroup"
         >
           <div>
-            <label class="block text-sm font-medium text-dark-text mb-1">{{
-              CONST_GROUP_NAME_LABEL
-            }}</label>
+            <label :class="appConfig.typography.inputLabel">{{ CONST_GROUP_NAME_LABEL }}</label>
             <UInput
               v-model="updateGroupName"
               :placeholder="CONST_GROUP_NAME_PLACEHOLDER"
+              variant="glass"
               class="w-full"
             />
-            <p v-if="updateError" class="text-xs text-error-500 mt-1">{{ updateError }}</p>
+            <p v-if="updateError" :class="appConfig.typography.inputError">{{ updateError }}</p>
           </div>
         </form>
       </template>
       <template #footer>
-        <div class="flex items-center justify-between w-full">
+        <div :class="appConfig.layout.modalActions">
           <UButton
             :label="CONST_CANCEL_BTN_TEXT"
             variant="actionCancelButton"
@@ -57,23 +56,20 @@
       <template #body>
         <form
           id="invite-user-form"
-          class="flex flex-col gap-4 py-2"
+          :class="appConfig.layout.modalForm"
           @submit.prevent="handleInviteUser"
         >
           <div>
-            <label class="block text-sm font-medium text-dark-text mb-1">{{
-              CONST_USER_EMAIL_LABEL
-            }}</label>
+            <label :class="appConfig.typography.inputLabel">{{ CONST_USER_EMAIL_LABEL }}</label>
             <UInput
               v-model="inviteEmail"
               :placeholder="CONST_USER_EMAIL_PLACEHOLDER"
+              variant="glass"
               class="w-full"
             />
           </div>
           <div>
-            <label class="block text-sm font-medium text-dark-text mb-1">{{
-              CONST_ROLE_SELECTION_LABEL
-            }}</label>
+            <label :class="appConfig.typography.inputLabel">{{ CONST_ROLE_SELECTION_LABEL }}</label>
             <USelect
               v-model="inviteRole"
               :items="roleOptions"
@@ -82,22 +78,16 @@
               class="min-w-40"
             />
           </div>
-          <p
-            v-if="inviteError"
-            class="text-xs font-semibold text-error-500 mt-2 bg-error-500/10 p-2 rounded border border-error-500/20"
-          >
+          <p v-if="inviteError" :class="appConfig.typography.modalErrorBox">
             {{ inviteError }}
           </p>
-          <p
-            v-if="inviteSuccess"
-            class="text-xs font-semibold text-brand-500 mt-2 bg-brand-500/10 p-2 rounded border border-brand-500/20"
-          >
+          <p v-if="inviteSuccess" :class="appConfig.typography.modalSuccessBox">
             {{ inviteSuccess }}
           </p>
         </form>
       </template>
       <template #footer>
-        <div class="flex items-center justify-between w-full">
+        <div :class="appConfig.layout.modalActions">
           <UButton
             :label="CONST_CANCEL_BTN_TEXT"
             variant="actionCancelButton"
@@ -125,17 +115,16 @@
     >
       <template #default><div class="hidden"></div></template>
       <template #body>
-        <p class="text-sm text-dark-text/80 py-2">
+        <p :class="appConfig.typography.modalText">
           {{ CONST_REMOVE_USER_CONFIRM }}
-          <span class="block font-semibold mt-1 text-brand-500"
+          <span :class="appConfig.typography.modalHighlight"
             >„{{ groupsStore.selectedUserEmailToRemove }}”</span
           >
         </p>
-        <p v-if="removeErrorText" class="text-xs text-error-500 mt-1">{{ removeErrorText }}</p>
+        <p v-if="removeErrorText" :class="appConfig.typography.inputError">{{ removeErrorText }}</p>
       </template>
       <template #footer>
-        <div class="flex items-center justify-between w-full">
-          <!-- JAVÍTÁS: () használata -->
+        <div :class="appConfig.layout.modalActions">
           <UButton
             :label="CONST_CANCEL_BTN_TEXT"
             variant="actionCancelButton"
@@ -162,7 +151,9 @@ import {
   useInviteUserMutation,
   useRemoveUserMutation,
 } from '~/queries/groups.mutation';
+import { useAppConfig } from '#imports';
 
+const appConfig = useAppConfig();
 const groupsStore = useGroupsStore();
 const route = useRoute();
 

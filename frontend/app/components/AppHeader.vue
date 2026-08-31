@@ -1,37 +1,24 @@
 <!-- frontend/app/components/AppHeader.vue -->
 <template>
-  <header
-    class="flex items-center justify-between px-6 py-4 bg-surface-500/70 backdrop-blur-md shadow-sm z-50 border-b border-dark-text/10 sticky top-0"
-  >
+  <header :class="[appConfig.layout.headerBase, appConfig.layout.headerSticky]">
     <div class="flex-1">
-      <NuxtLink
-        to="/#home"
-        class="flex items-center gap-2 text-dark-text hover:opacity-80 transition-opacity w-max"
-      >
+      <NuxtLink to="/#home" :class="appConfig.layout.logoWrapper">
         <UIcon name="i-heroicons-map-pin" class="w-7 h-7 text-brand-500" />
-        <span class="text-xl font-semibold tracking-wider">{{ CONST_BRAND_NAME }}</span>
+        <span :class="appConfig.typography.logoText">{{ CONST_BRAND_NAME }}</span>
       </NuxtLink>
     </div>
 
-    <nav class="hidden md:flex gap-8 font-bold tracking-wide">
-      <NuxtLink
-        to="/#home"
-        class="hover:text-brand-500 hover:underline underline-offset-4 transition-colors"
-        >{{ CONST_HOME_TITLE }}</NuxtLink
-      >
-      <NuxtLink
-        to="/#about"
-        class="hover:text-brand-500 hover:underline underline-offset-4 transition-colors"
-        >{{ CONST_ABOUT_TITLE }}</NuxtLink
-      >
-      <NuxtLink
-        to="/#support"
-        class="hover:text-brand-500 hover:underline underline-offset-4 transition-colors"
-        >{{ CONST_SUPPORT_TITLE }}</NuxtLink
-      >
+    <nav :class="appConfig.layout.navWrapper">
+      <NuxtLink to="/#home" :class="appConfig.typography.navLink">{{ CONST_HOME_TITLE }}</NuxtLink>
+      <NuxtLink to="/#about" :class="appConfig.typography.navLink">{{
+        CONST_ABOUT_TITLE
+      }}</NuxtLink>
+      <NuxtLink to="/#support" :class="appConfig.typography.navLink">{{
+        CONST_SUPPORT_TITLE
+      }}</NuxtLink>
     </nav>
 
-    <div class="flex-1 flex justify-end items-center gap-4">
+    <div :class="appConfig.layout.headerRight">
       <ClientOnly>
         <div class="flex items-center gap-4">
           <template v-if="isAuthenticated">
@@ -48,15 +35,11 @@
               <UAvatar :alt="userProfile?.username || 'User'" icon="i-heroicons-user" />
             </NuxtLink>
           </template>
-
           <template v-else>
             <UButton :label="CONST_LOGIN_TITLE" to="/login" variant="smallHollowActionButton" />
-            <NuxtLink to="/login">
-              <UAvatar icon="i-heroicons-user" />
-            </NuxtLink>
+            <NuxtLink to="/login"><UAvatar icon="i-heroicons-user" /></NuxtLink>
           </template>
         </div>
-
         <template #fallback>
           <div class="flex items-center gap-3">
             <UButton
@@ -77,17 +60,15 @@
 import { watch } from 'vue';
 import { useAuth } from '../composables/useAuth';
 import { useCurrentUserQuery } from '../queries/user.query';
+import { useAppConfig } from '#imports';
 
+const appConfig = useAppConfig();
 const { isAuthenticated, logout } = useAuth();
 const { data: userProfile, error } = useCurrentUserQuery();
 
 watch(error, (newError) => {
-  if (newError) {
-    handleLogout();
-  }
+  if (newError) handleLogout();
 });
 
-const handleLogout = () => {
-  logout();
-};
+const handleLogout = () => logout();
 </script>

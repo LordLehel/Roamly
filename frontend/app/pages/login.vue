@@ -1,16 +1,15 @@
 <!-- frontend/app/pages/login.vue -->
 <template>
-  <!-- Ez a wrapper tartja össze a kártyát és a gombot egyetlen középre zárt oszlopban -->
-  <div class="w-full max-w-md mx-auto flex flex-col gap-6">
+  <div :class="appConfig.layout.authWrapper">
     <UCard variant="glass">
-      <div class="text-center mb-8">
-        <h1 class="text-2xl font-medium tracking-wide text-brand-950">{{ CONST_LOGIN_HEADING }}</h1>
+      <div :class="appConfig.typography.authTitleWrapper">
+        <h1 :class="appConfig.typography.authTitle">{{ CONST_LOGIN_HEADING }}</h1>
       </div>
 
       <UForm
         :schema="loginSchema"
         :state="form"
-        class="w-full flex flex-col gap-4"
+        :class="appConfig.layout.formWrapper"
         @submit="handleLogin"
       >
         <UFormField name="email" :label="CONST_EMAIL_LABEL">
@@ -35,14 +34,14 @@
           </template>
         </UFormField>
 
-        <div v-if="error" class="text-error-400 text-sm text-center font-medium">
+        <div v-if="error" :class="appConfig.typography.formStatusError">
           {{ getErrorMessage(error) }}
         </div>
-        <div v-if="status === 'success'" class="text-success-400 text-sm text-center font-medium">
+        <div v-if="status === 'success'" :class="appConfig.typography.formStatusSuccess">
           {{ CONST_LOGIN_SUCCESS }}
         </div>
 
-        <div class="flex items-center justify-between pt-6">
+        <div :class="appConfig.layout.formActions">
           <UButton
             :label="CONST_CANCEL_BTN_TEXT"
             variant="actionCancelButton"
@@ -59,7 +58,7 @@
       </UForm>
     </UCard>
 
-    <div class="pt-2 text-center w-full">
+    <div :class="appConfig.layout.singleButtonWrapper">
       <UButton
         to="/register"
         :label="CONST_REGISTER_PROMPT_BTN"
@@ -77,12 +76,14 @@ import type { FormSubmitEvent } from '#ui/types';
 import { loginSchema, type LoginFormState } from '../utils/schemas/login.schema';
 import { useLoginUserMutation } from '../queries/auth.mutation';
 import { getErrorMessage } from '../utils/error.utils';
+import { useAppConfig } from '#imports';
 
 definePageMeta({
   layout: 'auth',
 });
 
 const router = useRouter();
+const appConfig = useAppConfig();
 
 const form = reactive<LoginFormState>({
   email: '',

@@ -12,25 +12,23 @@
       <template #body>
         <form
           id="create-group-form"
-          class="flex flex-col gap-4 py-2"
+          :class="appConfig.layout.modalForm"
           @submit.prevent="handleCreateGroup"
         >
           <div>
-            <label class="block text-sm font-medium text-dark-text mb-1">{{
-              CONST_GROUP_NAME_LABEL
-            }}</label>
+            <label :class="appConfig.typography.inputLabel">{{ CONST_GROUP_NAME_LABEL }}</label>
             <UInput
               v-model="newGroupName"
               :placeholder="CONST_GROUP_NAME_PLACEHOLDER"
               variant="glass"
               class="w-full"
             />
-            <p v-if="createError" class="text-xs text-error-500 mt-1">{{ createError }}</p>
+            <p v-if="createError" :class="appConfig.typography.inputError">{{ createError }}</p>
           </div>
         </form>
       </template>
       <template #footer>
-        <div class="flex items-center justify-between w-full">
+        <div :class="appConfig.layout.modalActions">
           <UButton
             :label="CONST_CANCEL_BTN_TEXT"
             variant="actionCancelButton"
@@ -57,24 +55,21 @@
     >
       <template #default><div class="hidden"></div></template>
       <template #body>
-        <p class="text-sm text-dark-text/80 py-2">
+        <p :class="appConfig.typography.modalText">
           {{ CONST_DELETE_GROUP_CONFIRM }}
           <span
             v-if="groupsStore.selectedGroupToDelete"
-            class="block font-semibold mt-1 text-brand-500"
+            :class="appConfig.typography.modalHighlight"
           >
             „{{ groupsStore.selectedGroupToDelete.name }}”
           </span>
         </p>
-        <p
-          v-if="deleteErrorText"
-          class="text-xs font-semibold text-error-500 mt-2 bg-error-500/10 p-2 rounded border border-error-500/20"
-        >
+        <p v-if="deleteErrorText" :class="appConfig.typography.modalErrorBox">
           {{ deleteErrorText }}
         </p>
       </template>
       <template #footer>
-        <div class="flex items-center justify-between w-full">
+        <div :class="appConfig.layout.modalActions">
           <UButton
             :label="CONST_CANCEL_BTN_TEXT"
             variant="actionCancelButton"
@@ -99,12 +94,12 @@
     >
       <template #default><div class="hidden"></div></template>
       <template #body>
-        <div class="flex flex-col gap-2 py-2">
-          <p class="text-sm text-dark-text/80">
+        <div :class="appConfig.layout.modalForm">
+          <p :class="appConfig.typography.modalText">
             {{ CONST_LEAVE_GROUP_CONFIRM }}
             <span
               v-if="groupsStore.selectedGroupToLeave"
-              class="block font-semibold mt-1 text-brand-500"
+              :class="appConfig.typography.modalHighlight"
             >
               „{{ groupsStore.selectedGroupToLeave.name }}”
             </span>
@@ -114,20 +109,17 @@
               groupsStore.selectedGroupToLeave?.current_size === 1 &&
               groupsStore.selectedGroupToLeave?.role?.toLowerCase() === 'leader'
             "
-            class="text-xs font-semibold text-error-500 mt-2 bg-error-500/10 p-2 rounded border border-error-500/20"
+            :class="appConfig.typography.modalErrorBox"
           >
             {{ CONST_LEAVE_GROUP_WARNING }}
           </p>
-          <p
-            v-if="leaveErrorText"
-            class="text-xs font-semibold text-error-500 mt-2 bg-error-500/10 p-2 rounded border border-error-500/20"
-          >
+          <p v-if="leaveErrorText" :class="appConfig.typography.modalErrorBox">
             {{ leaveErrorText }}
           </p>
         </div>
       </template>
       <template #footer>
-        <div class="flex items-center justify-between w-full">
+        <div :class="appConfig.layout.modalActions">
           <UButton
             :label="CONST_CANCEL_BTN_TEXT"
             variant="actionCancelButton"
@@ -154,7 +146,9 @@ import {
   useDeleteGroupMutation,
   useLeaveGroupMutation,
 } from '~/queries/groups.mutation';
+import { useAppConfig } from '#imports';
 
+const appConfig = useAppConfig();
 const groupsStore = useGroupsStore();
 const router = useRouter();
 

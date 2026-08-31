@@ -1,9 +1,6 @@
 <!-- frontend/app/components/ProfileHeader.vue -->
 <template>
-  <header
-    class="flex items-center justify-between px-6 py-4 bg-surface-500/70 backdrop-blur-md shadow-sm z-50 border-b border-dark-text/10 sticky top-0"
-  >
-    <!-- Left side: Select -->
+  <header :class="[appConfig.layout.headerBase, appConfig.layout.headerSticky]">
     <div class="flex-1 flex items-center gap-4">
       <UButton
         icon="i-heroicons-arrow-left"
@@ -20,19 +17,14 @@
       />
     </div>
 
-    <!-- Center: Logo -->
     <div class="flex-1 flex justify-center">
-      <NuxtLink
-        to="/"
-        class="flex items-center gap-2 text-dark-text hover:opacity-80 transition-opacity w-max"
-      >
+      <NuxtLink to="/" :class="appConfig.layout.logoWrapper">
         <UIcon name="i-heroicons-map-pin" class="w-7 h-7 text-brand-500" />
-        <span class="text-xl font-semibold tracking-wider">{{ CONST_BRAND_NAME }}</span>
+        <span :class="appConfig.typography.logoText">{{ CONST_BRAND_NAME }}</span>
       </NuxtLink>
     </div>
 
-    <!-- Right side: Profil / Log out -->
-    <div class="flex-1 flex justify-end items-center gap-4">
+    <div :class="appConfig.layout.headerRight">
       <ClientOnly>
         <div class="flex items-center gap-4">
           <template v-if="isAuthenticated">
@@ -60,7 +52,9 @@ import { ref, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useAuth } from '../composables/useAuth';
 import { useCurrentUserQuery } from '../queries/user.query';
+import { useAppConfig } from '#imports';
 
+const appConfig = useAppConfig();
 const router = useRouter();
 const route = useRoute();
 const { isAuthenticated, logout } = useAuth();
@@ -70,21 +64,16 @@ const getCurrentViewValue = (path: string) => {
   const found = CONST_NAV_VIEWS.find((item) => item.value === path || path.includes(item.value));
   return found ? found.value : path;
 };
-
 const selectedView = ref(getCurrentViewValue(route.path));
-
 watch(
   () => route.path,
   (newPath) => {
     selectedView.value = getCurrentViewValue(newPath);
   },
 );
-
 const onViewChange = (path: string | undefined) => {
-  const targetPath = path ?? '/';
-  router.push(targetPath);
+  router.push(path ?? '/');
 };
-
 const handleLogout = () => {
   logout();
   router.push('/login');

@@ -1,16 +1,12 @@
 <!-- frontend/app/pages/index.vue -->
 <template>
-  <div class="flex-1 flex flex-col items-center px-6 py-12 gap-24 relative z-10 w-full">
-    <!-- HOME section -->
-    <section id="home" class="flex flex-col items-center text-center mt-10 max-w-3xl scroll-mt-24">
+  <div :class="appConfig.layout.homeWrapper">
+    <section id="home" :class="appConfig.layout.homeHeroSection">
       <UButton :label="CONST_GET_STARTED" to="/groups" variant="actionHeroButton" />
-      <p class="mt-10 text-lg text-brand-50 font-medium opacity-90 leading-relaxed">
-        {{ CONST_HOME_DESCRIPTION }}
-      </p>
+      <p :class="appConfig.typography.homeHeroText">{{ CONST_HOME_DESCRIPTION }}</p>
     </section>
 
-    <!-- Cards Section -->
-    <section class="flex flex-col md:flex-row flex-wrap gap-8 w-full max-w-6xl mt-12">
+    <section :class="appConfig.layout.homeCardsSection">
       <UCard
         v-for="card in featureCards"
         :key="card.id"
@@ -31,7 +27,6 @@
               : 'flex flex-col items-center flex-1 text-center w-full h-full'
           "
         >
-          <!-- Left side-->
           <div
             :class="
               activeCard === card.id
@@ -40,22 +35,17 @@
             "
           >
             <div class="flex flex-col items-center">
-              <!-- Title -->
               <h3
                 class="text-lg font-bold mb-4 tracking-wide transition-colors duration-500"
                 :class="activeCard === card.id ? 'text-white' : 'text-dark-text'"
               >
                 {{ card.title }}
               </h3>
-
-              <!-- Icon -->
               <UIcon
                 :name="card.icon"
                 class="w-14 h-14 mb-4 opacity-80 transition-colors duration-500"
                 :class="activeCard === card.id ? 'text-white' : 'text-brand-500'"
               />
-
-              <!-- Description -->
               <p
                 class="text-sm mb-6 leading-relaxed transition-colors duration-500"
                 :class="activeCard === card.id ? 'text-white/90' : 'text-dark-text/80 text-center'"
@@ -63,7 +53,6 @@
                 {{ card.desc }}
               </p>
             </div>
-
             <UButton
               variant="ghost"
               class="font-bold tracking-wide hover:underline underline-offset-4 transition-colors duration-500 cursor-pointer"
@@ -73,8 +62,6 @@
               {{ activeCard === card.id ? CONST_SHOW_LESS : CONST_LEARN_MORE }}
             </UButton>
           </div>
-
-          <!-- Right side -->
           <div
             v-if="activeCard === card.id"
             class="flex-1 p-4 md:border-l border-white/20 text-white/90 leading-relaxed flex items-center text-left"
@@ -85,35 +72,24 @@
       </UCard>
     </section>
 
-    <!-- ABOUT section -->
-    <section
-      id="about"
-      class="flex flex-col items-center text-center max-w-3xl pt-12 border-t border-dark-text/10 scroll-mt-24"
-    >
-      <h2 class="text-3xl font-bold text-surface-500 tracking-wide">{{ CONST_ABOUT_HERO }}</h2>
-      <p class="mt-8 text-lg text-surface-500 font-medium opacity-90 leading-relaxed">
-        {{ CONST_ABOUT_DESCRIPTION }}
-      </p>
+    <section id="about" :class="appConfig.layout.homeContentSection">
+      <h2 :class="appConfig.typography.homeSectionTitle">{{ CONST_ABOUT_HERO }}</h2>
+      <p :class="appConfig.typography.homeSectionText">{{ CONST_ABOUT_DESCRIPTION }}</p>
     </section>
 
-    <!-- SUPPORT section -->
-    <section
-      id="support"
-      class="flex flex-col items-center text-center max-w-3xl pt-12 border-t border-dark-text/10 scroll-mt-24"
-    >
-      <h2 class="text-3xl font-bold text-surface-500 tracking-wide">{{ CONST_SUPPORT_HERO }}</h2>
-      <p class="mt-8 text-lg text-surface-500 font-medium opacity-90 leading-relaxed">
-        {{ CONST_SUPPORT_DESCRIPTION }}
-      </p>
+    <section id="support" :class="appConfig.layout.homeContentSection">
+      <h2 :class="appConfig.typography.homeSectionTitle">{{ CONST_SUPPORT_HERO }}</h2>
+      <p :class="appConfig.typography.homeSectionText">{{ CONST_SUPPORT_DESCRIPTION }}</p>
     </section>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { definePageMeta } from '#imports';
+import { definePageMeta, useAppConfig } from '#imports';
 
 definePageMeta({ layout: 'default' });
+const appConfig = useAppConfig();
 
 const activeCard = ref<string | null>(null);
 

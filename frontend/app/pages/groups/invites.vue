@@ -1,23 +1,22 @@
+<!--frontend/app/pages/groups/invites.vue -->
 <template>
-  <div class="w-full max-w-7xl mx-auto px-6 py-8 flex flex-col gap-8 relative">
-    <h1 :class="appConfig.typography.pageTitle">
-      {{ CONST_INVITES_HEADING }}
-    </h1>
+  <div :class="appConfig.layout.pageWrapper">
+    <h1 :class="appConfig.typography.pageTitle">{{ CONST_INVITES_HEADING }}</h1>
 
-    <div class="flex items-center gap-4">
+    <div :class="appConfig.layout.actionGroup">
       <UButton icon="i-heroicons-funnel" :label="CONST_FILTER_LABEL" variant="glassButton" />
     </div>
 
     <ClientOnly>
-      <div v-if="isLoading && invitesList.length === 0" class="text-center py-10 text-dark-text/70">
+      <div v-if="isLoading && invitesList.length === 0" :class="appConfig.typography.statusLoading">
         {{ CONST_LOADING_TEXT }}
       </div>
-      <div v-else-if="error" class="text-center py-10 text-error-500">
+      <div v-else-if="error" :class="appConfig.typography.statusError">
         {{ CONST_FETCH_ERROR_TEXT }}
       </div>
 
       <div v-else-if="invitesList.length > 0" class="flex flex-col gap-6 w-full">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+        <div :class="appConfig.layout.cardGrid">
           <UCard
             v-for="group in invitesList"
             :key="group.uuid"
@@ -33,18 +32,13 @@
               />
             </div>
 
-            <div class="flex flex-col gap-6 w-full pt-2">
-              <h3 :class="appConfig.typography.cardTitleCenter">
-                {{ group.name }}
-              </h3>
-
+            <div :class="appConfig.layout.cardContent">
+              <h3 :class="appConfig.typography.cardTitleCenter">{{ group.name }}</h3>
               <p class="text-sm text-center text-dark-text/80 font-medium">
                 {{ group.leaders.length > 1 ? CONST_LEADERS_LABEL : CONST_LEADER_LABEL }}
                 <span class="font-bold">{{ group.leaders.join(', ') }}</span>
               </p>
-              <div
-                class="flex items-end justify-between w-full pt-4 border-t border-dark-text/10 text-xs text-dark-text/70"
-              >
+              <div :class="appConfig.layout.cardFooter">
                 <div>
                   <p class="opacity-70">{{ CONST_CREATED_AT_LABEL }}</p>
                   <p class="font-semibold">{{ group.created_at }}</p>
@@ -57,15 +51,9 @@
             </div>
           </UCard>
         </div>
-
-        <div ref="loadMoreTrigger" class="h-10 w-full flex items-center justify-center">
-          <span v-if="isFetchingNextPage" class="text-dark-text/70 text-sm">{{
-            CONST_LOADING_INVITES_MSG
-          }}</span>
-        </div>
       </div>
 
-      <div v-else class="text-center py-10 text-dark-text/70">
+      <div v-else :class="appConfig.typography.statusLoading">
         {{ CONST_NO_INVITES_MSG }}
       </div>
     </ClientOnly>

@@ -1,24 +1,21 @@
 <!-- frontend/app/pages/users/profile.vue -->
 <template>
-  <div class="w-full max-w-7xl mx-auto px-6 py-8 flex flex-col gap-10 relative">
-    <!-- Profile Heading -->
+  <div :class="appConfig.layout.pageWrapper">
     <div>
       <h1 :class="appConfig.typography.pageTitle">{{ CONST_PROFILE_HEADING }}</h1>
     </div>
 
     <ClientOnly>
-      <div v-if="isLoading" class="text-center py-10 text-dark-text/70">
+      <div v-if="isLoading" :class="appConfig.typography.statusLoading">
         {{ CONST_LOADING_TEXT }}
       </div>
-      <div v-else-if="error" class="text-center py-10 text-error-500">
+      <div v-else-if="error" :class="appConfig.typography.statusError">
         {{ CONST_FETCH_ERROR_TEXT }}
       </div>
 
       <div v-else-if="currentUser" class="w-full relative">
         <!-- PROFILE Card -->
-        <div
-          class="w-full bg-surface-500/70 backdrop-blur-xl rounded-[25px] shadow-[0_15px_40px_rgba(47,62,50,0.15)] ring-1 ring-surface-500/50 p-8 flex flex-col md:flex-row gap-10 relative"
-        >
+        <div :class="appConfig.layout.profileCard">
           <!-- Delete Button -->
           <div class="absolute top-4 right-4 z-10">
             <UButton
@@ -29,10 +26,8 @@
           </div>
 
           <!-- Profile picture -->
-          <div class="relative w-40 h-40 shrink-0 mx-auto md:mx-0 md:ml-12 mt-8 md:mt-0">
-            <div
-              class="w-full h-full bg-brand-500 rounded-2xl overflow-hidden shadow-lg border border-surface-500/50 flex items-center justify-center relative"
-            >
+          <div :class="appConfig.layout.profilePictureWrapper">
+            <div :class="appConfig.layout.profilePictureInner">
               <img
                 v-if="currentUser.profile_image_url"
                 :src="currentUser.profile_image_url"
@@ -61,12 +56,12 @@
           </div>
 
           <!-- Right side: user details -->
-          <div class="flex-1 flex flex-col justify-center gap-3 text-dark-text pt-2">
+          <div :class="appConfig.layout.profileDetailsWrapper">
             <!-- Username -->
-            <div class="flex items-center gap-4">
-              <p class="w-28 font-medium opacity-80 shrink-0">{{ CONST_USERNAME_LABEL }}</p>
-              <div class="flex items-center gap-2">
-                <p class="font-bold text-lg">{{ currentUser.username }}</p>
+            <div :class="appConfig.layout.profileDetailRow">
+              <p :class="appConfig.typography.profileLabel">{{ CONST_USERNAME_LABEL }}</p>
+              <div :class="appConfig.layout.actionGroup">
+                <p :class="appConfig.typography.profileValue">{{ currentUser.username }}</p>
                 <UButton
                   icon="i-heroicons-pencil"
                   variant="ghostDangerIconButton"
@@ -75,10 +70,10 @@
               </div>
             </div>
             <!-- Email -->
-            <div class="flex items-center gap-4">
-              <p class="w-28 font-medium opacity-80 shrink-0">{{ CONST_EMAIL_LABEL }}</p>
-              <div class="flex items-center gap-2">
-                <p class="font-bold">{{ currentUser.email }}</p>
+            <div :class="appConfig.layout.profileDetailRow">
+              <p :class="appConfig.typography.profileLabel">{{ CONST_EMAIL_LABEL }}</p>
+              <div :class="appConfig.layout.actionGroup">
+                <p :class="appConfig.typography.profileValue">{{ currentUser.email }}</p>
                 <UButton
                   icon="i-heroicons-pencil"
                   variant="ghostDangerIconButton"
@@ -87,24 +82,22 @@
               </div>
             </div>
             <!-- Password -->
-            <div class="flex items-center gap-4">
-              <p class="w-28 font-medium opacity-80 shrink-0">{{ CONST_PASSWORD_LABEL }}</p>
-              <div class="flex items-center gap-2">
-                <p class="font-bold text-xl leading-none">************</p>
-                <div class="flex items-center gap-1">
-                  <UButton
-                    icon="i-heroicons-pencil"
-                    variant="ghostDangerIconButton"
-                    @click="profileStore.openChangePasswordModal()"
-                  />
-                </div>
+            <div :class="appConfig.layout.profileDetailRow">
+              <p :class="appConfig.typography.profileLabel">{{ CONST_PASSWORD_LABEL }}</p>
+              <div :class="appConfig.layout.actionGroup">
+                <p :class="appConfig.typography.profileValueLg">************</p>
+                <UButton
+                  icon="i-heroicons-pencil"
+                  variant="ghostDangerIconButton"
+                  @click="profileStore.openChangePasswordModal()"
+                />
               </div>
             </div>
             <!-- Registered -->
-            <div class="flex items-center gap-4">
-              <p class="w-28 font-medium opacity-80 shrink-0">{{ CONST_REGISTERED_LABEL }}</p>
-              <div class="flex items-center gap-2">
-                <p class="font-bold">
+            <div :class="appConfig.layout.profileDetailRow">
+              <p :class="appConfig.typography.profileLabel">{{ CONST_REGISTERED_LABEL }}</p>
+              <div :class="appConfig.layout.actionGroup">
+                <p :class="appConfig.typography.profileValue">
                   {{
                     currentUser.created_at
                       ? new Date(currentUser.created_at).toLocaleDateString()
@@ -117,9 +110,9 @@
         </div>
 
         <!-- DOCUMENT SECTION -->
-        <div class="mt-12 flex flex-col gap-6">
-          <div class="flex flex-col md:flex-row justify-between items-center w-full gap-6">
-            <div class="flex items-center gap-4">
+        <div :class="appConfig.layout.sectionWrapper">
+          <div :class="appConfig.layout.pageHeader">
+            <div :class="appConfig.layout.actionGroup">
               <UButton
                 icon="i-heroicons-funnel"
                 :label="CONST_FILTER_LABEL"
@@ -131,14 +124,14 @@
                 @click="profileStore.openUploadDocumentModal()"
               />
             </div>
-            <h2 class="text-2xl font-bold text-surface-500 tracking-wide text-center flex-1">
+            <h2 :class="appConfig.typography.sectionTitleTransparent">
               {{ CONST_DOCUMENTS_HEADING }}
             </h2>
             <div class="w-30 hidden md:block"></div>
           </div>
 
           <!-- Dummy Document List -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full mt-4">
+          <div :class="appConfig.layout.documentGrid">
             <UCard
               v-for="doc in dummyDocuments"
               :key="doc.id"
@@ -146,9 +139,7 @@
               class="relative"
             >
               <!-- Title and action buttons -->
-              <div
-                class="absolute top-0 left-0 w-full p-4 flex justify-between items-start z-10 bg-linear-to-b from-black/50 to-transparent text-white"
-              >
+              <div :class="appConfig.layout.documentCardHeader">
                 <p class="font-bold truncate pr-2 shadow-sm">{{ doc.title }}</p>
                 <div class="flex items-center gap-1">
                   <UButton
@@ -165,11 +156,8 @@
               </div>
 
               <!-- File Preview (Proxy) -->
-              <div
-                class="w-full h-40 bg-surface-600/30 flex flex-col items-center justify-center relative"
-              >
+              <div :class="appConfig.layout.documentCardImage">
                 <UIcon name="i-heroicons-photo" class="w-16 h-16 text-surface-500/50" />
-
                 <div class="absolute bottom-2 px-4 w-full flex justify-between">
                   <UButton icon="i-heroicons-eye" variant="ghostDangerIconButton" />
                   <UButton icon="i-heroicons-arrow-down-tray" variant="ghostDangerIconButton" />
@@ -177,15 +165,17 @@
               </div>
 
               <!-- Metadata -->
-              <div class="p-4 flex flex-col gap-1.5 text-xs text-dark-text/80">
+              <div :class="appConfig.layout.documentCardMeta">
                 <p>
                   Uploaded at: <span class="font-bold text-dark-text">{{ doc.uploadedAt }}</span>
                 </p>
                 <p>
                   Document type: <span class="font-bold text-dark-text">{{ doc.type }}</span>
                 </p>
-                <div class="my-1 border-t border-dark-text/10 w-full"></div>
-                <div class="flex justify-between w-full">
+
+                <div :class="appConfig.layout.divider"></div>
+
+                <div :class="appConfig.layout.flexBetween">
                   <p>
                     File type: <span class="font-bold text-dark-text">{{ doc.fileType }}</span>
                   </p>
@@ -193,7 +183,9 @@
                     File size: <span class="font-bold text-dark-text">{{ doc.fileSize }}</span>
                   </p>
                 </div>
-                <div class="my-1 border-t border-dark-text/10 w-full"></div>
+
+                <div :class="appConfig.layout.divider"></div>
+
                 <p>
                   Issued: <span class="font-bold text-dark-text">{{ doc.issued }}</span>
                 </p>

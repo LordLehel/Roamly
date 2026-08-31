@@ -1,8 +1,8 @@
 <!-- frontend/app/pages/groups/[uuid]/members.vue -->
 <template>
-  <div class="w-full max-w-7xl mx-auto px-6 py-8 flex flex-col gap-8 relative">
-    <div class="flex flex-col md:flex-row justify-between items-center w-full gap-6">
-      <div class="flex items-center gap-4">
+  <div :class="appConfig.layout.pageWrapper">
+    <div :class="appConfig.layout.pageHeader">
+      <div :class="appConfig.layout.actionGroup">
         <UButton icon="i-heroicons-funnel" label="Filter" variant="glassButton" />
 
         <UButton
@@ -41,7 +41,7 @@
         <p :class="appConfig.typography.pageSubtitle">Members</p>
       </div>
 
-      <div class="flex items-center gap-4">
+      <div :class="appConfig.layout.actionGroup">
         <UButton icon="i-heroicons-users" variant="glassIconButtonBrand" to="/" />
         <UButton icon="i-heroicons-calendar" variant="glassIconButton" to="/" />
         <UButton icon="i-heroicons-photo" variant="glassIconButton" to="/" />
@@ -50,16 +50,16 @@
     </div>
 
     <ClientOnly>
-      <div v-if="isLoading" class="text-center py-10 text-dark-text/70">
+      <div v-if="isLoading" :class="appConfig.typography.statusLoading">
         {{ CONST_LOADING_TEXT }}
       </div>
-      <div v-else-if="error" class="text-center py-10 text-error-500">
+      <div v-else-if="error" :class="appConfig.typography.statusError">
         {{ CONST_FETCH_ERROR_TEXT }}
       </div>
 
       <div
         v-else-if="groupInfos?.group_profiles?.length"
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full mt-4"
+        :class="[appConfig.layout.cardGrid, 'mt-4']"
       >
         <UCard
           v-for="profile in groupInfos.group_profiles"
@@ -67,7 +67,7 @@
           variant="interactiveGlass"
           class="relative"
         >
-          <div class="flex items-start gap-4 w-full h-full">
+          <div :class="appConfig.layout.memberCardInner">
             <div class="shrink-0 pt-1">
               <UAvatar
                 :alt="profile.users.username"
@@ -77,8 +77,8 @@
               />
             </div>
 
-            <div class="flex-1 flex flex-col justify-between h-full min-h-16">
-              <div class="flex justify-between items-start w-full">
+            <div :class="appConfig.layout.memberCardContent">
+              <div :class="appConfig.layout.flexBetween">
                 <div>
                   <h3 :class="appConfig.typography.cardTitle">
                     {{ profile.users.username }}
@@ -102,7 +102,7 @@
                 </div>
               </div>
 
-              <div class="flex justify-between items-end mt-4 w-full">
+              <div :class="[appConfig.layout.flexBetween, 'items-end mt-4']">
                 <p class="text-sm font-medium text-dark-text/80">
                   Role:
                   <span class="font-bold capitalize">{{ profile.roles.type }}</span>
