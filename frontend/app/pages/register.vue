@@ -122,8 +122,8 @@ const {
   isLoading,
   error,
   status,
-} = useCreateUserMutation(() => {
-  setTimeout(() => router.push('/login'), 2000);
+} = useCreateUserMutation({
+  onSuccess: () => router.push('/login'),
 });
 
 const clearForm = () => {

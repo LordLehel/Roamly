@@ -128,7 +128,7 @@ import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useGroupInfosQuery } from '~/queries/groups.query';
 import { useCurrentUserQuery } from '~/queries/user.query';
-import { useGroupsStore } from '~/stores/modals.store';
+import { useGroupsStore } from '~/stores/groups.modals.store';
 import type { GroupOutDto } from '~/types/groups.type';
 
 definePageMeta({ layout: 'general', middleware: ['auth'] });

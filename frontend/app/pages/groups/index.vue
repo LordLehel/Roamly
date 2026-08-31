@@ -91,7 +91,7 @@ import { ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useIntersectionObserver } from '@vueuse/core';
 import { useGroupsQuery } from '~/queries/groups.query';
-import { useGroupsStore } from '~/stores/modals.store';
+import { useGroupsStore } from '~/stores/groups.modals.store';
 import type { GroupOutDto } from '~/types/groups.type';
 
 definePageMeta({ layout: 'general', middleware: ['auth'] });

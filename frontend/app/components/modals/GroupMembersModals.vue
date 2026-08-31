@@ -156,7 +156,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import { useRoute } from 'vue-router';
-import { useGroupsStore } from '~/stores/modals.store';
+import { useGroupsStore } from '~/stores/groups.modals.store';
 import {
   useUpdateGroupMutation,
   useInviteUserMutation,

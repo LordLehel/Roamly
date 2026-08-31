@@ -24,7 +24,7 @@
             <UButton
               icon="i-heroicons-trash"
               variant="glassIconButtonDanger"
-              @click="isDeleteModalOpen = true"
+              @click="profileStore.openDeleteModal(currentUser)"
             />
           </div>
 
@@ -49,13 +49,13 @@
                 icon="i-heroicons-eye"
                 variant="ghostDangerIconButton"
                 class="absolute bottom-2 left-2 text-surface-500"
-                @click="isViewPictureModalOpen = true"
+                @click="profileStore.openViewPictureModal(currentUser)"
               />
               <UButton
                 icon="i-heroicons-arrow-up-tray"
                 variant="ghostDangerIconButton"
                 class="absolute bottom-2 right-2 text-surface-500"
-                @click="isUploadPictureModalOpen = true"
+                @click="profileStore.openUploadPictureModal()"
               />
             </div>
           </div>
@@ -70,7 +70,7 @@
                 <UButton
                   icon="i-heroicons-pencil"
                   variant="ghostDangerIconButton"
-                  @click="openEditUsername"
+                  @click="profileStore.openEditUsernameModal(currentUser)"
                 />
               </div>
             </div>
@@ -82,7 +82,7 @@
                 <UButton
                   icon="i-heroicons-pencil"
                   variant="ghostDangerIconButton"
-                  @click="openEditEmail"
+                  @click="profileStore.openEditEmailModal(currentUser)"
                 />
               </div>
             </div>
@@ -95,7 +95,7 @@
                   <UButton
                     icon="i-heroicons-pencil"
                     variant="ghostDangerIconButton"
-                    @click="isChangePasswordModalOpen = true"
+                    @click="profileStore.openChangePasswordModal()"
                   />
                 </div>
               </div>
@@ -128,7 +128,7 @@
               <UButton
                 icon="i-heroicons-plus"
                 variant="glassIconButton"
-                @click="isUploadDocumentModalOpen = true"
+                @click="profileStore.openUploadDocumentModal()"
               />
             </div>
             <h2 class="text-2xl font-bold text-surface-500 tracking-wide text-center flex-1">
@@ -206,356 +206,23 @@
         </div>
       </div>
     </ClientOnly>
-
-    <!-- MODALS -->
-
-    <!-- Edit Username -->
-    <UModal
-      v-model:open="isEditUsernameModalOpen"
-      :title="CONST_EDIT_USERNAME_TITLE"
-      :dismissible="false"
-      :close="false"
-    >
-      <template #default><div class="hidden"></div></template>
-      <template #body>
-        <form
-          id="edit-username-form"
-          class="flex flex-col gap-4 py-2"
-          @submit.prevent="handleUpdateProfile('username')"
-        >
-          <div>
-            <label class="block text-sm font-medium text-dark-text mb-1">{{
-              CONST_USERNAME_LABEL
-            }}</label>
-            <UInput v-model="editFormData.username" class="w-full" />
-            <p v-if="editError" class="text-xs text-error-500 mt-1">{{ editError }}</p>
-          </div>
-        </form>
-      </template>
-      <template #footer>
-        <div class="flex items-center justify-between w-full">
-          <UButton
-            :label="CONST_CANCEL_BTN_TEXT"
-            variant="actionCancelButton"
-            @click="closeModals"
-          />
-          <UButton
-            :label="CONST_EDIT_BTN"
-            variant="actionOkButton"
-            type="submit"
-            form="edit-username-form"
-            :loading="isUpdating"
-          />
-        </div>
-      </template>
-    </UModal>
-
-    <!-- Edit Email -->
-    <UModal
-      v-model:open="isEditEmailModalOpen"
-      :title="CONST_EDIT_EMAIL_TITLE"
-      :dismissible="false"
-      :close="false"
-    >
-      <template #default><div class="hidden"></div></template>
-      <template #body>
-        <form
-          id="edit-email-form"
-          class="flex flex-col gap-4 py-2"
-          @submit.prevent="handleUpdateProfile('email')"
-        >
-          <div>
-            <label class="block text-sm font-medium text-dark-text mb-1">{{
-              CONST_EMAIL_LABEL
-            }}</label>
-            <UInput v-model="editFormData.email" type="email" class="w-full" />
-            <p v-if="editError" class="text-xs text-error-500 mt-1">{{ editError }}</p>
-          </div>
-        </form>
-      </template>
-      <template #footer>
-        <div class="flex items-center justify-between w-full">
-          <UButton
-            :label="CONST_CANCEL_BTN_TEXT"
-            variant="actionCancelButton"
-            @click="closeModals"
-          />
-          <UButton
-            :label="CONST_EDIT_BTN"
-            variant="actionOkButton"
-            type="submit"
-            form="edit-email-form"
-            :loading="isUpdating"
-          />
-        </div>
-      </template>
-    </UModal>
-
-    <!-- Change Password -->
-    <UModal
-      v-model:open="isChangePasswordModalOpen"
-      :title="CONST_CHANGE_PASSWORD_TITLE"
-      :dismissible="false"
-      :close="false"
-    >
-      <template #default><div class="hidden"></div></template>
-      <template #body>
-        <form
-          id="change-pwd-form"
-          class="flex flex-col gap-4 py-2"
-          @submit.prevent="handleChangePassword"
-        >
-          <div>
-            <label class="block text-sm font-medium text-dark-text mb-1">{{
-              CONST_OLD_PASSWORD_LABEL
-            }}</label>
-            <UInput v-model="pwdData.oldPassword" type="password" class="w-full" />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-dark-text mb-1">{{
-              CONST_NEW_PASSWORD_LABEL
-            }}</label>
-            <UInput v-model="pwdData.newPassword" type="password" class="w-full" />
-          </div>
-          <p v-if="editError" class="text-xs text-error-500 mt-1">{{ editError }}</p>
-        </form>
-      </template>
-      <template #footer>
-        <div class="flex items-center justify-between w-full">
-          <UButton
-            :label="CONST_CANCEL_BTN_TEXT"
-            variant="actionCancelButton"
-            @click="closeModals"
-          />
-          <UButton
-            :label="CONST_EDIT_BTN"
-            variant="actionOkButton"
-            type="submit"
-            form="change-pwd-form"
-            :loading="isChangingPwd"
-          />
-        </div>
-      </template>
-    </UModal>
-
-    <!-- Delete Account -->
-    <UModal
-      v-model:open="isDeleteModalOpen"
-      :title="CONST_DELETE_ACCOUNT_TITLE"
-      :dismissible="false"
-      :close="false"
-    >
-      <template #default><div class="hidden"></div></template>
-      <template #body>
-        <p class="text-sm text-dark-text/80 py-2">{{ CONST_DELETE_ACCOUNT_CONFIRM }}</p>
-        <p v-if="editError" class="text-xs text-error-500 mt-1">{{ editError }}</p>
-      </template>
-      <template #footer>
-        <div class="flex items-center justify-between w-full">
-          <UButton
-            :label="CONST_CANCEL_BTN_TEXT"
-            variant="actionCancelButton"
-            @click="closeModals"
-          />
-          <UButton
-            :label="CONST_DELETE_BTN"
-            variant="actionOkButton"
-            :loading="isDeleting"
-            @click="handleDeleteProfile"
-          />
-        </div>
-      </template>
-    </UModal>
-
-    <!-- Upload Picture -->
-    <UModal
-      v-model:open="isUploadPictureModalOpen"
-      :title="CONST_UPLOAD_PICTURE_TITLE"
-      :dismissible="false"
-      :close="false"
-    >
-      <template #default><div class="hidden"></div></template>
-      <template #body>
-        <form
-          id="upload-pic-form"
-          class="flex flex-col gap-4 py-2"
-          @submit.prevent="handleUploadPicture"
-        >
-          <div>
-            <label class="block text-sm font-medium text-dark-text mb-1">{{
-              CONST_SELECT_FILE_LABEL
-            }}</label>
-            <input
-              type="file"
-              class="w-full text-sm text-dark-text/70 file:mr-4 file:py-2 file:px-6 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-transparent file:text-brand-500 file:ring-1 file:ring-brand-500/40 hover:file:bg-brand-500/20 file:transition-colors file:cursor-pointer cursor-pointer"
-              accept="image/*"
-              @change="onPictureSelected"
-            />
-            <p v-if="editError" class="text-xs text-error-500 mt-1">{{ editError }}</p>
-          </div>
-        </form>
-      </template>
-      <template #footer>
-        <div class="flex items-center justify-between w-full">
-          <UButton
-            :label="CONST_CANCEL_BTN_TEXT"
-            variant="actionCancelButton"
-            @click="closeModals"
-          />
-          <UButton
-            :label="CONST_UPLOAD_BTN"
-            variant="actionOkButton"
-            type="submit"
-            form="upload-pic-form"
-            :loading="isUploadingPic"
-          />
-        </div>
-      </template>
-    </UModal>
-
-    <!-- View Picture Full -->
-    <UModal
-      v-model:open="isViewPictureModalOpen"
-      :title="CONST_VIEW_PICTURE_TITLE"
-      :dismissible="false"
-      :close="false"
-    >
-      <template #default><div class="hidden"></div></template>
-      <template #body>
-        <div
-          class="w-full h-80 flex items-center justify-center bg-surface-600/10 rounded-2xl overflow-hidden mt-2"
-        >
-          <img
-            v-if="currentUser?.profile_image_url"
-            :src="currentUser.profile_image_url"
-            alt="Profile Full"
-            class="max-w-full max-h-full object-contain"
-          />
-          <UIcon v-else name="i-heroicons-user" class="w-32 h-32 text-surface-500/50" />
-        </div>
-      </template>
-      <template #footer>
-        <div class="flex items-center justify-end w-full">
-          <UButton label="OK" variant="actionOkButton" @click="isViewPictureModalOpen = false" />
-        </div>
-      </template>
-    </UModal>
-
-    <!-- Upload Document (Dummy) -->
-    <UModal
-      v-model:open="isUploadDocumentModalOpen"
-      :title="CONST_UPLOAD_DOCUMENT_TITLE"
-      :dismissible="false"
-      :close="false"
-    >
-      <template #default><div class="hidden"></div></template>
-      <template #body>
-        <form id="upload-doc-form" class="flex flex-col gap-4 py-2" @submit.prevent="closeModals">
-          <div>
-            <label class="block text-sm font-medium text-dark-text mb-1">{{
-              CONST_SELECT_FILE_LABEL
-            }}</label>
-            <input
-              type="file"
-              class="w-full text-sm text-dark-text/70 file:mr-4 file:py-2 file:px-6 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-transparent file:text-brand-500 file:ring-1 file:ring-brand-500/40 hover:file:bg-brand-500/20 file:transition-colors file:cursor-pointer cursor-pointer"
-            />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-dark-text mb-1">{{
-              CONST_DOCUMENT_TYPE_LABEL
-            }}</label>
-            <USelect
-              :items="[
-                { label: 'ID Card', value: 'id' },
-                { label: 'Passport', value: 'passport' },
-              ]"
-              label-key="label"
-              value-key="value"
-            />
-          </div>
-          <div class="flex gap-4">
-            <div class="flex-1">
-              <label class="block text-sm font-medium text-dark-text mb-1">{{
-                CONST_ISSUED_AT_LABEL
-              }}</label>
-              <UInput type="date" class="w-full" />
-            </div>
-            <div class="flex-1">
-              <label class="block text-sm font-medium text-dark-text mb-1">{{
-                CONST_ENDS_AT_LABEL
-              }}</label>
-              <UInput type="date" class="w-full" />
-            </div>
-          </div>
-        </form>
-      </template>
-      <template #footer>
-        <div class="flex items-center justify-between w-full">
-          <UButton
-            :label="CONST_CANCEL_BTN_TEXT"
-            variant="actionCancelButton"
-            @click="closeModals"
-          />
-          <UButton
-            :label="CONST_UPLOAD_BTN"
-            variant="actionOkButton"
-            type="submit"
-            form="upload-doc-form"
-          />
-        </div>
-      </template>
-    </UModal>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useAppConfig } from '#imports';
-import { ref, reactive, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuth } from '~/composables/useAuth';
 import { useCurrentUserQuery } from '~/queries/user.query';
-import {
-  useUpdateProfileMutation,
-  useDeleteProfileMutation,
-  useChangePasswordMutation,
-  useUploadProfilePictureMutation,
-} from '~/queries/user.mutation';
-import type { ApiError } from '~/types/apiError.type';
-import {
-  CONST_PROFILE_HEADING,
-  CONST_DOCUMENTS_HEADING,
-  CONST_USERNAME_LABEL,
-  CONST_EMAIL_LABEL,
-  CONST_PASSWORD_LABEL,
-  CONST_REGISTERED_LABEL,
-  CONST_FILTER_LABEL,
-  CONST_LOADING_TEXT,
-  CONST_FETCH_ERROR_TEXT,
-  CONST_EDIT_USERNAME_TITLE,
-  CONST_EDIT_EMAIL_TITLE,
-  CONST_CHANGE_PASSWORD_TITLE,
-  CONST_DELETE_ACCOUNT_TITLE,
-  CONST_DELETE_ACCOUNT_CONFIRM,
-  CONST_UPLOAD_PICTURE_TITLE,
-  CONST_VIEW_PICTURE_TITLE,
-  CONST_UPLOAD_DOCUMENT_TITLE,
-  CONST_OLD_PASSWORD_LABEL,
-  CONST_NEW_PASSWORD_LABEL,
-  CONST_SELECT_FILE_LABEL,
-  CONST_DOCUMENT_TYPE_LABEL,
-  CONST_ISSUED_AT_LABEL,
-  CONST_ENDS_AT_LABEL,
-  CONST_UPLOAD_BTN,
-  CONST_EDIT_BTN,
-  CONST_CANCEL_BTN_TEXT,
-  CONST_DELETE_BTN,
-} from '~/utils/constants';
+import { useProfileStore } from '~/stores/profile.modals.store';
 
-definePageMeta({ layout: 'profile', middleware: ['auth'] });
+definePageMeta({ layout: 'general', middleware: ['auth'] });
 
 const appConfig = useAppConfig();
 const router = useRouter();
-const { isAuthenticated, logout } = useAuth();
+const { isAuthenticated } = useAuth();
+const profileStore = useProfileStore();
 
 watch(
   isAuthenticated,
@@ -566,125 +233,6 @@ watch(
 );
 
 const { data: currentUser, isLoading, error } = useCurrentUserQuery();
-
-// Mutations
-const { mutate: updateProfile, isLoading: isUpdating } = useUpdateProfileMutation();
-const { mutate: changePwd, isLoading: isChangingPwd } = useChangePasswordMutation();
-const { mutate: deleteProfile, isLoading: isDeleting } = useDeleteProfileMutation();
-const { mutate: uploadPicture, isLoading: isUploadingPic } = useUploadProfilePictureMutation();
-
-// Modal States
-const isEditUsernameModalOpen = ref(false);
-const isEditEmailModalOpen = ref(false);
-const isChangePasswordModalOpen = ref(false);
-const isDeleteModalOpen = ref(false);
-const isUploadPictureModalOpen = ref(false);
-const isViewPictureModalOpen = ref(false);
-const isUploadDocumentModalOpen = ref(false);
-
-const editError = ref('');
-const editFormData = reactive({ username: '', email: '' });
-const pwdData = reactive({ oldPassword: '', newPassword: '' });
-const selectedPicture = ref<File | null>(null);
-
-const closeModals = () => {
-  isEditUsernameModalOpen.value = false;
-  isEditEmailModalOpen.value = false;
-  isChangePasswordModalOpen.value = false;
-  isDeleteModalOpen.value = false;
-  isUploadPictureModalOpen.value = false;
-  isUploadDocumentModalOpen.value = false;
-  editError.value = '';
-  pwdData.oldPassword = '';
-  pwdData.newPassword = '';
-  selectedPicture.value = null;
-};
-
-const openEditUsername = () => {
-  editFormData.username = currentUser.value?.username || '';
-  isEditUsernameModalOpen.value = true;
-};
-
-const openEditEmail = () => {
-  editFormData.email = currentUser.value?.email || '';
-  isEditEmailModalOpen.value = true;
-};
-
-const handleUpdateProfile = async (field: 'username' | 'email') => {
-  editError.value = '';
-  try {
-    const payload =
-      field === 'username' ? { username: editFormData.username } : { email: editFormData.email };
-    await updateProfile(payload);
-    closeModals();
-  } catch (err: unknown) {
-    const apiErr = err as ApiError;
-    editError.value =
-      typeof apiErr.response?._data?.message === 'string'
-        ? apiErr.response._data.message
-        : 'Error updating profile.';
-  }
-};
-
-const handleChangePassword = async () => {
-  editError.value = '';
-  if (!pwdData.oldPassword || !pwdData.newPassword) {
-    editError.value = 'Both fields are required!';
-    return;
-  }
-  try {
-    await changePwd({ oldPassword: pwdData.oldPassword, newPassword: pwdData.newPassword });
-    closeModals();
-  } catch (err: unknown) {
-    const apiErr = err as ApiError;
-    editError.value =
-      typeof apiErr.response?._data?.message === 'string'
-        ? apiErr.response._data.message
-        : 'Error changing password.';
-  }
-};
-
-const handleDeleteProfile = async () => {
-  editError.value = '';
-  try {
-    await deleteProfile();
-    logout();
-    router.push('/login');
-  } catch (err: unknown) {
-    const apiErr = err as ApiError;
-    editError.value =
-      typeof apiErr.response?._data?.message === 'string'
-        ? apiErr.response._data.message
-        : 'Error deleting profile.';
-  }
-};
-
-const onPictureSelected = (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  if (target.files && target.files.length > 0) {
-    selectedPicture.value = target.files[0] ?? null;
-  } else {
-    selectedPicture.value = null;
-  }
-};
-
-const handleUploadPicture = async () => {
-  editError.value = '';
-  if (!selectedPicture.value) {
-    editError.value = 'Please select a file first!';
-    return;
-  }
-  try {
-    await uploadPicture(selectedPicture.value);
-    closeModals();
-  } catch (err: unknown) {
-    const apiErr = err as ApiError;
-    editError.value =
-      typeof apiErr.response?._data?.message === 'string'
-        ? apiErr.response._data.message
-        : 'Error uploading picture.';
-  }
-};
 
 // Dummy Data
 const dummyDocuments = ref([
