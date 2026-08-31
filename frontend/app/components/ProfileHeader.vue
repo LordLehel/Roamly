@@ -1,11 +1,29 @@
-<!-- frontend/app/components/AppHeader.vue -->
+<!-- frontend/app/components/ProfileHeader.vue -->
 <template>
   <header
     class="flex items-center justify-between px-6 py-4 bg-surface-500/70 backdrop-blur-md shadow-sm z-50 border-b border-dark-text/10 sticky top-0"
   >
-    <div class="flex-1">
+    <!-- Left side: Select -->
+    <div class="flex-1 flex items-center gap-4">
+      <UButton
+        icon="i-heroicons-arrow-left"
+        variant="glassIconButton"
+        class="shrink-0"
+        :to="selectedView"
+      />
+      <USelect
+        v-model="selectedView"
+        :items="CONST_NAV_VIEWS"
+        label-key="label"
+        value-key="value"
+        @update:model-value="onViewChange"
+      />
+    </div>
+
+    <!-- Center: Logo -->
+    <div class="flex-1 flex justify-center">
       <NuxtLink
-        to="/#home"
+        to="/"
         class="flex items-center gap-2 text-dark-text hover:opacity-80 transition-opacity w-max"
       >
         <UIcon name="i-heroicons-map-pin" class="w-7 h-7 text-brand-500" />
@@ -13,24 +31,7 @@
       </NuxtLink>
     </div>
 
-    <nav class="hidden md:flex gap-8 font-bold tracking-wide">
-      <NuxtLink
-        to="/#home"
-        class="hover:text-brand-500 hover:underline underline-offset-4 transition-colors"
-        >{{ CONST_HOME_TITLE }}</NuxtLink
-      >
-      <NuxtLink
-        to="/#about"
-        class="hover:text-brand-500 hover:underline underline-offset-4 transition-colors"
-        >{{ CONST_ABOUT_TITLE }}</NuxtLink
-      >
-      <NuxtLink
-        to="/#support"
-        class="hover:text-brand-500 hover:underline underline-offset-4 transition-colors"
-        >{{ CONST_SUPPORT_TITLE }}</NuxtLink
-      >
-    </nav>
-
+    <!-- Right side: Profil / Log out -->
     <div class="flex-1 flex justify-end items-center gap-4">
       <ClientOnly>
         <div class="flex items-center gap-4">
@@ -48,46 +49,44 @@
               <UAvatar :alt="userProfile?.username || 'User'" icon="i-heroicons-user" />
             </NuxtLink>
           </template>
-
-          <template v-else>
-            <UButton :label="CONST_LOGIN_TITLE" to="/login" variant="smallHollowActionButton" />
-            <NuxtLink to="/login">
-              <UAvatar icon="i-heroicons-user" />
-            </NuxtLink>
-          </template>
         </div>
-
-        <template #fallback>
-          <div class="flex items-center gap-3">
-            <UButton
-              :label="CONST_LOGIN_TITLE"
-              to="/login"
-              variant="smallHollowActionButton"
-              class="opacity-50"
-            />
-            <UAvatar icon="i-heroicons-user" class="opacity-50" />
-          </div>
-        </template>
       </ClientOnly>
     </div>
   </header>
 </template>
 
 <script setup lang="ts">
-import { watch } from 'vue';
+import { ref, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { useAuth } from '../composables/useAuth';
 import { useCurrentUserQuery } from '../queries/user.query';
 
+const router = useRouter();
+const route = useRoute();
 const { isAuthenticated, logout } = useAuth();
-const { data: userProfile, error } = useCurrentUserQuery();
+const { data: userProfile } = useCurrentUserQuery();
 
-watch(error, (newError) => {
-  if (newError) {
-    handleLogout();
-  }
-});
+const getCurrentViewValue = (path: string) => {
+  const found = CONST_NAV_VIEWS.find((item) => item.value === path || path.includes(item.value));
+  return found ? found.value : path;
+};
+
+const selectedView = ref(getCurrentViewValue(route.path));
+
+watch(
+  () => route.path,
+  (newPath) => {
+    selectedView.value = getCurrentViewValue(newPath);
+  },
+);
+
+const onViewChange = (path: string | undefined) => {
+  const targetPath = path ?? '/';
+  router.push(targetPath);
+};
 
 const handleLogout = () => {
   logout();
+  router.push('/login');
 };
 </script>

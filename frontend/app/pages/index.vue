@@ -66,7 +66,7 @@
 
             <UButton
               variant="ghost"
-              class="font-bold tracking-wide hover:underline underline-offset-4 transition-colors duration-500"
+              class="font-bold tracking-wide hover:underline underline-offset-4 transition-colors duration-500 cursor-pointer"
               :class="activeCard === card.id ? 'text-white hover:text-white/80' : 'text-brand-500'"
               @click="toggleCard(card.id)"
             >
@@ -105,13 +105,6 @@
       <p class="mt-8 text-lg text-surface-500 font-medium opacity-90 leading-relaxed">
         {{ CONST_SUPPORT_DESCRIPTION }}
       </p>
-      <div class="flex justify-center my-8 transition-transform hover:-translate-y-1">
-        <img
-          :src="CONST_SUPPORT_PICTURE_PATH"
-          alt="Support Mascot"
-          class="w-full max-w-lg rounded-[25px] shadow-[0_15px_40px_rgba(47,62,50,0.15)] object-cover ring-1 ring-dark-text/20"
-        />
-      </div>
     </section>
   </div>
 </template>
@@ -119,26 +112,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { definePageMeta } from '#imports';
-import {
-  CONST_GET_STARTED,
-  CONST_HOME_DESCRIPTION,
-  CONST_DOCUMENT_MANAGEMENT,
-  CONST_DOCUMENT_MANAGEMENT_DESCRIPTION,
-  CONST_DOCUMENT_MANAGEMENT_EXTENDED,
-  CONST_EVENT_CALENDAR,
-  CONST_EVENT_CALENDAR_DESCRIPTION,
-  CONST_EVENT_CALENDAR_EXTENDED,
-  CONST_GROUP_GALLERY,
-  CONST_GROUP_GALLERY_DESCRIPTION,
-  CONST_GROUP_GALLERY_EXTENDED,
-  CONST_LEARN_MORE,
-  CONST_SHOW_LESS,
-  CONST_ABOUT_HERO,
-  CONST_ABOUT_DESCRIPTION,
-  CONST_SUPPORT_HERO,
-  CONST_SUPPORT_DESCRIPTION,
-  CONST_SUPPORT_PICTURE_PATH,
-} from '../utils/constants';
 
 definePageMeta({ layout: 'default' });
 

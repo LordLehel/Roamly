@@ -1,3 +1,4 @@
+// frontend/app/services/userService.ts
 import { useApi } from '~/composables/useApi';
 import type { UserOutDto, UserInDto } from '~/types/user.type';
 import type { ApiResponse } from '~/types/api.type';

@@ -1,35 +1,7 @@
-// frontend/app/utils/constants.ts
-// Global
-export const CONST_BRAND_NAME = 'ROAMLY';
+// frontend/app/utils/constants/auth.constants.ts
 export const CONST_HOME_TITLE = 'Home';
 export const CONST_ABOUT_TITLE = 'About';
 export const CONST_SUPPORT_TITLE = 'Support';
-export const CONST_LOGIN_TITLE = 'Log in';
-export const CONST_LOGOUT_TITLE = 'Log out';
-export const CONST_REGISTER_TITLE = 'Register';
-export const CONST_REGISTER_PROMPT_BTN = "You don't have an account? Register one here.";
-export const CONST_GO_BACK_TITLE = 'Go Back';
-export const CONST_COPYRIGHT_LABEL = '© Copyright - Roamly Co. 2026 | All rights reserved.';
-
-// Backgrounds
-export const CONST_BG_AUTH = "bg-[url('/register/register-background.jpg')]";
-export const CONST_BG_HOME = "bg-[url('/home/home-background.jpg')]";
-export const CONST_BG_ABOUT = "bg-[url('/about/about-background.jpg')]";
-export const CONST_BG_SUPPORT = "bg-[url('/support/support-background.jpg')]";
-
-// Form
-export const CONST_LOGIN_HEADING = 'Log into your account';
-export const CONST_REGISTER_HEADING = 'Register account';
-export const CONST_EMAIL_LABEL = 'Email';
-export const CONST_USERNAME_LABEL = 'Username';
-export const CONST_PHONE_LABEL = 'Phone number';
-export const CONST_PASSWORD_LABEL = 'Password';
-export const CONST_REPEAT_PASSWORD_LABEL = 'Repeat password';
-export const CONST_CANCEL_BTN = 'Cancel';
-export const CONST_LOGIN_SUCCESS = 'Login successful! Redirecting...';
-export const CONST_REGISTER_SUCCESS = 'Registration successful! Redirecting to login page...';
-
-// Home
 export const CONST_LEARN_MORE = 'Learn more';
 export const CONST_SHOW_LESS = 'Show less';
 export const CONST_GET_STARTED = 'Get Started';
