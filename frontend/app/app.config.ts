@@ -76,10 +76,10 @@ export default defineAppConfig({
       variants: {
         variant: {
           glass: {
-            base: 'bg-input-bg text-dark-text rounded-xl ring-1 ring-input-border placeholder:text-text-muted focus:ring-2 focus:ring-brand-500 transition-colors h-11 px-4 shadow-none',
+            base: 'bg-input-bg text-dark-text rounded-xl ring-1 ring-input-border placeholder:text-text-muted focus:ring-2 focus:ring-brand-500 transition-colors h-11 !px-4 shadow-none',
           },
           glassError: {
-            base: 'bg-error-50 text-error-900 rounded-xl ring-1 ring-error-500 placeholder:text-error-300 focus:ring-2 focus:ring-error-500 transition-colors h-11 px-4 shadow-none',
+            base: 'bg-error-50 text-error-900 rounded-xl ring-1 ring-error-500 placeholder:text-error-300 focus:ring-2 focus:ring-error-500 transition-colors h-11 !px-4 shadow-none',
           },
         },
       },
@@ -130,7 +130,7 @@ export default defineAppConfig({
       slots: {
         overlay: 'fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm',
         content:
-          'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] !w-[calc(100%-2rem)] !sm:max-w-md bg-white/90 backdrop-blur-2xl !rounded-[25px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] ring-1 ring-black/10 focus:outline-none overflow-hidden',
+          'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] !w-[calc(60%-2rem)] !sm:max-w-md bg-white/90 backdrop-blur-2xl !rounded-[25px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] ring-1 ring-black/10 focus:outline-none overflow-hidden',
       },
     },
   },
