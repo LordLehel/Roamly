@@ -149,6 +149,17 @@ export default defineAppConfig({
         arrow: 'fill-surface-500/90',
       },
     },
+
+    // SelectMenu
+    selectMenu: {
+      slots: {
+        base: 'bg-transparent text-surface-500 font-bold text-xl border-none shadow-none ring-0 focus:ring-0 focus:outline-none cursor-pointer hover:opacity-80 transition-opacity',
+        trailingIcon: 'text-surface-500 w-6 h-6',
+        content:
+          'z-[100] bg-surface-500/90 backdrop-blur-xl rounded-2xl ring-1 ring-brand-500/30 shadow-xl text-dark-text mt-2 min-w-56',
+        item: 'flex items-center text-left py-2 px-4 hover:bg-brand-500/20 text-dark-text cursor-pointer data-[highlighted]:bg-brand-500/20 data-[highlighted]:text-dark-text font-medium text-sm rounded-xl mx-1 my-0.5',
+      },
+    },
   },
 
   // Layout
@@ -259,5 +270,50 @@ export default defineAppConfig({
   footer: {
     base: 'py-5 px-6 flex items-center justify-between text-xs text-dark-text bg-light-bg/70 backdrop-blur-md shadow-[0_-2px_10px_rgba(0,0,0,0.02)] relative z-10',
     text: 'font-medium opacity-80',
+  },
+
+  calendar: {
+    container:
+      'w-full max-w-360 mx-auto px-6 py-8 flex flex-col gap-8 relative h-[calc(100vh-80px)]',
+
+    // Címsor (Nincs háttér, nincs keret)
+    headerRow: 'flex flex-col md:flex-row justify-between items-center w-full gap-6 shrink-0',
+
+    // Legördülő menü stílusai
+    groupSelectWrapper:
+      'flex flex-col items-center justify-center w-full max-w-md mx-auto relative',
+    groupSelectTrigger:
+      'flex items-center justify-center gap-2 cursor-pointer hover:opacity-80 transition-opacity w-full',
+    groupSelectTitle: 'text-3xl font-bold text-surface-500 tracking-wide text-center truncate',
+    groupSelectIcon: 'w-6 h-6 text-surface-500 shrink-0',
+
+    // Fő rács
+    mainGrid:
+      'grid grid-cols-1 md:grid-cols-12 gap-1 flex-1 min-h-0 bg-surface-500/50 backdrop-blur-md border border-dark-text/20 rounded-xl overflow-hidden shadow-lg',
+
+    // Oszlopok
+    columnBase: 'flex flex-col h-full border-dark-text/10',
+    columnHeader:
+      'p-3 font-semibold text-sm text-dark-text/80 uppercase tracking-wider shrink-0 bg-surface-600/50 flex justify-between border-b border-dark-text/10',
+    columnBody: 'flex-1 overflow-y-auto',
+
+    // Lista Elemek
+    listItem:
+      'flex items-center justify-between p-4 border-b border-dark-text/10 cursor-pointer transition-colors',
+    listItemHover: 'hover:bg-surface-500/40',
+    listItemSelected: 'bg-surface-600/70 border-l-4 border-l-brand-500',
+    eventListItemSelected: 'bg-brand-500/20',
+
+    // Hozzáadás gomb listaelemként (shrink-0 biztosítja, hogy ne tűnjön el)
+    addDayItem:
+      'flex items-center justify-center p-4 border-b border-dark-text/10 cursor-pointer hover:bg-surface-500/40 transition-colors bg-surface-500/10 shrink-0 min-h-[60px]',
+
+    // Preview
+    previewWrapper: 'p-6 flex flex-col gap-6',
+    previewTitleRow: 'flex items-start justify-between',
+    previewMetaRow: 'flex flex-col gap-3 text-sm text-dark-text/90',
+    previewMapPlaceholder:
+      'w-full h-64 mt-2 rounded-xl overflow-hidden relative flex items-center justify-center shadow-inner border border-dark-text/20 bg-surface-600/30',
+    emptyPreview: 'flex-1 flex items-center justify-center text-dark-text/60 text-sm font-medium',
   },
 });
