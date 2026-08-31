@@ -19,3 +19,32 @@ export type docSharedWithGroups = Prisma.file_sharesGetPayload<{
     };
   };
 }>;
+
+export type GroupFile = Prisma.filesGetPayload<{
+  include: {
+    documents: true;
+    media_files: true;
+
+    creator: {
+      select: {
+        email: true;
+        username: true;
+        uuid: true;
+      };
+    };
+  };
+}>;
+
+export type GroupFileWithUrl = GroupFile & {
+  download_url: string;
+};
+
+export type PaginatedGroupFiles = {
+  items: GroupFileWithUrl[];
+  meta: {
+    next_cursor: number | null;
+    has_next_page: boolean;
+    limit: number;
+    count: number;
+  };
+};

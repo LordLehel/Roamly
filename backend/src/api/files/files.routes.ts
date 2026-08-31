@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { requireAuth } from '../../middlewares/auth.middleware';
 import filesController from './files.controller';
-import { uploadDocument } from '../../middlewares/upload.middleware';
+import { uploadDocument, uploadMedia } from '../../middlewares/upload.middleware';
 import { validateData } from '../../middlewares/validate.middleware';
 import * as zodSchemas from './files.validation';
 
@@ -64,5 +64,66 @@ router.get(
   validateData(zodSchemas.fileIdValidationSchema, 'params'),
   filesController.listAllGroupsADocumentIsSharedWith,
 );
+
+// group files
+router.post(
+  '/group/:groupUuid/document',
+  uploadDocument.single('file'),
+  validateData(zodSchemas.groupUuidValidationSchema, 'params'),
+  validateData(zodSchemas.groupDocumentDataSchema, 'body'),
+  filesController.uploadGroupDocument,
+);
+
+router.post(
+  '/group/:groupUuid/media',
+  uploadMedia.single('file'),
+  validateData(zodSchemas.groupUuidValidationSchema, 'params'),
+  validateData(zodSchemas.groupMediaDataSchema, 'body'),
+  filesController.uploadGroupMediaFile,
+);
+
+router.patch(
+  '/group/:groupUuid/document/:fileId',
+  uploadDocument.single('file'),
+  validateData(
+    zodSchemas.groupUuidValidationSchema.extend(zodSchemas.fileIdValidationSchema.shape),
+    'params',
+  ),
+  validateData(zodSchemas.groupDocumentUpdateSchema, 'body'),
+  filesController.updateGroupDocument,
+);
+
+router.patch(
+  '/group/:groupUuid/media/:fileId',
+  uploadMedia.single('file'),
+  validateData(
+    zodSchemas.groupUuidValidationSchema.extend(zodSchemas.fileIdValidationSchema.shape),
+    'params',
+  ),
+  validateData(zodSchemas.groupMediaDataSchema, 'body'),
+  filesController.updateGroupMediaFile,
+);
+
+router.delete(
+  '/group/:groupUuid/:fileId',
+  validateData(
+    zodSchemas.groupUuidValidationSchema.extend(zodSchemas.fileIdValidationSchema.shape),
+    'params',
+  ),
+  filesController.deleteGroupFile,
+);
+
+router.get(
+  '/group/:groupUuid',
+  validateData(zodSchemas.groupUuidValidationSchema, 'params'),
+  validateData(zodSchemas.paginatedQuerySchema, 'query'),
+  filesController.getGroupFiles,
+);
+
+// group-ra vonatkozo, group-on belul mindenki szamara
+// lathato file-ok feltoltese, doc(pl kozos jegyek)
+// es media(pl kozos kepek, videok) is
+
+// member vagy leader torolheti, updatelheti a group-ban megosztott file-t?
 
 export default router;

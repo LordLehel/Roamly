@@ -194,6 +194,172 @@ class FilesController extends BaseController {
       });
     },
   );
+
+  public uploadGroupDocument = this.handleAsync(
+    async (req: Request, res: Response): Promise<void> => {
+      const user = res.locals.user!;
+      const file = req.file;
+      const groupUuid = req.params.groupUuid as string;
+      const { document_type, issue_date, expiry_date } = req.body;
+
+      if (!file) {
+        res.status(400).json({
+          status: 'error',
+          message: 'No document provided!',
+        });
+
+        return;
+      }
+
+      const uploadedDocument = await fileService.uploadGroupDocument(
+        user.uuid,
+        groupUuid,
+        file,
+        document_type,
+        issue_date,
+        expiry_date,
+      );
+
+      res.status(201).json({
+        status: 'success',
+        message: 'Group document uploaded successfully!',
+        data: uploadedDocument,
+      });
+    },
+  );
+
+  public uploadGroupMediaFile = this.handleAsync(
+    async (req: Request, res: Response): Promise<void> => {
+      const user = res.locals.user!;
+
+      const file = req.file;
+
+      const groupUuid = req.params.groupUuid as string;
+
+      const { description } = req.body;
+
+      if (!file) {
+        res.status(400).json({
+          status: 'error',
+          message: 'No media file provided!',
+        });
+
+        return;
+      }
+
+      const uploadedMedia = await fileService.uploadGroupMediaFile(
+        user.uuid,
+        groupUuid,
+        file,
+        description,
+      );
+
+      res.status(201).json({
+        status: 'success',
+        message: 'Group media file uploaded successfully!',
+        data: uploadedMedia,
+      });
+    },
+  );
+
+  public updateGroupDocument = this.handleAsync(
+    async (req: Request, res: Response): Promise<void> => {
+      const user = res.locals.user!;
+
+      const groupUuid = req.params.groupUuid as string;
+
+      const fileId = parseInt(req.params.fileId as string, 10);
+
+      const file = req.file;
+
+      const { document_type, issue_date, expiry_date } = req.body;
+
+      const updatedGroupDocument = await fileService.updateGroupDocument(
+        user.uuid,
+        groupUuid,
+        fileId,
+        document_type,
+        file,
+        issue_date,
+        expiry_date,
+      );
+
+      res.status(200).json({
+        status: 'success',
+        message: 'Group document updated successfully!',
+        data: updatedGroupDocument,
+      });
+    },
+  );
+
+  public updateGroupMediaFile = this.handleAsync(
+    async (req: Request, res: Response): Promise<void> => {
+      const user = res.locals.user!;
+
+      const groupUuid = req.params.groupUuid as string;
+
+      const fileId = parseInt(req.params.fileId as string, 10);
+
+      const file = req.file;
+
+      const { description } = req.body;
+
+      const updatedGroupMedia = await fileService.updateGroupMediaFile(
+        user.uuid,
+        groupUuid,
+        fileId,
+        file,
+        description,
+      );
+
+      res.status(200).json({
+        status: 'success',
+        message: 'Group media file updated successfully!',
+        data: updatedGroupMedia,
+      });
+    },
+  );
+
+  public deleteGroupFile = this.handleAsync(async (req: Request, res: Response): Promise<void> => {
+    const user = res.locals.user!;
+
+    const groupUuid = req.params.groupUuid as string;
+
+    const fileId = parseInt(req.params.fileId as string, 10);
+
+    await fileService.deleteGroupFile(user.uuid, groupUuid, fileId);
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Group file deleted successfully!',
+    });
+  });
+
+  public getGroupFiles = this.handleAsync(async (req: Request, res: Response): Promise<void> => {
+    const user = res.locals.user!;
+
+    const groupUuid = req.params.groupUuid as string;
+
+    const limit = req.query.limit as unknown as number;
+
+    const cursor = req.query.cursor as unknown as number | undefined;
+
+    const type = req.query.type as unknown as string;
+
+    const paginatedFiles = await fileService.getGroupFiles(
+      user.uuid,
+      groupUuid,
+      limit,
+      cursor,
+      type,
+    );
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Files of the group listed successfully!',
+      data: paginatedFiles,
+    });
+  });
 }
 
 export default new FilesController();
