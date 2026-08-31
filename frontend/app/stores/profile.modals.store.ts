@@ -79,7 +79,7 @@ export const useProfileStore = defineStore('profile', () => {
     isUploadPictureModalOpen,
     isViewPictureModalOpen,
     isUploadDocumentModalOpen,
-    
+
     selectedUser,
 
     openEditUsernameModal,

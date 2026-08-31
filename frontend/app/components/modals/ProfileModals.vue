@@ -319,7 +319,11 @@ import {
   useChangePasswordMutation,
   useUploadProfilePictureMutation,
 } from '~/queries/user.mutation';
-import { updateUsernameSchema, updateEmailSchema, changePasswordSchema } from '~/utils/schemas/users.validation';
+import {
+  updateUsernameSchema,
+  updateEmailSchema,
+  changePasswordSchema,
+} from '~/utils/schemas/users.validation';
 import type { ApiError } from '~/types/apiError.type';
 
 const profileStore = useProfileStore();
@@ -409,14 +413,14 @@ watch(
 const handleUpdateUsername = () => {
   resetUpdateProfile();
   usernameValidationError.value = '';
-  
+
   const validationResult = updateUsernameSchema.safeParse({ username: editFormData.username });
   if (!validationResult.success) {
     usernameValidationError.value =
       validationResult.error.issues[0]?.message ?? CONST_INVALID_DATA_ERROR;
     return;
   }
-  
+
   updateProfile({ username: validationResult.data.username });
 };
 
@@ -481,12 +485,15 @@ const handleChangePassword = () => {
   });
 
   if (!validationResult.success) {
-     pwdValidationError.value =
+    pwdValidationError.value =
       validationResult.error.issues[0]?.message ?? CONST_INVALID_DATA_ERROR;
     return;
   }
 
-  changePwd({ oldPassword: validationResult.data.oldPassword, newPassword: validationResult.data.newPassword });
+  changePwd({
+    oldPassword: validationResult.data.oldPassword,
+    newPassword: validationResult.data.newPassword,
+  });
 };
 
 // -- Profile Delete --

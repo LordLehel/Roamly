@@ -9,9 +9,7 @@ export const updateUsernameSchema = z.object({
 });
 
 export const updateEmailSchema = z.object({
-  email: z
-    .string('Email must be a string!')
-    .email('Email address format not recognized'),
+  email: z.string('Email must be a string!').email('Email address format not recognized'),
 });
 
 export const changePasswordSchema = z.object({
