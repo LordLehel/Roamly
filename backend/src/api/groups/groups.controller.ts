@@ -185,6 +185,38 @@ class GroupsController extends BaseController {
       message: 'User successfully left from group!',
     });
   });
+
+  public promoteUser = this.handleAsync(async (req: Request, res: Response): Promise<void> => {
+    const user = res.locals.user!;
+
+    const groupUuid = req.params.groupUuid as string;
+
+    const { email } = req.body;
+
+    const promotedUserProfile = await groupsService.promoteUser(user.uuid, groupUuid, email);
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Target user promoted successfully!',
+      data: promotedUserProfile,
+    });
+  });
+
+  public demoteUser = this.handleAsync(async (req: Request, res: Response): Promise<void> => {
+    const user = res.locals.user!;
+
+    const groupUuid = req.params.groupUuid as string;
+
+    const { email } = req.body;
+
+    const demotedUserProfile = await groupsService.demoteUser(user.uuid, groupUuid, email);
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Target User demoted successfully!',
+      data: demotedUserProfile,
+    });
+  });
 }
 
 export default new GroupsController();

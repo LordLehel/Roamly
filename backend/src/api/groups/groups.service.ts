@@ -1,5 +1,5 @@
 import prisma from '../../prisma';
-import { groups, Prisma } from '@prisma/client';
+import { group_profiles, groups, Prisma } from '@prisma/client';
 import {
   profileRelatedToTheGroup,
   PaginatedGroups,
@@ -724,4 +724,189 @@ export const userLeavingGroup = async (userUuid: string, groupUuid: string): Pro
       },
     }),
   ]);
+};
+
+export const promoteUser = async (
+  userUuid: string,
+  groupUuid: string,
+  targetUserEmail: string,
+): Promise<group_profiles> => {
+  const user = await prisma.users.findUniqueOrThrow({
+    where: {
+      uuid: userUuid,
+    },
+  });
+
+  const group = await prisma.groups.findUniqueOrThrow({
+    where: {
+      uuid: groupUuid,
+    },
+  });
+
+  const targetUser = await prisma.users.findUniqueOrThrow({
+    where: {
+      email: targetUserEmail,
+    },
+  });
+
+  const requesterUserProfile = await prisma.group_profiles.findUnique({
+    where: {
+      user_id_group_id: {
+        user_id: user.user_id,
+        group_id: group.group_id,
+      },
+    },
+    include: {
+      roles: true,
+    },
+  });
+
+  if (!requesterUserProfile || requesterUserProfile.roles.type !== ROLES.LEADER) {
+    throw new ForbiddenError('Only leaders can promote other users!');
+  }
+
+  const targetUserProfile = await prisma.group_profiles.findUniqueOrThrow({
+    where: {
+      user_id_group_id: {
+        user_id: targetUser.user_id,
+        group_id: group.group_id,
+      },
+    },
+
+    include: {
+      roles: true,
+    },
+  });
+
+  if (targetUserProfile.roles.type === ROLES.LEADER) {
+    throw new ConflictError('Target user is already a leader!');
+  }
+
+  if (targetUserProfile.roles.type !== ROLES.MEMBER) {
+    throw new BadRequestError('Target user must be a member of the group to be promoted!');
+  }
+
+  const leaderRole = await prisma.roles.findUniqueOrThrow({
+    where: {
+      type: ROLES.LEADER,
+    },
+  });
+
+  const promotedUserProfile = await prisma.group_profiles.update({
+    where: {
+      user_id_group_id: {
+        user_id: targetUser.user_id,
+        group_id: group.group_id,
+      },
+    },
+
+    data: {
+      role_id: leaderRole.role_id,
+    },
+
+    include: {
+      roles: true,
+    },
+  });
+
+  return promotedUserProfile;
+};
+
+export const demoteUser = async (
+  userUuid: string,
+  groupUuid: string,
+  targetUserEmail: string,
+): Promise<group_profiles> => {
+  const user = await prisma.users.findUniqueOrThrow({
+    where: {
+      uuid: userUuid,
+    },
+  });
+
+  const group = await prisma.groups.findUniqueOrThrow({
+    where: {
+      uuid: groupUuid,
+    },
+  });
+
+  const targetUser = await prisma.users.findUniqueOrThrow({
+    where: {
+      email: targetUserEmail,
+    },
+  });
+
+  const requesterUserProfile = await prisma.group_profiles.findUnique({
+    where: {
+      user_id_group_id: {
+        user_id: user.user_id,
+        group_id: group.group_id,
+      },
+    },
+    include: {
+      roles: true,
+    },
+  });
+
+  if (!requesterUserProfile || requesterUserProfile.roles.type !== ROLES.LEADER) {
+    throw new ForbiddenError('Only leaders can demote other users!');
+  }
+
+  const targetUserProfile = await prisma.group_profiles.findUniqueOrThrow({
+    where: {
+      user_id_group_id: {
+        user_id: targetUser.user_id,
+        group_id: group.group_id,
+      },
+    },
+
+    include: {
+      roles: true,
+    },
+  });
+
+  if (targetUserProfile.roles.type === ROLES.MEMBER) {
+    throw new ConflictError('Target user is already a member!');
+  }
+
+  if (targetUserProfile.roles.type !== ROLES.LEADER) {
+    throw new BadRequestError('Only leaders can be demoted!');
+  }
+
+  const numberOfLeaders = await prisma.group_profiles.count({
+    where: {
+      group_id: group.group_id,
+      roles: {
+        type: ROLES.LEADER,
+      },
+    },
+  });
+
+  if (numberOfLeaders <= 1) {
+    throw new BadRequestError('Last leader of the group can not be demoted!');
+  }
+
+  const memberRole = await prisma.roles.findFirstOrThrow({
+    where: {
+      type: ROLES.MEMBER,
+    },
+  });
+
+  const demotedUserProfile = await prisma.group_profiles.update({
+    where: {
+      user_id_group_id: {
+        user_id: targetUser.user_id,
+        group_id: group.group_id,
+      },
+    },
+
+    data: {
+      role_id: memberRole.role_id,
+    },
+
+    include: {
+      roles: true,
+    },
+  });
+
+  return demotedUserProfile;
 };
