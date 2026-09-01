@@ -38,30 +38,67 @@ export const sharingUpdateSchema = z.object({
   }),
 });
 
-export const groupDocumentDataSchema = z.object({
-  document_type: z
-    .string({
-      message: 'Document type is required!',
-    })
-    .min(1, 'Document type cannot be empty!'),
-  issue_date: z.string().optional(),
-  expiry_date: z.string().optional(),
-});
+export const groupDocumentDataSchema = z
+  .object({
+    document_type: z.enum(
+      ['TICKET', 'BOOKING_CONFIRMATION', 'HOTEL_VOUCHER', 'GUEST_REGISTRATION_CARD', 'OTHER'],
+      {
+        message:
+          'Invalid document type!, Must be TICKET, BOOKING_CONFIRMATION, HOTEL_VOUCHER, GUEST_REGISTRATION_CARD, or OTHER',
+      },
+    ),
+
+    issue_date: z.iso.date('Invalid date format! Use ISO format (YYYY-MM-DD)').optional(),
+
+    expiry_date: z.iso.date('Invalid date format! Use ISO format (YYYY-MM-DD)').optional(),
+  })
+  .refine(
+    (data: { document_type: string; issue_date?: string; expiry_date?: string }) => {
+      if (data.issue_date && data.expiry_date) {
+        return new Date(data.expiry_date) > new Date(data.issue_date);
+      }
+
+      return true;
+    },
+    {
+      message: 'Expiry date must be after the issue date!',
+      path: ['expiry_date'],
+    },
+  );
 
 export const groupMediaDataSchema = z.object({
   description: z.string().max(512, 'Description can not be longer then 512 characters!').optional(),
 });
 
-export const groupDocumentUpdateSchema = z.object({
-  document_type: z
-    .string({
-      message: 'Document type is required!',
-    })
-    .min(1, 'Document type cannot be empty!')
-    .optional(),
-  issue_date: z.string().optional(),
-  expiry_date: z.string().optional(),
-});
+export const groupDocumentUpdateSchema = z
+  .object({
+    document_type: z
+      .enum(
+        ['TICKET', 'BOOKING_CONFIRMATION', 'HOTEL_VOUCHER', 'GUEST_REGISTRATION_CARD', 'OTHER'],
+        {
+          message:
+            'Invalid document type!, Must be TICKET, BOOKING_CONFIRMATION, HOTEL_VOUCHER, GUEST_REGISTRATION_CARD, or OTHER',
+        },
+      )
+      .optional(),
+
+    issue_date: z.iso.date('Invalid date format! Use ISO format (YYYY-MM-DD)').optional(),
+
+    expiry_date: z.iso.date('Invalid date format! Use ISO format (YYYY-MM-DD)').optional(),
+  })
+  .refine(
+    (data: { document_type?: string; issue_date?: string; expiry_date?: string }) => {
+      if (data.issue_date && data.expiry_date) {
+        return new Date(data.expiry_date) > new Date(data.issue_date);
+      }
+
+      return true;
+    },
+    {
+      message: 'Expiry date must be after the issue date!',
+      path: ['expiry_date'],
+    },
+  );
 
 export const paginatedQuerySchema = z.object({
   limit: z.coerce

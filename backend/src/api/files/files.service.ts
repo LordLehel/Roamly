@@ -593,7 +593,15 @@ export const updateGroupDocument = async (
     where: {
       file_id: fileId,
     },
+    include: {
+      documents: true,
+    },
   });
+
+  // is the file really a document
+  if (!file.documents) {
+    throw new BadRequestError('This file is not a document!');
+  }
 
   // is the file uploaded in this group
   if (file.group_id !== group.group_id) {
@@ -624,6 +632,7 @@ export const updateGroupDocument = async (
   }
 
   const updateData: Prisma.filesUpdateInput = {
+    updated_at: new Date(),
     documents: {
       update: {
         // if the user did not send anything, the data stays the same,
@@ -688,7 +697,15 @@ export const updateGroupMediaFile = async (
     where: {
       file_id: fileId,
     },
+    include: {
+      media_files: true,
+    },
   });
+
+  // is the file really a media file
+  if (!file.media_files) {
+    throw new BadRequestError('This file is not a media file!');
+  }
 
   if (file.group_id !== group.group_id) {
     throw new BadRequestError('This file does not belong to this group!');
@@ -718,6 +735,7 @@ export const updateGroupMediaFile = async (
   }
 
   const updateData: Prisma.filesUpdateInput = {
+    updated_at: new Date(),
     media_files: {
       update: {
         description:

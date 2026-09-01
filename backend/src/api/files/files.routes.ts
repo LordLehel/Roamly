@@ -120,10 +120,4 @@ router.get(
   filesController.getGroupFiles,
 );
 
-// group-ra vonatkozo, group-on belul mindenki szamara
-// lathato file-ok feltoltese, doc(pl kozos jegyek)
-// es media(pl kozos kepek, videok) is
-
-// member vagy leader torolheti, updatelheti a group-ban megosztott file-t?
-
 export default router;
