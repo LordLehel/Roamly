@@ -61,6 +61,7 @@ model groups {
   events         events[]
   files          files[]
   group_profiles group_profiles[]
+  file_shares    file_shares[]
 }
 
 model media_files {
@@ -90,6 +91,7 @@ model users {
   uploaded_files     files[]              @relation("FilesUploadedByUser")
   owned_files        files[]              @relation("FilesOwnedByUser")
   group_profiles     group_profiles[]
+  file_shares        file_shares[]
 }
 
 model documents {
@@ -101,21 +103,35 @@ model documents {
 }
 
 model files {
-  file_id         Int          @id @default(autoincrement())
-  file_name       String?      @db.VarChar(255)
+  file_id         Int           @id @default(autoincrement())
+  file_name       String?       @db.VarChar(255)
   file_url        String
-  file_size       BigInt?
-  mime_type       String?      @db.VarChar(32)
-  upload_datetime DateTime?    @default(now()) @db.Timestamp(6)
+  file_size       Int?
+  mime_type       String?       @db.VarChar(32)
+  upload_datetime DateTime?     @default(now()) @db.Timestamp(6)
   uploaded_by     Int?
-  ownership_type  String       @db.VarChar(255)
+  ownership_type  String        @db.VarChar(255)
   user_id         Int?
   group_id        Int?
-  created_at      DateTime     @default(now()) @db.Timestamp(6)
-  updated_at      DateTime     @updatedAt @db.Timestamp(6)
+  created_at      DateTime      @default(now()) @db.Timestamp(6)
+  updated_at      DateTime      @updatedAt @db.Timestamp(6)
   documents       documents?
-  groups          groups?      @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: NoAction)
-  creator         users?       @relation("FilesUploadedByUser", fields: [uploaded_by], references: [user_id], onUpdate: NoAction)
-  owner           users?       @relation("FilesOwnedByUser", fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
+  groups          groups?       @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: NoAction)
+  creator         users?        @relation("FilesUploadedByUser", fields: [uploaded_by], references: [user_id], onUpdate: NoAction)
+  owner           users?        @relation("FilesOwnedByUser", fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
   media_files     media_files?
+  file_shares     file_shares[]
+}
+
+model file_shares {
+  file_id      Int
+  group_id     Int
+  shared_by    Int?
+  shared_at    DateTime @default(now()) @db.Timestamp(6)
+  access_level String   @default("ALL") @db.VarChar(32)
+  files        files    @relation(fields: [file_id], references: [file_id], onDelete: Cascade, onUpdate: NoAction)
+  groups       groups   @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: NoAction)
+  users        users?   @relation(fields: [shared_by], references: [user_id], onDelete: SetNull, onUpdate: NoAction)
+
+  @@id([file_id, group_id])
 }
