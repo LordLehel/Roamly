@@ -80,6 +80,7 @@ import { useAppConfig } from '#imports';
 
 definePageMeta({
   layout: 'auth',
+  middleware: ['guest'],
 });
 
 const router = useRouter();
@@ -95,7 +96,7 @@ const {
   isLoading,
   error,
   status,
-} = useLoginUserMutation(() => router.push('/'));
+} = useLoginUserMutation(() => router.push('/groups'));
 
 const clearForm = () => {
   Object.assign(form, { email: '', password: '' });

@@ -88,7 +88,11 @@
 import { ref } from 'vue';
 import { definePageMeta, useAppConfig } from '#imports';
 
-definePageMeta({ layout: 'default' });
+definePageMeta({
+  layout: 'default',
+  middleware: ['guest'],
+});
+
 const appConfig = useAppConfig();
 
 const activeCard = ref<string | null>(null);

@@ -1,17 +1,32 @@
 <template>
-  <UApp>
+  <div>
+    <Transition name="fade">
+      <LoadingScreen v-if="isAppLoading" />
+    </Transition>
+
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
-  </UApp>
+  </div>
 </template>
 
-<style>
-html {
-  scrollbar-gutter: stable;
-}
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { useNuxtApp } from '#imports';
+import LoadingScreen from '~/components/LoadingScreen.vue';
 
-body {
-  padding-right: 0 !important;
-}
-</style>
+const isAppLoading = ref(true);
+const nuxtApp = useNuxtApp();
+
+nuxtApp.hook('page:start', () => {
+  isAppLoading.value = true;
+});
+
+nuxtApp.hook('page:finish', () => {
+  isAppLoading.value = false;
+});
+
+onMounted(() => {
+  isAppLoading.value = false;
+});
+</script>

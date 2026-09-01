@@ -102,6 +102,7 @@ import { useAppConfig } from '#imports';
 
 definePageMeta({
   layout: 'auth',
+  middleware: ['guest'],
 });
 
 const router = useRouter();

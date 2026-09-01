@@ -33,7 +33,7 @@ export default defineAppConfig({
             'text-dark-text/70 hover:text-error-500 transition-colors p-1 cursor-pointer [&>span]:!w-5 [&>span]:!h-5',
           ghostBrandIconButton:
             'text-surface-500 hover:text-brand-500 p-1 transition-colors cursor-pointer [&>span]:!w-5 [&>span]:!h-5',
-          },
+        },
       },
     },
     // Card
@@ -118,7 +118,8 @@ export default defineAppConfig({
     modal: {
       slots: {
         overlay: 'fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm',
-        content: 'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] w-[calc(100%-2rem)] sm:max-w-lg !bg-surface-500/70 backdrop-blur-2xl !rounded-[25px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] !ring-1 !ring-surface-500/50 !divide-none !border-0 focus:!outline-none overflow-hidden flex flex-col',
+        content:
+          'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] w-[calc(100%-2rem)] sm:max-w-lg !bg-surface-500/70 backdrop-blur-2xl !rounded-[25px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] !ring-1 !ring-surface-500/50 !divide-none !border-0 focus:!outline-none overflow-hidden flex flex-col',
         header: 'p-4 sm:px-6 !border-0 !ring-0',
         body: 'p-4 sm:p-6 !border-0 !ring-0',
         footer: 'p-4 sm:px-6 !border-0 !ring-0',
@@ -192,6 +193,8 @@ export default defineAppConfig({
     modalActions: 'flex items-center justify-between w-full',
     fileInput:
       'w-full text-sm text-dark-text/70 file:mr-4 file:py-2 file:px-6 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-transparent file:text-brand-500 file:ring-1 file:ring-brand-500/40 hover:file:bg-brand-500/20 file:transition-colors file:cursor-pointer cursor-pointer',
+    loadingOverlay:
+      'fixed inset-0 z-[9999] bg-light-bg/80 backdrop-blur-md flex flex-col items-center justify-center gap-6',
   },
 
   // Tipography
