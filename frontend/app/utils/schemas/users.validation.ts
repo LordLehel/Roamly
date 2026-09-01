@@ -3,13 +3,13 @@ import { z } from 'zod';
 
 export const updateUsernameSchema = z.object({
   username: z
-    .string('Username must be a string!')
+    .string('Please enter a valid username!')
     .min(3, 'Username too short! It must be atleast 3 characters long!')
     .max(50, 'Username too long! It can not be more than 50 characters long!'),
 });
 
 export const updateEmailSchema = z.object({
-  email: z.string('Email must be a string!').email('Email address format not recognized'),
+  email: z.string('Please enter a valid email!').email('Email address format not recognized'),
 });
 
 export const changePasswordSchema = z.object({
