@@ -64,6 +64,10 @@ export default defineAppConfig({
             root: 'bg-surface-500/70 backdrop-blur-xl rounded-[25px] shadow-[0_15px_40px_rgba(47,62,50,0.15)] border-0 ring-1 ring-surface-500/50 text-dark-text transition-transform hover:-translate-y-1 cursor-pointer',
             body: 'flex flex-col items-center justify-center h-full text-center p-8',
           },
+          documentGlass: {
+            root: 'bg-surface-500/70 backdrop-blur-xl rounded-[25px] shadow-[0_15px_40px_rgba(47,62,50,0.15)] border-0 ring-1 ring-surface-500/50 text-dark-text overflow-hidden transition-transform hover:-translate-y-1',
+            body: 'p-0 flex flex-col h-full',
+          },
         },
       },
     },

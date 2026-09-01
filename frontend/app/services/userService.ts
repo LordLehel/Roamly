@@ -26,4 +26,38 @@ export const userService = {
     const api = useApi();
     return api<ApiResponse<UserOutDto>>('/users/me');
   },
+
+  updateProfile(data: { username?: string; email?: string; phone_number?: string }) {
+    const api = useApi();
+    return api<ApiResponse<UserOutDto>>('/users/me', {
+      method: 'PATCH',
+      body: data,
+    });
+  },
+
+  deleteProfile() {
+    const api = useApi();
+    return api<ApiResponse<void>>('/users/me', {
+      method: 'DELETE',
+    });
+  },
+
+  changePassword(data: { oldPassword: string; newPassword: string }) {
+    const api = useApi();
+    return api<ApiResponse<void>>('/users/me/password', {
+      method: 'PATCH',
+      body: data,
+    });
+  },
+
+  uploadProfilePicture(file: File) {
+    const api = useApi();
+    const formData = new FormData();
+    formData.append('picture', file);
+
+    return api<ApiResponse<UserOutDto>>('/users/profile-picture', {
+      method: 'POST',
+      body: formData,
+    });
+  },
 };

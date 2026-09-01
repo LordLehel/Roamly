@@ -14,6 +14,7 @@
     <GroupModals />
     <GroupInvitesModals />
     <GroupMembersModals />
+    <ProfileModals />
   </div>
 </template>
 
@@ -23,6 +24,7 @@ import { useRoute, useAppConfig } from '#imports';
 import GroupModals from '~/components/modals/GroupModals.vue';
 import GroupInvitesModals from '~/components/modals/GroupInvitesModals.vue';
 import GroupMembersModals from '~/components/modals/GroupMembersModals.vue';
+import ProfileModals from '~/components/modals/ProfileModals.vue';
 
 const route = useRoute();
 const appConfig = useAppConfig();

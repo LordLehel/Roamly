@@ -89,7 +89,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useGroupsStore } from '~/stores/modals.store';
+import { useGroupsStore } from '~/stores/groups.modals.store';
 import { useJoinGroupMutation, useLeaveGroupMutation } from '~/queries/groups.mutation';
 
 const groupsStore = useGroupsStore();

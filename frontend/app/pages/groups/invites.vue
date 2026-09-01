@@ -77,7 +77,7 @@ import { useAppConfig } from '#imports';
 import { ref, watch } from 'vue';
 import { useIntersectionObserver } from '@vueuse/core';
 import { usePendingInvitesQuery } from '~/queries/groups.query';
-import { useGroupsStore } from '~/stores/modals.store';
+import { useGroupsStore } from '~/stores/groups.modals.store';
 import type { GroupInvitesOutDto } from '~/types/groups.type';
 
 definePageMeta({ layout: 'general', middleware: ['auth'] });
