@@ -30,10 +30,10 @@ export default defineAppConfig({
           glassIconButtonBrand:
             'w-10 h-10 rounded-full font-semibold flex items-center justify-center p-0 cursor-pointer bg-surface-500/70 backdrop-blur-xl text-brand-500 ring-1 ring-dark-text/10 hover:bg-brand-50 transition-colors',
           ghostDangerIconButton:
-            'text-dark-text/70 hover:text-error-500 transition-colors p-0 cursor-pointer',
+            'text-dark-text/70 hover:text-error-500 transition-colors p-1 cursor-pointer [&>span]:!w-5 [&>span]:!h-5',
           ghostBrandIconButton:
-            'text-surface-500 hover:text-brand-500 p-1 transition-colors cursor-pointer',
-        },
+            'text-surface-500 hover:text-brand-500 p-1 transition-colors cursor-pointer [&>span]:!w-5 [&>span]:!h-5',
+          },
       },
     },
     // Card
@@ -104,12 +104,13 @@ export default defineAppConfig({
     // Select
     select: {
       slots: {
-        base: 'rounded-full text-brand-500 ring-1 ring-brand-500 bg-surface-500/70 backdrop-blur-md !px-4 !py-2 transition-colors text-xs font-semibold shadow-sm cursor-pointer justify-between min-w-36 flex-row-reverse',
-        trailingIcon: 'absolute right-25 transition-transform pointer-events-none text-brand-500',
+        base: 'w-fit rounded-full text-brand-500 !ring-1 !ring-brand-500 !bg-surface-500/90 !pl-8 !pr-4 !py-2 transition-colors text-xs font-semibold shadow-sm cursor-pointer text-left',
+        trailingIcon:
+          'absolute right-2 w-4 h-4 transition-transform pointer-events-none text-brand-500',
         content:
-          'z-[100] bg-text backdrop-blur-xl rounded-2xl ring-1 ring-brand-500/30 shadow-xl text-dark-text mt-2 min-w-40',
+          'z-100 !bg-surface-500 rounded-2xl ring-1 ring-brand-500/30 shadow-xl text-dark-text mt-2',
         viewport: 'p-1',
-        item: 'flex items-center justify-center text-center py-2 px-4 hover:bg-brand-500/20 text-dark-text cursor-pointer data-[highlighted]:bg-brand-500/20 data-[highlighted]:text-dark-text font-medium text-xs rounded-xl mx-1 my-0.5',
+        item: 'flex items-center justify-start text-left py-2 px-4 hover:bg-brand-500/20 text-dark-text cursor-pointer data-[highlighted]:bg-brand-500/20 data-[highlighted]:text-dark-text font-medium text-xs rounded-xl mx-1 my-0.5 whitespace-nowrap',
       },
     },
 
@@ -117,8 +118,20 @@ export default defineAppConfig({
     modal: {
       slots: {
         overlay: 'fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm',
+        content: 'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] w-[calc(100%-2rem)] sm:max-w-lg !bg-surface-500/70 backdrop-blur-2xl !rounded-[25px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] !ring-1 !ring-surface-500/50 !divide-none !border-0 focus:!outline-none overflow-hidden flex flex-col',
+        header: 'p-4 sm:px-6 !border-0 !ring-0',
+        body: 'p-4 sm:p-6 !border-0 !ring-0',
+        footer: 'p-4 sm:px-6 !border-0 !ring-0',
+      },
+    },
+
+    // Dropdown
+    dropdownMenu: {
+      slots: {
         content:
-          'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] !w-[calc(60%-2rem)] !sm:max-w-md bg-white/90 backdrop-blur-2xl !rounded-[25px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] ring-1 ring-black/10 focus:outline-none overflow-hidden',
+          'z-[100] bg-surface-500/90 backdrop-blur-md rounded-2xl ring-1 ring-brand-500/30 shadow-xl p-1 w-48',
+        item: 'flex items-center gap-2 w-full justify-start text-left cursor-pointer px-4 py-2 text-sm font-medium text-dark-text/80 hover:text-dark-text hover:bg-brand-500/20 data-[highlighted]:bg-brand-500/20 data-[highlighted]:text-dark-text rounded-xl transition-colors',
+        itemLeadingIcon: 'w-5 h-5 text-brand-500 shrink-0',
       },
     },
   },
