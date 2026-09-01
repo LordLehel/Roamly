@@ -9,6 +9,7 @@ import {
   privateDocumentMetadata,
 } from '../../types/files.types';
 import { ROLES } from '../../constants/roles.constants';
+import * as FILE_CONSTANTS from '../../constants/files.constants';
 
 export const uploadPrivateDocument = async (
   userUuid: string,
@@ -26,7 +27,7 @@ export const uploadPrivateDocument = async (
   const existingDocsCount = await prisma.files.count({
     where: {
       user_id: user.user_id,
-      ownership_type: 'PRIVATE',
+      ownership_type: FILE_CONSTANTS.OWNERSHIP.PRIVATE,
       documents: {
         document_type: document_type,
       },
@@ -39,7 +40,10 @@ export const uploadPrivateDocument = async (
     );
   }
 
-  const fileKey = await cloudOperations.uploadPrivateFileToCloud(fileData, 'document');
+  const fileKey = await cloudOperations.uploadPrivateFileToCloud(
+    fileData,
+    FILE_CONSTANTS.BUCKET_FOLDER_NAME.DOCUMENT,
+  );
 
   const newFile = await prisma.files.create({
     data: {
@@ -47,7 +51,7 @@ export const uploadPrivateDocument = async (
       file_url: fileKey,
       file_size: fileData.size,
       mime_type: fileData.mimetype,
-      ownership_type: 'PRIVATE',
+      ownership_type: FILE_CONSTANTS.OWNERSHIP.PRIVATE,
       user_id: user.user_id,
       uploaded_by: user.user_id,
 
@@ -162,7 +166,7 @@ export const getAllPrivateDocumentsMetadataOfAUser = async (
   const privateDocumentsMetadata = await prisma.files.findMany({
     where: {
       user_id: user.user_id,
-      ownership_type: 'PRIVATE',
+      ownership_type: FILE_CONSTANTS.OWNERSHIP.PRIVATE,
     },
     include: {
       documents: true,
@@ -214,7 +218,10 @@ export const replacePrivateDocument = async (
     // deleting old file from Cloud
     await cloudOperations.deletePrivateFilesFromCloud([file.file_url]);
 
-    const fileKey = await cloudOperations.uploadPrivateFileToCloud(fileData, 'document');
+    const fileKey = await cloudOperations.uploadPrivateFileToCloud(
+      fileData,
+      FILE_CONSTANTS.BUCKET_FOLDER_NAME.DOCUMENT,
+    );
 
     updateData.file_name = fileData.originalname;
     updateData.file_url = fileKey;
@@ -276,7 +283,7 @@ export const shareDocumentsWithGroup = async (
     throw new ForbiddenError('Users can only share files to groups they are part of!');
   }
 
-  if (file.ownership_type !== 'PRIVATE') {
+  if (file.ownership_type !== FILE_CONSTANTS.OWNERSHIP.PRIVATE) {
     throw new BadRequestError('Users can share only their private files with other groups!');
   }
 
@@ -481,7 +488,10 @@ export const uploadGroupDocument = async (
   }
 
   // uploading the document to the cloud
-  const fileKey = await cloudOperations.uploadPrivateFileToCloud(fileData, 'group_files');
+  const fileKey = await cloudOperations.uploadPrivateFileToCloud(
+    fileData,
+    FILE_CONSTANTS.BUCKET_FOLDER_NAME.GROUP_FILES,
+  );
 
   // saving in database
   const newGroupDocument = await prisma.files.create({
@@ -490,7 +500,7 @@ export const uploadGroupDocument = async (
       file_url: fileKey,
       file_size: fileData.size,
       mime_type: fileData.mimetype,
-      ownership_type: 'GROUP',
+      ownership_type: FILE_CONSTANTS.OWNERSHIP.GROUP,
       // it only has group_id, because the file belongs to a group, not to a single user
       group_id: group.group_id,
       uploaded_by: user.user_id,
@@ -541,7 +551,10 @@ export const uploadGroupMediaFile = async (
     throw new ForbiddenError('User must be part of the group to upload media!');
   }
 
-  const fileKey = await cloudOperations.uploadPrivateFileToCloud(fileData, 'group_files');
+  const fileKey = await cloudOperations.uploadPrivateFileToCloud(
+    fileData,
+    FILE_CONSTANTS.BUCKET_FOLDER_NAME.GROUP_FILES,
+  );
 
   const newGroupMedia = await prisma.files.create({
     data: {
@@ -549,7 +562,7 @@ export const uploadGroupMediaFile = async (
       file_url: fileKey,
       file_size: fileData.size,
       mime_type: fileData.mimetype,
-      ownership_type: 'GROUP',
+      ownership_type: FILE_CONSTANTS.OWNERSHIP.GROUP,
       group_id: group.group_id,
       uploaded_by: user.user_id,
 
@@ -651,7 +664,10 @@ export const updateGroupDocument = async (
   // if the user wants to change the file too
   if (fileData) {
     await cloudOperations.deletePrivateFilesFromCloud([file.file_url]);
-    const fileKey = await cloudOperations.uploadPrivateFileToCloud(fileData, 'group_files');
+    const fileKey = await cloudOperations.uploadPrivateFileToCloud(
+      fileData,
+      FILE_CONSTANTS.BUCKET_FOLDER_NAME.GROUP_FILES,
+    );
 
     updateData.file_name = fileData.originalname;
     updateData.file_url = fileKey;
@@ -746,7 +762,10 @@ export const updateGroupMediaFile = async (
 
   if (fileData) {
     await cloudOperations.deletePrivateFilesFromCloud([file.file_url]);
-    const fileKey = await cloudOperations.uploadPrivateFileToCloud(fileData, 'group_files');
+    const fileKey = await cloudOperations.uploadPrivateFileToCloud(
+      fileData,
+      FILE_CONSTANTS.BUCKET_FOLDER_NAME.GROUP_FILES,
+    );
 
     updateData.file_name = fileData.originalname;
     updateData.file_url = fileKey;
@@ -862,9 +881,9 @@ export const getGroupFiles = async (
     take: limit,
     where: {
       group_id: group.group_id,
-      ownership_type: 'GROUP',
-      ...(type === 'document' && { documents: { isNot: null } }),
-      ...(type === 'media' && { media_files: { isNot: null } }),
+      ownership_type: FILE_CONSTANTS.OWNERSHIP.GROUP,
+      ...(type === FILE_CONSTANTS.GROUP_FILE_TYPE.DOCUMENT && { documents: { isNot: null } }),
+      ...(type === FILE_CONSTANTS.GROUP_FILE_TYPE.MEDIA_FILE && { media_files: { isNot: null } }),
     },
     include: {
       documents: true,
