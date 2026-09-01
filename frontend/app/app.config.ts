@@ -119,7 +119,7 @@ export default defineAppConfig({
       slots: {
         overlay: 'fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm',
         content:
-          'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] w-[calc(100%-2rem)] sm:max-w-lg !bg-surface-500/70 backdrop-blur-2xl !rounded-[25px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] !ring-1 !ring-surface-500/50 !divide-none !border-0 focus:!outline-none overflow-hidden flex flex-col',
+          'fixed z-[100] !min-w-[calc(20%-2rem)] sm:max-w-lg !bg-surface-500/70 backdrop-blur-2xl !rounded-[25px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] !ring-1 !ring-surface-500/50 !divide-none !border-0 focus:!outline-none overflow-hidden flex flex-col',
         header: 'p-4 sm:px-6 !border-0 !ring-0',
         body: 'p-4 sm:p-6 !border-0 !ring-0',
         footer: 'p-4 sm:px-6 !border-0 !ring-0',
@@ -226,6 +226,7 @@ export default defineAppConfig({
     // Modal
     modalText: 'text-sm text-dark-text/80 py-2',
     modalHighlight: 'block font-semibold mt-1 text-brand-500',
+    modalInlineHighlight: 'font-semibold mt-1 text-brand-500',
     modalErrorBox:
       'text-xs font-semibold text-error-500 mt-2 bg-error-500/10 p-2 rounded border border-error-500/20',
     modalSuccessBox:

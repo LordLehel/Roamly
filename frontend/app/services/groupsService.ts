@@ -147,4 +147,11 @@ export const groupsService = {
       method: 'DELETE',
     });
   },
+
+  async promoteUser(groupUuid: string, email: string): Promise<void> {
+    const api = useApi();
+    await api<ApiResponse<void>>(`/groups/${groupUuid}/users/${email}/promote`, {
+      method: 'PATCH',
+    });
+  },
 };

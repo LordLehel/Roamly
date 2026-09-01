@@ -90,16 +90,15 @@
                     You
                   </p>
                 </div>
-                <div class="text-xs text-right text-dark-text/70 shrink-0">
-                  <p class="opacity-70">Joined:</p>
-                  <p class="font-semibold">
-                    {{
-                      groupInfos.created_at
-                        ? new Date(groupInfos.created_at).toLocaleDateString()
-                        : 'N/A'
-                    }}
-                  </p>
-                </div>
+                <UButton
+                  v-if="isCurrentUserLeader && profile.roles.type.toLowerCase() === 'member'"
+                  icon="i-heroicons-arrow-up-circle"
+                  variant="ghostBrandIconButton"
+                  class="text-dark-text/70"
+                  @click="
+                    groupsStore.openPromoteUserModal(profile.users.email, profile.users.username)
+                  "
+                />
               </div>
 
               <div :class="[appConfig.layout.flexBetween, 'items-end mt-4']">
@@ -119,6 +118,28 @@
         </UCard>
       </div>
     </ClientOnly>
+
+    <!-- Upcoming Events-->
+    <div class="fixed bottom-14 left-0 w-full z-40 pt-6 pb-8 px-6 shadow-lg bg-surface-500/60">
+      <div class="max-w-7xl mx-auto w-full">
+        <h2 class="text-2xl font-bold text-dark-text tracking-wide mb-4">Upcoming events</h2>
+        <div :class="appConfig.layout.cardGrid">
+          <UCard v-for="i in 3" :key="i" variant="glass" class="bg-surface-500/70">
+            <div :class="appConfig.layout.cardContent">
+              <div class="flex items-center justify-between border-b border-dark-text/10 pb-2">
+                <h3 :class="appConfig.typography.cardTitle">Event Name {{ i }}</h3>
+                <UIcon name="i-heroicons-calendar" class="w-5 h-5 text-brand-500" />
+              </div>
+              <div>
+                <p class="text-sm text-dark-text/80 mt-2">Date: 06.15.2023</p>
+                <p class="text-sm text-dark-text/80 mt-2">Time: 18:00</p>
+                <p class="text-sm text-dark-text/80 mt-2">Location: Sample Location {{ i }}</p>
+              </div>
+            </div>
+          </UCard>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 

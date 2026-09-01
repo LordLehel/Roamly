@@ -91,3 +91,15 @@ export const useRemoveUserMutation = (options?: MutationOptions) => {
     },
   });
 };
+
+export const usePromoteUserMutation = (options?: MutationOptions) => {
+  const queryCache = useQueryCache();
+  return useMutation({
+    mutation: ({ groupUuid, email }: { groupUuid: string; email: string }) =>
+      groupsService.promoteUser(groupUuid, email),
+    onSuccess: (data, variables) => {
+      queryCache.invalidateQueries({ key: ['groups', 'infos', variables.groupUuid] });
+      options?.onSuccess?.();
+    },
+  });
+};

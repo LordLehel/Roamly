@@ -139,6 +139,43 @@
         </div>
       </template>
     </UModal>
+
+    <!-- PROMOTE USER MODAL -->
+    <UModal
+      v-model:open="groupsStore.isPromoteUserModalOpen"
+      title="Promote User"
+      :dismissible="false"
+      :close="false"
+    >
+      <template #default><div class="hidden"></div></template>
+      <template #body>
+        <p :class="appConfig.typography.modalText">
+          Are you sure you want to promote
+          <span :class="appConfig.typography.modalInlineHighlight"
+            >„{{ groupsStore.selectedUserNameToPromote }}”</span
+          >
+          to leader?
+        </p>
+        <p v-if="promoteErrorText" :class="appConfig.typography.inputError">
+          {{ promoteErrorText }}
+        </p>
+      </template>
+      <template #footer>
+        <div :class="appConfig.layout.modalActions">
+          <UButton
+            :label="CONST_CANCEL_BTN_TEXT"
+            variant="actionCancelButton"
+            @click="groupsStore.closePromoteUserModal()"
+          />
+          <UButton
+            label="Promote"
+            variant="actionOkButton"
+            :loading="isPromoting"
+            @click="handlePromoteUser"
+          />
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>
 
@@ -150,6 +187,7 @@ import {
   useUpdateGroupMutation,
   useInviteUserMutation,
   useRemoveUserMutation,
+  usePromoteUserMutation,
 } from '~/queries/groups.mutation';
 import { useAppConfig } from '#imports';
 
@@ -296,5 +334,37 @@ const handleRemoveUser = () => {
   if (!groupsStore.selectedUserEmailToRemove || !membersGroupUuid.value) return;
   resetRemove();
   removeUser({ groupUuid: membersGroupUuid.value, email: groupsStore.selectedUserEmailToRemove });
+};
+
+// Promote User
+const {
+  mutate: promoteUser,
+  isLoading: isPromoting,
+  error: promoteApiError,
+  reset: resetPromote,
+} = usePromoteUserMutation({
+  onSuccess: () => {
+    groupsStore.closePromoteUserModal();
+  },
+});
+
+const promoteErrorText = computed(() =>
+  promoteApiError.value ? getErrorMessage(promoteApiError.value) : '',
+);
+
+watch(
+  () => groupsStore.isPromoteUserModalOpen,
+  (isOpen: boolean) => {
+    if (!isOpen) resetPromote();
+  },
+);
+
+const handlePromoteUser = () => {
+  if (!groupsStore.selectedUserEmailToPromote || !membersGroupUuid.value) return;
+  resetPromote();
+  promoteUser({
+    groupUuid: membersGroupUuid.value,
+    email: groupsStore.selectedUserEmailToPromote,
+  });
 };
 </script>
