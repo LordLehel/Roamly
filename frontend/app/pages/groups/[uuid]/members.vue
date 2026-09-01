@@ -1,12 +1,14 @@
 <!-- frontend/app/pages/groups/[uuid]/members.vue -->
 <template>
-  <!-- Main Container-->
+  <!-- MAIN CONTAINER: Height is adjusted to ensure navbar and footer fit perfectly without page scrolling -->
   <div
     :class="appConfig.layout.pageWrapper"
-    class="h-[calc(100vh-5rem)] overflow-hidden flex flex-col gap-4 py-4"
+    class="h-[calc(100vh-9rem)] py-2! overflow-hidden flex flex-col gap-4"
   >
-    <!-- Header and sidebar -->
-    <div class="shrink-0 flex flex-col gap-4">
+    <!-- HEADER & SEARCH SECTION (20%) -->
+    <div
+      class="flex-2 min-h-0 flex flex-col justify-center gap-4 overflow-y-auto pr-2 scrollbar-none [&::-webkit-scrollbar]:hidden"
+    >
       <div :class="appConfig.layout.pageHeader">
         <div :class="appConfig.layout.actionGroup" class="flex-1 justify-start">
           <UButton
@@ -59,8 +61,10 @@
       </div>
     </div>
 
-    <!-- Rollable list -->
-    <div class="flex-1 overflow-y-auto min-h-0">
+    <!-- MEMBERS LIST SECTION (60%) -->
+    <div
+      class="flex-6 min-h-0 overflow-y-auto pr-2 relative z-0 scrollbar-none [&::-webkit-scrollbar]:hidden"
+    >
       <ClientOnly>
         <div v-if="isLoading" :class="appConfig.typography.statusLoading">
           {{ CONST_LOADING_TEXT }}
@@ -127,19 +131,29 @@
       </ClientOnly>
     </div>
 
-    <div class="shrink-0 shadow-md bg-surface-500/40 rounded-2xl ring-1 ring-dark-text/10 p-4">
-      <h2 :class="appConfig.typography.cardTitle" class="mb-3 text-surface-600">Upcoming events</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 w-full">
-        <UCard v-for="i in 3" :key="i" variant="glass" class="bg-surface-500/70">
-          <div class="flex items-center justify-between border-b border-dark-text/10 pb-1.5 mb-1.5">
-            <h3 class="text-sm font-bold text-dark-text truncate">Event Name {{ i }}</h3>
-            <UIcon name="i-heroicons-calendar" class="w-4 h-4 text-brand-500 shrink-0" />
-          </div>
-          <div class="flex justify-between items-center text-xs text-dark-text/80">
-            <span>06.15.2023 - 18:00</span>
-            <span class="truncate ml-2 text-right">Sample Location {{ i }}</span>
-          </div>
-        </UCard>
+    <!-- UPCOMING EVENTS SECTION (20%) -->
+    <div
+      class="flex-2 min-h-0 flex flex-col shadow-md bg-surface-500/40 rounded-2xl ring-1 ring-dark-text/10 p-4"
+    >
+      <h2 :class="appConfig.typography.cardTitle" class="shrink-0 mb-3 text-surface-600">
+        Upcoming events
+      </h2>
+
+      <div class="flex-1 overflow-y-auto min-h-0 pr-2 scrollbar-none [&::-webkit-scrollbar]:hidden">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 w-full">
+          <UCard v-for="i in 3" :key="i" variant="glass" class="bg-surface-500/70">
+            <div
+              class="flex items-center justify-between border-b border-dark-text/10 pb-1.5 mb-1.5"
+            >
+              <h3 class="text-sm font-bold text-dark-text truncate">Event Name {{ i }}</h3>
+              <UIcon name="i-heroicons-calendar" class="w-4 h-4 text-brand-500 shrink-0" />
+            </div>
+            <div class="flex justify-between items-center text-xs text-dark-text/80">
+              <span>06.15.2023 - 18:00</span>
+              <span class="truncate ml-2 text-right">Sample Location {{ i }}</span>
+            </div>
+          </UCard>
+        </div>
       </div>
     </div>
   </div>
@@ -230,7 +244,7 @@ const handleOpenProfile = (profile: GroupProfileDto) => {
     email: profile.users.email,
     role: profile.roles.type,
     joinedAt: groupInfos.value?.created_at || 'Unknown',
-    canViewDocuments: isCurrentUserLeader.value, // A jogosultság meghatározza a láthatóságot
+    canViewDocuments: isCurrentUserLeader.value,
   });
 };
 </script>
