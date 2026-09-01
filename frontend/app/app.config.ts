@@ -27,6 +27,8 @@ export default defineAppConfig({
             'w-10 h-10 rounded-full font-semibold flex items-center justify-center p-0 cursor-pointer bg-surface-500/70 backdrop-blur-xl text-dark-text ring-1 ring-dark-text/10 hover:bg-surface-500/90 transition-colors',
           glassIconButtonDanger:
             'w-10 h-10 rounded-full font-semibold flex items-center justify-center p-0 cursor-pointer bg-surface-500/70 backdrop-blur-xl text-dark-text ring-1 ring-dark-text/10 hover:bg-error-500 hover:text-white transition-colors',
+          glassIconButtonHighlight:
+            'w-10 h-10 rounded-full font-semibold flex items-center justify-center p-0 cursor-pointer bg-surface-500/70 backdrop-blur-xl text-dark-text ring-1 ring-dark-text/10 hover:bg-brand-500 hover:text-white transition-colors',
           glassIconButtonBrand:
             'w-10 h-10 rounded-full font-semibold flex items-center justify-center p-0 cursor-pointer bg-surface-500/70 backdrop-blur-xl text-brand-500 ring-1 ring-dark-text/10 hover:bg-brand-50 transition-colors',
           ghostDangerIconButton:
@@ -122,7 +124,7 @@ export default defineAppConfig({
       slots: {
         overlay: 'fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm',
         content:
-          'fixed z-[100] !min-w-[calc(20%-2rem)] sm:max-w-lg !bg-surface-500/70 backdrop-blur-2xl !rounded-[25px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] !ring-1 !ring-surface-500/50 !divide-none !border-0 focus:!outline-none overflow-hidden flex flex-col',
+          'fixed z-[100] !bg-surface-500/70 backdrop-blur-2xl !rounded-[25px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] !ring-1 !ring-surface-500/50 !divide-none !border-0 focus:!outline-none overflow-hidden flex flex-col',
         header: 'p-4 sm:px-6 !border-0 !ring-0',
         body: 'p-4 sm:p-6 !border-0 !ring-0',
         footer: 'p-4 sm:px-6 !border-0 !ring-0',
@@ -198,6 +200,9 @@ export default defineAppConfig({
       'w-full text-sm text-dark-text/70 file:mr-4 file:py-2 file:px-6 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-transparent file:text-brand-500 file:ring-1 file:ring-brand-500/40 hover:file:bg-brand-500/20 file:transition-colors file:cursor-pointer cursor-pointer',
     loadingOverlay:
       'fixed inset-0 z-[9999] bg-light-bg/80 backdrop-blur-md flex flex-col items-center justify-center gap-6',
+    modalSizeSm: 'w-full sm:max-w-md',
+    modalSizeMd: 'w-full sm:max-w-lg',
+    modalSizeLg: 'w-full sm:max-w-3xl',
   },
 
   // Tipography

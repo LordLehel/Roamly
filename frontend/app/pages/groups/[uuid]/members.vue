@@ -53,7 +53,7 @@
         <UButton
           v-if="isCurrentUserLeader"
           icon="i-heroicons-user-plus"
-          variant="glassIconButton"
+          variant="glassIconButtonHighlight"
           @click="groupsStore.openInviteModal()"
         />
       </div>
@@ -74,7 +74,8 @@
             v-for="profile in filteredMembers"
             :key="profile.users.email"
             variant="interactiveGlass"
-            class="relative"
+            class="relative cursor-pointer"
+            @click="handleOpenProfile(profile)"
           >
             <div :class="appConfig.layout.memberCardInner">
               <div class="shrink-0 pt-1">
@@ -102,7 +103,7 @@
                     icon="i-heroicons-arrow-up-circle"
                     variant="ghostBrandIconButton"
                     class="text-dark-text/70"
-                    @click="
+                    @click.stop="
                       groupsStore.openPromoteUserModal(profile.users.email, profile.users.username)
                     "
                   />
@@ -116,7 +117,7 @@
                     v-if="isCurrentUserLeader && !isCurrentUser(profile.users.email)"
                     icon="i-heroicons-user-minus"
                     variant="ghostDangerIconButton"
-                    @click="groupsStore.openRemoveUserModal(profile.users.email)"
+                    @click.stop="groupsStore.openRemoveUserModal(profile.users.email)"
                   />
                 </div>
               </div>
@@ -126,7 +127,7 @@
       </ClientOnly>
     </div>
 
-    <div class="border-t border-dark-text/10">
+    <div class="shrink-0 shadow-md bg-surface-500/40 rounded-2xl ring-1 ring-dark-text/10 p-4">
       <h2 :class="appConfig.typography.cardTitle" class="mb-3 text-surface-600">Upcoming events</h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-3 w-full">
         <UCard v-for="i in 3" :key="i" variant="glass" class="bg-surface-500/70">
@@ -151,7 +152,7 @@ import { useRoute } from 'vue-router';
 import { useGroupInfosQuery } from '~/queries/groups.query';
 import { useCurrentUserQuery } from '~/queries/user.query';
 import { useGroupsStore } from '~/stores/groups.modals.store';
-import type { GroupOutDto } from '~/types/groups.type';
+import type { GroupOutDto, GroupProfileDto } from '~/types/groups.type';
 
 definePageMeta({ layout: 'general', middleware: ['auth'] });
 
@@ -163,7 +164,7 @@ const groupUuid = computed(() => route.params.uuid as string);
 const { data: currentUser } = useCurrentUserQuery();
 const { data: groupInfos, isLoading, error } = useGroupInfosQuery(groupUuid);
 
-// Filter logika
+// Filter logic
 const searchQuery = ref('');
 const debouncedQuery = ref('');
 let debounceTimeout: ReturnType<typeof setTimeout>;
@@ -221,5 +222,15 @@ const handleDeleteCurrentGroup = () => {
     created_at: groupInfos.value?.created_at || '',
   };
   groupsStore.openDeleteModal(dummyGroupToDelete);
+};
+
+const handleOpenProfile = (profile: GroupProfileDto) => {
+  groupsStore.openUserProfileModal({
+    username: profile.users.username,
+    email: profile.users.email,
+    role: profile.roles.type,
+    joinedAt: groupInfos.value?.created_at || 'Unknown',
+    canViewDocuments: isCurrentUserLeader.value, // A jogosultság meghatározza a láthatóságot
+  });
 };
 </script>

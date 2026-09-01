@@ -2,6 +2,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import type { GroupOutDto, GroupInvitesOutDto } from '~/types/groups.type';
+import type { UserProfileModalDto } from '~/types/user.type';
 
 export const useGroupsStore = defineStore('groups', () => {
   const isCreateModalOpen = ref(false);
@@ -14,14 +15,16 @@ export const useGroupsStore = defineStore('groups', () => {
   const isInviteModalOpen = ref(false);
   const groupNameToUpdate = ref('');
   const isPromoteUserModalOpen = ref(false);
+  const isUserProfileModalOpen = ref(false);
+
   const selectedUserEmailToPromote = ref<string | null>(null);
   const selectedUserNameToPromote = ref<string | null>(null);
-
   const selectedGroupToDelete = ref<GroupOutDto | null>(null);
   const selectedGroupToLeave = ref<GroupOutDto | null>(null);
   const selectedGroupToJoin = ref<GroupInvitesOutDto | null>(null);
   const selectedGroupToDecline = ref<GroupInvitesOutDto | null>(null);
   const selectedUserEmailToRemove = ref<string | null>(null);
+  const selectedUserProfile = ref<UserProfileModalDto | null>(null);
 
   // Create modal
   const openCreateModal = () => {
@@ -117,6 +120,17 @@ export const useGroupsStore = defineStore('groups', () => {
     selectedUserNameToPromote.value = null;
   };
 
+  // Open User Profile Modal
+  const openUserProfileModal = (profile: UserProfileModalDto) => {
+    selectedUserProfile.value = profile;
+    isUserProfileModalOpen.value = true;
+  };
+
+  const closeUserProfileModal = () => {
+    isUserProfileModalOpen.value = false;
+    selectedUserProfile.value = null;
+  };
+
   return {
     isCreateModalOpen,
     isDeleteModalOpen,
@@ -127,6 +141,7 @@ export const useGroupsStore = defineStore('groups', () => {
     isInviteModalOpen,
     isRemoveUserModalOpen,
     isPromoteUserModalOpen,
+    isUserProfileModalOpen,
     groupNameToUpdate,
 
     selectedGroupToLeave,
@@ -136,6 +151,7 @@ export const useGroupsStore = defineStore('groups', () => {
     selectedUserEmailToRemove,
     selectedUserEmailToPromote,
     selectedUserNameToPromote,
+    selectedUserProfile,
 
     openCreateModal,
     closeCreateModal,
@@ -155,5 +171,7 @@ export const useGroupsStore = defineStore('groups', () => {
     closeRemoveUserModal,
     openPromoteUserModal,
     closePromoteUserModal,
+    openUserProfileModal,
+    closeUserProfileModal,
   };
 });

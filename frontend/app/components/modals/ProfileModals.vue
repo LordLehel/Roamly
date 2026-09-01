@@ -7,6 +7,7 @@
       :title="CONST_EDIT_USERNAME_TITLE"
       :dismissible="false"
       :close="false"
+      :ui="{ content: appConfig.layout.modalSizeSm }"
     >
       <template #default><div class="hidden"></div></template>
       <template #body>
@@ -46,6 +47,7 @@
       :title="CONST_EDIT_EMAIL_TITLE"
       :dismissible="false"
       :close="false"
+      :ui="{ content: appConfig.layout.modalSizeSm }"
     >
       <template #default><div class="hidden"></div></template>
       <template #body>
@@ -85,6 +87,7 @@
       :title="CONST_CHANGE_PASSWORD_TITLE"
       :dismissible="false"
       :close="false"
+      :ui="{ content: appConfig.layout.modalSizeSm }"
     >
       <template #default><div class="hidden"></div></template>
       <template #body>
@@ -128,6 +131,7 @@
       :title="CONST_DELETE_ACCOUNT_TITLE"
       :dismissible="false"
       :close="false"
+      :ui="{ content: appConfig.layout.modalSizeSm }"
     >
       <template #default><div class="hidden"></div></template>
       <template #body>
@@ -157,6 +161,7 @@
       :title="CONST_UPLOAD_PICTURE_TITLE"
       :dismissible="false"
       :close="false"
+      :ui="{ content: appConfig.layout.modalSizeSm }"
     >
       <template #default><div class="hidden"></div></template>
       <template #body>
@@ -203,6 +208,7 @@
       :title="CONST_VIEW_PICTURE_TITLE"
       :dismissible="false"
       :close="false"
+      :ui="{ content: appConfig.layout.modalSizeLg }"
     >
       <template #default><div class="hidden"></div></template>
       <template #body>
@@ -235,6 +241,7 @@
       :title="CONST_UPLOAD_DOCUMENT_TITLE"
       :dismissible="false"
       :close="false"
+      :ui="{ content: appConfig.layout.modalSizeMd }"
     >
       <template #default><div class="hidden"></div></template>
       <template #body>

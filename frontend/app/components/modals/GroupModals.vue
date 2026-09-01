@@ -7,6 +7,7 @@
       :title="CONST_CREATE_GROUP_TITLE"
       :dismissible="false"
       :close="false"
+      :ui="{ content: appConfig.layout.modalSizeSm }"
     >
       <template #default><div class="hidden"></div></template>
       <template #body>
@@ -52,6 +53,7 @@
       :title="CONST_DELETE_GROUP_TITLE"
       :dismissible="false"
       :close="false"
+      :ui="{ content: appConfig.layout.modalSizeSm }"
     >
       <template #default><div class="hidden"></div></template>
       <template #body>
@@ -91,6 +93,7 @@
       :title="CONST_LEAVE_GROUP_TITLE"
       :dismissible="false"
       :close="false"
+      :ui="{ content: appConfig.layout.modalSizeSm }"
     >
       <template #default><div class="hidden"></div></template>
       <template #body>

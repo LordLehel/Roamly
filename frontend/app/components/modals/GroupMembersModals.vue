@@ -7,6 +7,7 @@
       :title="CONST_EDIT_GROUP_TITLE"
       :dismissible="false"
       :close="false"
+      :ui="{ content: appConfig.layout.modalSizeSm }"
     >
       <template #default><div class="hidden"></div></template>
       <template #body>
@@ -51,6 +52,7 @@
       :title="CONST_INVITE_USER_TITLE"
       :dismissible="false"
       :close="false"
+      :ui="{ content: appConfig.layout.modalSizeSm }"
     >
       <template #default><div class="hidden"></div></template>
       <template #body>
@@ -112,6 +114,7 @@
       :title="CONST_REMOVE_USER_TITLE"
       :dismissible="false"
       :close="false"
+      :ui="{ content: appConfig.layout.modalSizeSm }"
     >
       <template #default><div class="hidden"></div></template>
       <template #body>
@@ -146,6 +149,7 @@
       title="Promote User"
       :dismissible="false"
       :close="false"
+      :ui="{ content: appConfig.layout.modalSizeSm }"
     >
       <template #default><div class="hidden"></div></template>
       <template #body>

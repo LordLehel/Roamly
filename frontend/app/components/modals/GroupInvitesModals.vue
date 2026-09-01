@@ -7,6 +7,7 @@
       :title="CONST_JOIN_GROUP_TITLE"
       :dismissible="false"
       :close="false"
+      :ui="{ content: appConfig.layout.modalSizeSm }"
     >
       <template #default><div class="hidden"></div></template>
       <template #body>
@@ -43,6 +44,7 @@
       :title="CONST_DECLINE_INVITE_TITLE"
       :dismissible="false"
       :close="false"
+      :ui="{ content: appConfig.layout.modalSizeSm }"
     >
       <template #default><div class="hidden"></div></template>
       <template #body>
