@@ -3,8 +3,8 @@ export const CONST_LOGIN_TITLE = 'Log in';
 export const CONST_LOGOUT_TITLE = 'Log out';
 export const CONST_REGISTER_TITLE = 'Register';
 export const CONST_LOGIN_HEADING = 'Log into your account';
-export const CONST_REGISTER_HEADING = 'Register account';
-export const CONST_REGISTER_PROMPT_BTN = "You don't have an account? Register one here.";
+export const CONST_REGISTER_HEADING = 'Create a new account';
+export const CONST_REGISTER_PROMPT_BTN = "Don't have an account? Register one here";
 export const CONST_GO_BACK_TITLE = 'Go Back';
 
 export const CONST_EMAIL_LABEL = 'Email';

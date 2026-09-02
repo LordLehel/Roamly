@@ -18,7 +18,7 @@ export default defineAppConfig({
           actionOkButton:
             'rounded-full !px-10 justify-center bg-brand-500 hover:bg-brand-600 text-surface-500 shadow-[inset_0_1px_3px_rgba(255,255,255,0.3),0_2px_4px_rgba(122,154,130,0.3)] h-12 font-bold tracking-wide transition-all text-lg cursor-pointer',
           actionCancelButton:
-            'rounded-full !px-10 justify-center bg-transparent ring-1 ring-accent-500 text-accent-500 hover:bg-accent-500 hover:text-surface-500 h-11 font-bold tracking-wide transition-colors cursor-pointer',
+            'rounded-full !px-10 justify-center bg-surface-500/50 ring-1 ring-accent-500 text-accent-500 hover:bg-accent-500 hover:text-surface-500 h-11 font-bold tracking-wide transition-colors cursor-pointer',
           glassButton:
             'h-10 px-8 rounded-full !min-w-18 flex items-center justify-center text-md bg-surface-500/70 backdrop-blur-xl text-dark-text ring-1 ring-dark-text/10 hover:bg-surface-500/90 transition-colors cursor-pointer',
           glassOutlineButton:
@@ -78,7 +78,7 @@ export default defineAppConfig({
             base: 'bg-error-50 text-error-900 rounded-xl ring-1 ring-error-500 placeholder:text-error-300 focus:ring-2 focus:ring-error-500 transition-colors h-11 !px-5 shadow-none',
           },
           search: {
-            base: 'bg-input-bg text-dark-text rounded-full ring-1 ring-input-border placeholder:text-text-muted focus:ring-2 focus:ring-brand-500 transition-colors h-10 !px-5 shadow-none max-w-1/4',
+            base: 'bg-input-bg text-dark-text rounded-full ring-1 ring-input-border placeholder:text-text-muted focus:ring-2 focus:ring-brand-500 transition-colors h-10 !px-5 shadow-none w-full',
           },
         },
       },
@@ -135,9 +135,9 @@ export default defineAppConfig({
     dropdownMenu: {
       slots: {
         content:
-          'z-[100] bg-surface-500/90 backdrop-blur-md rounded-2xl ring-1 ring-brand-500/30 shadow-xl p-1 w-48',
-        item: 'flex items-center gap-2 w-full justify-start text-left cursor-pointer px-4 py-2 text-sm font-medium text-dark-text/80 hover:text-dark-text hover:bg-brand-500/20 data-[highlighted]:bg-brand-500/20 data-[highlighted]:text-dark-text rounded-xl transition-colors',
-        itemLeadingIcon: 'w-5 h-5 text-brand-500 shrink-0',
+          'z-[100] bg-surface-500/90 backdrop-blur-md rounded-2xl ring-1 ring-brand-500/30 shadow-xl p-1 w-36',
+        item: 'flex items-center gap-2 w-full justify-start text-left cursor-pointer px-4 py-2 text-md font-medium text-dark-text/80 hover:text-dark-text hover:bg-brand-500/20 data-[highlighted]:bg-brand-500/20 data-[highlighted]:text-dark-text rounded-xl transition-colors',
+        itemLeadingIcon: '!w-6 !h-8 !text-brand-500 shrink-0',
       },
     },
 
@@ -210,9 +210,9 @@ export default defineAppConfig({
     modalForm: 'flex flex-col gap-4 py-2',
     modalActions:
       'flex flex-col-reverse sm:flex-row items-center justify-between w-full gap-3 sm:gap-0',
-    modalSizeSm: 'w-full sm:max-w-md',
-    modalSizeMd: 'w-full sm:max-w-lg',
-    modalSizeLg: 'w-full sm:max-w-3xl',
+    modalSizeSm: 'w-full sm:max-w-md !w-[90%] !mx-auto sm:!w-full',
+    modalSizeMd: 'w-full sm:max-w-lg !w-[90%] !mx-auto sm:!w-full',
+    modalSizeLg: 'w-full sm:max-w-3xl !w-[90%] !mx-auto sm:!w-full',
   },
 
   // Tipography

@@ -1,13 +1,8 @@
 <!-- frontend/app/components/views/desktop/groups/MembersDesktop.vue -->
 <template>
-  <div
-    :class="appConfig.layout.pageWrapper"
-    class="h-[calc(100vh-9rem)] py-2! overflow-hidden flex flex-col gap-4"
-  >
-    <!-- HEADER & SEARCH SECTION (20%) -->
-    <div
-      class="flex-2 min-h-0 flex flex-col justify-center gap-4 overflow-y-auto pr-2 scrollbar-none [&::-webkit-scrollbar]:hidden"
-    >
+  <div :class="appConfig.layout.pageWrapper">
+    <!-- HEADER & SEARCH SECTION -->
+    <div class="flex flex-col gap-6 w-full">
       <div :class="appConfig.layout.pageHeader">
         <div :class="appConfig.layout.actionGroup" class="flex-1 justify-start">
           <UTooltip v-if="isCurrentUserLeader" :text="CONST_TOOLTIP_DELETE_GROUP ?? 'Delete Group'">
@@ -27,7 +22,7 @@
         </div>
 
         <div class="flex flex-col items-center justify-center shrink-0">
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-1.5">
             <h1 :class="appConfig.typography.pageTitle">
               {{ (groupInfos?.name || CONST_LOADING_TEXT) ?? 'Loading...' }}
             </h1>
@@ -35,11 +30,12 @@
               <UButton
                 icon="i-heroicons-pencil"
                 variant="ghostBrandIconButton"
+                class="w-4! h-4!"
                 @click="groupsStore.openUpdateModal(groupInfos?.name || '')"
               />
             </UTooltip>
           </div>
-          <p :class="appConfig.typography.pageSubtitle">Members</p>
+          <p :class="appConfig.typography.pageSubtitle" class="mt-0!">Members</p>
         </div>
 
         <div :class="appConfig.layout.actionGroup" class="flex-1 justify-end">
@@ -58,29 +54,31 @@
         </div>
       </div>
 
-      <div :class="appConfig.layout.actionGroup">
-        <!-- V-model helyett manuális update trigger a szülő felé -->
-        <UInput
-          :model-value="searchQuery"
-          icon="i-heroicons-magnifying-glass"
-          placeholder="Filter members..."
-          variant="search"
-          @update:model-value="emit('update:searchQuery', $event)"
-        />
-        <UTooltip v-if="isCurrentUserLeader" :text="CONST_TOOLTIP_INVITE_USER ?? 'Invite User'">
-          <UButton
-            icon="i-heroicons-user-plus"
-            variant="glassIconButtonHighlight"
-            @click="groupsStore.openInviteModal()"
+      <div class="flex items-center gap-4 w-full">
+        <div class="flex-1">
+          <UInput
+            :model-value="searchQuery"
+            icon="i-heroicons-magnifying-glass"
+            placeholder="Filter members..."
+            variant="search"
+            class="w-1/5! max-w-none!"
+            @update:model-value="emit('update:searchQuery', $event)"
           />
-        </UTooltip>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <UTooltip v-if="isCurrentUserLeader" :text="CONST_TOOLTIP_INVITE_USER ?? 'Invite User'">
+            <UButton
+              icon="i-heroicons-user-plus"
+              variant="glassIconButtonHighlight"
+              @click="groupsStore.openInviteModal()"
+            />
+          </UTooltip>
+        </div>
       </div>
     </div>
 
-    <!-- MEMBERS LIST SECTION (60%) -->
-    <div
-      class="flex-6 min-h-0 overflow-y-auto pr-2 relative z-0 scrollbar-none [&::-webkit-scrollbar]:hidden"
-    >
+    <!-- MEMBERS LIST SECTION -->
+    <div class="w-full">
       <ClientOnly>
         <div v-if="isLoading" :class="appConfig.typography.statusLoading">
           {{ CONST_LOADING_TEXT ?? 'Loading...' }}
@@ -158,29 +156,26 @@
       </ClientOnly>
     </div>
 
-    <!-- UPCOMING EVENTS SECTION (20%) -->
+    <!-- UPCOMING EVENTS SECTION -->
     <div
-      class="flex-2 min-h-0 flex flex-col shadow-md bg-surface-500/40 rounded-2xl ring-1 ring-dark-text/10 p-4"
+      class="flex flex-col shadow-md bg-surface-500/40 rounded-2xl ring-1 ring-dark-text/10 p-4 w-full"
     >
-      <h2 :class="appConfig.typography.cardTitle" class="shrink-0 mb-3 text-surface-600">
+      <h2 :class="appConfig.typography.cardTitle" class="shrink-0 mb-4 text-surface-600">
         Upcoming events
       </h2>
 
-      <div class="flex-1 overflow-y-auto min-h-0 pr-2 scrollbar-none [&::-webkit-scrollbar]:hidden">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 w-full">
-          <UCard v-for="i in 3" :key="i" variant="glass" class="bg-surface-500/70">
-            <div
-              class="flex items-center justify-between border-b border-dark-text/10 pb-1.5 mb-1.5"
-            >
-              <h3 class="text-sm font-bold text-dark-text truncate">Event Name {{ i }}</h3>
-              <UIcon name="i-heroicons-calendar" class="w-4 h-4 text-brand-500 shrink-0" />
-            </div>
-            <div class="flex justify-between items-center text-xs text-dark-text/80">
-              <span>06.15.2023 - 18:00</span>
-              <span class="truncate ml-2 text-right">Sample Location {{ i }}</span>
-            </div>
-          </UCard>
-        </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+        <!-- Eltávolítva a flex-1 és a scrollbar-none[cite: 23] -->
+        <UCard v-for="i in 3" :key="i" variant="glass" class="bg-surface-500/70">
+          <div class="flex items-center justify-between border-b border-dark-text/10 pb-1.5 mb-1.5">
+            <h3 class="text-sm font-bold text-dark-text truncate">Event Name {{ i }}</h3>
+            <UIcon name="i-heroicons-calendar" class="w-4 h-4 text-brand-500 shrink-0" />
+          </div>
+          <div class="flex justify-between items-center text-xs text-dark-text/80">
+            <span>06.15.2023 - 18:00</span>
+            <span class="truncate ml-2 text-right">Sample Location {{ i }}</span>
+          </div>
+        </UCard>
       </div>
     </div>
   </div>
