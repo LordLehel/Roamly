@@ -760,7 +760,6 @@ export const promoteUser = async (
     },
 
     include: {
-      users: true,
       roles: true,
     },
   });
@@ -773,22 +772,20 @@ export const promoteUser = async (
     throw new BadRequestError('Target user must be a member of the group to be promoted!');
   }
 
-  const leaderRole = await prisma.roles.findUniqueOrThrow({
-    where: {
-      type: ROLES.LEADER,
-    },
-  });
-
   const promotedUserProfile = await prisma.group_profiles.update({
     where: {
       user_id_group_id: {
-        user_id: targetUserProfile.users.user_id,
+        user_id: targetUserProfile.user_id,
         group_id: userGroupProfile.groups.group_id,
       },
     },
 
     data: {
-      role_id: leaderRole.role_id,
+      roles: {
+        connect: {
+          type: ROLES.LEADER,
+        },
+      },
     },
 
     include: {
@@ -833,7 +830,6 @@ export const demoteUser = async (
     },
 
     include: {
-      users: true,
       roles: true,
     },
   });
@@ -859,22 +855,20 @@ export const demoteUser = async (
     throw new BadRequestError('Last leader of the group can not be demoted!');
   }
 
-  const memberRole = await prisma.roles.findFirstOrThrow({
-    where: {
-      type: ROLES.MEMBER,
-    },
-  });
-
   const demotedUserProfile = await prisma.group_profiles.update({
     where: {
       user_id_group_id: {
-        user_id: targetUserProfile.users.user_id,
+        user_id: targetUserProfile.user_id,
         group_id: userGroupProfile.groups.group_id,
       },
     },
 
     data: {
-      role_id: memberRole.role_id,
+      roles: {
+        connect: {
+          type: ROLES.MEMBER,
+        },
+      },
     },
 
     include: {
