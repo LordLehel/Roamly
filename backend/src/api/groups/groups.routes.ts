@@ -62,5 +62,17 @@ router.delete(
   validateData(zodSchemas.groupUuidValidationSchema, 'params'),
   groupsController.userLeavingGroup,
 );
+router.patch(
+  '/:groupUuid/promote',
+  validateData(zodSchemas.groupUuidValidationSchema, 'params'),
+  validateData(zodSchemas.targetUserEmailSchema, 'body'),
+  groupsController.promoteUser,
+);
+router.patch(
+  '/:groupUuid/demote',
+  validateData(zodSchemas.groupUuidValidationSchema, 'params'),
+  validateData(zodSchemas.targetUserEmailSchema, 'body'),
+  groupsController.demoteUser,
+);
 
 export default router;

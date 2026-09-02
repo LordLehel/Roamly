@@ -68,3 +68,7 @@ export const updatedGroupSchema = z.object({
     )
     .optional(),
 });
+
+export const targetUserEmailSchema = z.object({
+  email: z.email('Invalid Email Format!'),
+});
