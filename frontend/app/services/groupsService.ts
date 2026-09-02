@@ -150,8 +150,18 @@ export const groupsService = {
 
   async promoteUser(groupUuid: string, email: string): Promise<void> {
     const api = useApi();
-    await api<ApiResponse<void>>(`/groups/${groupUuid}/users/${email}/promote`, {
+    // JAVÍTVA: A backend útvonalhoz és validációhoz igazítva (PATCH /:groupUuid/promote)
+    await api<ApiResponse<void>>(`/groups/${groupUuid}/promote`, {
       method: 'PATCH',
+      body: { email },
+    });
+  },
+
+  async demoteUser(groupUuid: string, email: string): Promise<void> {
+    const api = useApi();
+    await api<ApiResponse<void>>(`/groups/${groupUuid}/demote`, {
+      method: 'PATCH',
+      body: { email },
     });
   },
 };

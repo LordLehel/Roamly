@@ -103,3 +103,16 @@ export const usePromoteUserMutation = (options?: MutationOptions) => {
     },
   });
 };
+
+export const useDemoteUserMutation = (options?: MutationOptions) => {
+  const queryCache = useQueryCache();
+  return useMutation({
+    mutation: ({ groupUuid, email }: { groupUuid: string; email: string }) =>
+      groupsService.demoteUser(groupUuid, email),
+    onSuccess: (data, variables) => {
+      // Frissítjük a csoport adatokat, hogy azonnal látsszon a változás
+      queryCache.invalidateQueries({ key: ['groups', 'infos', variables.groupUuid] });
+      options?.onSuccess?.();
+    },
+  });
+};

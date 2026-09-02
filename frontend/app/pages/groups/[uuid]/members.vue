@@ -117,22 +117,46 @@
                       You
                     </p>
                   </div>
-                  <UTooltip
-                    v-if="isCurrentUserLeader && profile.roles.type.toLowerCase() === 'member'"
-                    :text="CONST_TOOLTIP_PROMOTE_USER ?? 'Promote'"
-                  >
-                    <UButton
-                      icon="i-heroicons-arrow-up-circle"
-                      variant="ghostBrandIconButton"
-                      class="text-dark-text/70"
-                      @click.stop="
-                        groupsStore.openPromoteUserModal(
-                          profile.users.email,
-                          profile.users.username,
-                        )
+
+                  <div class="flex items-center gap-1">
+                    <UTooltip
+                      v-if="isCurrentUserLeader && profile.roles.type.toLowerCase() === 'member'"
+                      text="Promote to Leader"
+                    >
+                      <UButton
+                        icon="i-heroicons-arrow-up-circle"
+                        variant="ghostBrandIconButton"
+                        class="text-dark-text/70"
+                        @click.stop="
+                          groupsStore.openPromoteUserModal(
+                            profile.users.email,
+                            profile.users.username,
+                          )
+                        "
+                      />
+                    </UTooltip>
+
+                    <UTooltip
+                      v-if="
+                        isCurrentUserLeader &&
+                        profile.roles.type.toLowerCase() === 'leader' &&
+                        !isCurrentUser(profile.users.email)
                       "
-                    />
-                  </UTooltip>
+                      text="Demote to Member"
+                    >
+                      <UButton
+                        icon="i-heroicons-arrow-down-circle"
+                        variant="ghostBrandIconButton"
+                        class="text-dark-text/70 hover:text-orange-500"
+                        @click.stop="
+                          groupsStore.openDemoteUserModal(
+                            profile.users.email,
+                            profile.users.username,
+                          )
+                        "
+                      />
+                    </UTooltip>
+                  </div>
                 </div>
 
                 <div :class="[appConfig.layout.flexBetween, 'items-end mt-4']">
@@ -140,7 +164,11 @@
                     Role: <span class="font-bold capitalize">{{ profile.roles.type }}</span>
                   </p>
                   <UTooltip
-                    v-if="isCurrentUserLeader && !isCurrentUser(profile.users.email)"
+                    v-if="
+                      isCurrentUserLeader &&
+                      !isCurrentUser(profile.users.email) &&
+                      profile.roles.type.toLowerCase() === 'member'
+                    "
                     :text="CONST_TOOLTIP_REMOVE_USER ?? 'Remove'"
                   >
                     <UButton

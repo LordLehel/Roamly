@@ -15,10 +15,13 @@ export const useGroupsStore = defineStore('groups', () => {
   const isInviteModalOpen = ref(false);
   const groupNameToUpdate = ref('');
   const isPromoteUserModalOpen = ref(false);
+  const isDemoteUserModalOpen = ref(false);
   const isUserProfileModalOpen = ref(false);
 
   const selectedUserEmailToPromote = ref<string | null>(null);
   const selectedUserNameToPromote = ref<string | null>(null);
+  const selectedUserEmailToDemote = ref<string | null>(null);
+  const selectedUserNameToDemote = ref<string | null>(null);
   const selectedGroupToDelete = ref<GroupOutDto | null>(null);
   const selectedGroupToLeave = ref<GroupOutDto | null>(null);
   const selectedGroupToJoin = ref<GroupInvitesOutDto | null>(null);
@@ -120,6 +123,19 @@ export const useGroupsStore = defineStore('groups', () => {
     selectedUserNameToPromote.value = null;
   };
 
+  //Demote User Modal
+  const openDemoteUserModal = (email: string, name: string) => {
+    selectedUserEmailToDemote.value = email;
+    selectedUserNameToDemote.value = name;
+    isDemoteUserModalOpen.value = true;
+  };
+
+  const closeDemoteUserModal = () => {
+    isDemoteUserModalOpen.value = false;
+    selectedUserEmailToDemote.value = null;
+    selectedUserNameToDemote.value = null;
+  };
+
   // Open User Profile Modal
   const openUserProfileModal = (profile: UserProfileModalDto) => {
     selectedUserProfile.value = profile;
@@ -141,6 +157,7 @@ export const useGroupsStore = defineStore('groups', () => {
     isInviteModalOpen,
     isRemoveUserModalOpen,
     isPromoteUserModalOpen,
+    isDemoteUserModalOpen,
     isUserProfileModalOpen,
     groupNameToUpdate,
 
@@ -151,6 +168,8 @@ export const useGroupsStore = defineStore('groups', () => {
     selectedUserEmailToRemove,
     selectedUserEmailToPromote,
     selectedUserNameToPromote,
+    selectedUserEmailToDemote,
+    selectedUserNameToDemote,
     selectedUserProfile,
 
     openCreateModal,
@@ -173,5 +192,7 @@ export const useGroupsStore = defineStore('groups', () => {
     closePromoteUserModal,
     openUserProfileModal,
     closeUserProfileModal,
+    openDemoteUserModal,
+    closeDemoteUserModal,
   };
 });
