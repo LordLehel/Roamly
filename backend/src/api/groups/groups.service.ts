@@ -731,49 +731,36 @@ export const promoteUser = async (
   groupUuid: string,
   targetUserEmail: string,
 ): Promise<group_profiles> => {
-  const user = await prisma.users.findUniqueOrThrow({
+  const userGroupProfile = await prisma.group_profiles.findFirstOrThrow({
     where: {
-      uuid: userUuid,
-    },
-  });
-
-  const group = await prisma.groups.findUniqueOrThrow({
-    where: {
-      uuid: groupUuid,
-    },
-  });
-
-  const targetUser = await prisma.users.findUniqueOrThrow({
-    where: {
-      email: targetUserEmail,
-    },
-  });
-
-  const requesterUserProfile = await prisma.group_profiles.findUnique({
-    where: {
-      user_id_group_id: {
-        user_id: user.user_id,
-        group_id: group.group_id,
+      users: {
+        uuid: userUuid,
+      },
+      groups: {
+        uuid: groupUuid,
       },
     },
     include: {
+      users: true,
+      groups: true,
       roles: true,
     },
   });
 
-  if (!requesterUserProfile || requesterUserProfile.roles.type !== ROLES.LEADER) {
+  if (userGroupProfile.roles.type !== ROLES.LEADER) {
     throw new ForbiddenError('Only leaders can promote other users!');
   }
 
-  const targetUserProfile = await prisma.group_profiles.findUniqueOrThrow({
+  const targetUserProfile = await prisma.group_profiles.findFirstOrThrow({
     where: {
-      user_id_group_id: {
-        user_id: targetUser.user_id,
-        group_id: group.group_id,
+      users: {
+        email: targetUserEmail,
       },
+      group_id: userGroupProfile.groups.group_id,
     },
 
     include: {
+      users: true,
       roles: true,
     },
   });
@@ -795,8 +782,8 @@ export const promoteUser = async (
   const promotedUserProfile = await prisma.group_profiles.update({
     where: {
       user_id_group_id: {
-        user_id: targetUser.user_id,
-        group_id: group.group_id,
+        user_id: targetUserProfile.users.user_id,
+        group_id: userGroupProfile.groups.group_id,
       },
     },
 
@@ -817,49 +804,36 @@ export const demoteUser = async (
   groupUuid: string,
   targetUserEmail: string,
 ): Promise<group_profiles> => {
-  const user = await prisma.users.findUniqueOrThrow({
+  const userGroupProfile = await prisma.group_profiles.findFirstOrThrow({
     where: {
-      uuid: userUuid,
-    },
-  });
-
-  const group = await prisma.groups.findUniqueOrThrow({
-    where: {
-      uuid: groupUuid,
-    },
-  });
-
-  const targetUser = await prisma.users.findUniqueOrThrow({
-    where: {
-      email: targetUserEmail,
-    },
-  });
-
-  const requesterUserProfile = await prisma.group_profiles.findUnique({
-    where: {
-      user_id_group_id: {
-        user_id: user.user_id,
-        group_id: group.group_id,
+      users: {
+        uuid: userUuid,
+      },
+      groups: {
+        uuid: groupUuid,
       },
     },
     include: {
+      users: true,
+      groups: true,
       roles: true,
     },
   });
 
-  if (!requesterUserProfile || requesterUserProfile.roles.type !== ROLES.LEADER) {
+  if (userGroupProfile.roles.type !== ROLES.LEADER) {
     throw new ForbiddenError('Only leaders can demote other users!');
   }
 
-  const targetUserProfile = await prisma.group_profiles.findUniqueOrThrow({
+  const targetUserProfile = await prisma.group_profiles.findFirstOrThrow({
     where: {
-      user_id_group_id: {
-        user_id: targetUser.user_id,
-        group_id: group.group_id,
+      users: {
+        email: targetUserEmail,
       },
+      group_id: userGroupProfile.groups.group_id,
     },
 
     include: {
+      users: true,
       roles: true,
     },
   });
@@ -874,7 +848,7 @@ export const demoteUser = async (
 
   const numberOfLeaders = await prisma.group_profiles.count({
     where: {
-      group_id: group.group_id,
+      group_id: userGroupProfile.groups.group_id,
       roles: {
         type: ROLES.LEADER,
       },
@@ -894,8 +868,8 @@ export const demoteUser = async (
   const demotedUserProfile = await prisma.group_profiles.update({
     where: {
       user_id_group_id: {
-        user_id: targetUser.user_id,
-        group_id: group.group_id,
+        user_id: targetUserProfile.users.user_id,
+        group_id: userGroupProfile.groups.group_id,
       },
     },
 
