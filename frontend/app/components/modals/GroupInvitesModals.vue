@@ -7,27 +7,22 @@
       :title="CONST_JOIN_GROUP_TITLE"
       :dismissible="false"
       :close="false"
+      :ui="{ content: appConfig.layout.modalSizeSm }"
     >
       <template #default><div class="hidden"></div></template>
       <template #body>
-        <p class="text-sm text-dark-text/80 py-2">
+        <p :class="appConfig.typography.modalText">
           {{ CONST_JOIN_GROUP_CONFIRM }}
-          <span
-            v-if="groupsStore.selectedGroupToJoin"
-            class="block font-semibold mt-1 text-brand-500"
-          >
+          <span v-if="groupsStore.selectedGroupToJoin" :class="appConfig.typography.modalHighlight">
             „{{ groupsStore.selectedGroupToJoin.name }}”
           </span>
         </p>
-        <p
-          v-if="joinErrorText"
-          class="text-xs font-semibold text-error-500 mt-2 bg-error-500/10 p-2 rounded border border-error-500/20"
-        >
+        <p v-if="joinErrorText" :class="appConfig.typography.modalErrorBox">
           {{ joinErrorText }}
         </p>
       </template>
       <template #footer>
-        <div class="flex items-center justify-between w-full">
+        <div :class="appConfig.layout.modalActions">
           <UButton
             :label="CONST_CANCEL_BTN_TEXT"
             variant="actionCancelButton"
@@ -49,27 +44,25 @@
       :title="CONST_DECLINE_INVITE_TITLE"
       :dismissible="false"
       :close="false"
+      :ui="{ content: appConfig.layout.modalSizeSm }"
     >
       <template #default><div class="hidden"></div></template>
       <template #body>
-        <p class="text-sm text-dark-text/80 py-2">
+        <p :class="appConfig.typography.modalText">
           {{ CONST_DECLINE_INVITE_CONFIRM }}
           <span
             v-if="groupsStore.selectedGroupToDecline"
-            class="block font-semibold mt-1 text-brand-500"
+            :class="appConfig.typography.modalHighlight"
           >
             „{{ groupsStore.selectedGroupToDecline.name }}”
           </span>
         </p>
-        <p
-          v-if="declineErrorText"
-          class="text-xs font-semibold text-error-500 mt-2 bg-error-500/10 p-2 rounded border border-error-500/20"
-        >
+        <p v-if="declineErrorText" :class="appConfig.typography.modalErrorBox">
           {{ declineErrorText }}
         </p>
       </template>
       <template #footer>
-        <div class="flex items-center justify-between w-full">
+        <div :class="appConfig.layout.modalActions">
           <UButton
             :label="CONST_CANCEL_BTN_TEXT"
             variant="actionCancelButton"
@@ -91,7 +84,9 @@
 import { computed } from 'vue';
 import { useGroupsStore } from '~/stores/groups.modals.store';
 import { useJoinGroupMutation, useLeaveGroupMutation } from '~/queries/groups.mutation';
+import { useAppConfig } from '#imports';
 
+const appConfig = useAppConfig();
 const groupsStore = useGroupsStore();
 
 const {

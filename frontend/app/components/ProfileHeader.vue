@@ -1,38 +1,18 @@
 <!-- frontend/app/components/ProfileHeader.vue -->
 <template>
-  <header
-    class="flex items-center justify-between px-6 py-4 bg-surface-500/70 backdrop-blur-md shadow-sm z-50 border-b border-dark-text/10 sticky top-0"
-  >
-    <!-- Left side: Select -->
+  <header :class="[appConfig.layout.headerBase, appConfig.layout.headerSticky]">
     <div class="flex-1 flex items-center gap-4">
-      <UButton
-        icon="i-heroicons-arrow-left"
-        variant="glassIconButton"
-        class="shrink-0"
-        :to="selectedView"
-      />
-      <USelect
-        v-model="selectedView"
-        :items="CONST_NAV_VIEWS"
-        label-key="label"
-        value-key="value"
-        @update:model-value="onViewChange"
-      />
+      <UButton icon="i-heroicons-arrow-left" variant="glassIconButton" class="shrink-0" to="/" />
     </div>
 
-    <!-- Center: Logo -->
     <div class="flex-1 flex justify-center">
-      <NuxtLink
-        to="/"
-        class="flex items-center gap-2 text-dark-text hover:opacity-80 transition-opacity w-max"
-      >
+      <NuxtLink to="/" :class="appConfig.layout.logoWrapper">
         <UIcon name="i-heroicons-map-pin" class="w-7 h-7 text-brand-500" />
-        <span class="text-xl font-semibold tracking-wider">{{ CONST_BRAND_NAME }}</span>
+        <span :class="appConfig.typography.logoText">{{ CONST_BRAND_NAME }}</span>
       </NuxtLink>
     </div>
 
-    <!-- Right side: Profil / Log out -->
-    <div class="flex-1 flex justify-end items-center gap-4">
+    <div :class="appConfig.layout.headerRight">
       <ClientOnly>
         <div class="flex items-center gap-4">
           <template v-if="isAuthenticated">
@@ -45,9 +25,18 @@
               variant="smallHollowActionButton"
               @click="handleLogout"
             />
-            <NuxtLink to="/users/profile">
-              <UAvatar :alt="userProfile?.username || 'User'" icon="i-heroicons-user" />
-            </NuxtLink>
+
+            <UDropdownMenu
+              :items="profileDropdownItems"
+              :content="{ align: 'end', side: 'bottom', sideOffset: 8 }"
+            >
+              <UButton
+                variant="ghost"
+                class="p-0 m-0 rounded-full hover:bg-transparent focus-visible:ring-2 focus-visible:ring-brand-500 transition-transform hover:scale-105 cursor-pointer"
+              >
+                <UAvatar :alt="userProfile?.username || 'User'" icon="i-heroicons-user" />
+              </UButton>
+            </UDropdownMenu>
           </template>
         </div>
       </ClientOnly>
@@ -56,37 +45,38 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { useAuth } from '../composables/useAuth';
 import { useCurrentUserQuery } from '../queries/user.query';
+import { useAppConfig } from '#imports';
+import type { DropdownMenuItem } from '@nuxt/ui';
 
+const appConfig = useAppConfig();
 const router = useRouter();
-const route = useRoute();
 const { isAuthenticated, logout } = useAuth();
 const { data: userProfile } = useCurrentUserQuery();
-
-const getCurrentViewValue = (path: string) => {
-  const found = CONST_NAV_VIEWS.find((item) => item.value === path || path.includes(item.value));
-  return found ? found.value : path;
-};
-
-const selectedView = ref(getCurrentViewValue(route.path));
-
-watch(
-  () => route.path,
-  (newPath) => {
-    selectedView.value = getCurrentViewValue(newPath);
-  },
-);
-
-const onViewChange = (path: string | undefined) => {
-  const targetPath = path ?? '/';
-  router.push(targetPath);
-};
 
 const handleLogout = () => {
   logout();
   router.push('/login');
 };
+
+const profileDropdownItems = ref<DropdownMenuItem[]>([
+  {
+    label: 'Profile',
+    icon: 'i-heroicons-user-circle',
+    to: '/users/profile',
+  },
+  {
+    label: 'Groups',
+    icon: 'i-heroicons-user-group',
+    to: '/groups',
+  },
+  {
+    label: 'Events',
+    icon: 'i-heroicons-calendar-days',
+    to: '/events',
+  },
+]);
 </script>

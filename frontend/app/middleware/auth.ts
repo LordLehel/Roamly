@@ -1,5 +1,5 @@
 // frontend/app/middleware/auth.ts
-import { defineNuxtRouteMiddleware, navigateTo } from '#app';
+import { defineNuxtRouteMiddleware, navigateTo } from '#imports';
 import { useAuth } from '~/composables/useAuth';
 
 export default defineNuxtRouteMiddleware((to) => {

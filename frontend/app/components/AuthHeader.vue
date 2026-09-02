@@ -1,19 +1,13 @@
 <!-- frontend/app/components/AuthHeader.vue -->
 <template>
-  <header
-    class="flex items-center justify-between px-6 py-4 bg-surface-500/70 backdrop-blur-md shadow-sm relative z-50 border-b border-dark-text/10"
-  >
+  <header :class="[appConfig.layout.headerBase, appConfig.layout.headerRelative]">
     <div class="flex-1">
-      <NuxtLink
-        to="/"
-        class="flex items-center gap-2 text-dark-text hover:opacity-80 transition-opacity w-max"
-      >
+      <NuxtLink to="/" :class="appConfig.layout.logoWrapper">
         <UIcon name="i-heroicons-map-pin" class="w-7 h-7 text-brand-500" />
-        <span class="text-xl font-semibold tracking-wider">{{ CONST_BRAND_NAME }}</span>
+        <span :class="appConfig.typography.logoText">{{ CONST_BRAND_NAME }}</span>
       </NuxtLink>
     </div>
-
-    <div class="flex-1 flex justify-end items-center gap-4">
+    <div :class="appConfig.layout.headerRight">
       <NuxtLink :to="isAuthenticated ? '/users/profile' : '/login'">
         <UAvatar icon="i-heroicons-user" />
       </NuxtLink>
@@ -23,6 +17,8 @@
 
 <script setup lang="ts">
 import { useAuth } from '../composables/useAuth';
+import { useAppConfig } from '#imports';
 
+const appConfig = useAppConfig();
 const { isAuthenticated } = useAuth();
 </script>

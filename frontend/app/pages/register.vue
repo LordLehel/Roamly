@@ -1,17 +1,14 @@
 <!-- frontend/app/pages/register.vue -->
 <template>
   <UCard variant="glass">
-    <div class="text-center mb-8">
-      <h1 class="text-2xl font-medium tracking-wide text-brand-950">
-        {{ CONST_REGISTER_HEADING }}
-      </h1>
+    <div :class="appConfig.typography.authTitleWrapper">
+      <h1 :class="appConfig.typography.authTitle">{{ CONST_REGISTER_HEADING }}</h1>
     </div>
 
-    <!-- Register form -->
     <UForm
       :schema="registerSchema"
       :state="form"
-      class="w-full flex flex-col gap-4"
+      :class="appConfig.layout.formWrapper"
       @submit="handleRegister"
     >
       <UFormField name="email" :label="CONST_EMAIL_LABEL">
@@ -69,21 +66,20 @@
         </template>
       </UFormField>
 
-      <div v-if="error" class="text-error-400 text-sm text-center font-medium">
+      <div v-if="error" :class="appConfig.typography.formStatusError">
         {{ getErrorMessage(error) }}
       </div>
-      <div v-if="status === 'success'" class="text-success-400 text-sm text-center font-medium">
+      <div v-if="status === 'success'" :class="appConfig.typography.formStatusSuccess">
         {{ CONST_REGISTER_SUCCESS }}
       </div>
 
-      <div class="flex items-center justify-between pt-6">
+      <div :class="appConfig.layout.formActions">
         <UButton
           :label="CONST_CANCEL_BTN_TEXT"
           variant="actionCancelButton"
           :disabled="isLoading"
           @click="clearForm"
         />
-        <!-- Loading state -->
         <UButton
           type="submit"
           :label="CONST_REGISTER_TITLE"
@@ -102,12 +98,15 @@ import type { FormSubmitEvent } from '#ui/types';
 import { registerSchema, type RegisterFormState } from '../utils/schemas/register.schema';
 import { useCreateUserMutation } from '../queries/user.mutation';
 import { getErrorMessage } from '../utils/error.utils';
+import { useAppConfig } from '#imports';
 
 definePageMeta({
   layout: 'auth',
+  middleware: ['guest'],
 });
 
 const router = useRouter();
+const appConfig = useAppConfig();
 
 const form = reactive<RegisterFormState>({
   email: '',

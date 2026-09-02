@@ -2,6 +2,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import type { GroupOutDto, GroupInvitesOutDto } from '~/types/groups.type';
+import type { UserProfileModalDto } from '~/types/user.type';
 
 export const useGroupsStore = defineStore('groups', () => {
   const isCreateModalOpen = ref(false);
@@ -13,12 +14,20 @@ export const useGroupsStore = defineStore('groups', () => {
   const isUpdateModalOpen = ref(false);
   const isInviteModalOpen = ref(false);
   const groupNameToUpdate = ref('');
+  const isPromoteUserModalOpen = ref(false);
+  const isDemoteUserModalOpen = ref(false);
+  const isUserProfileModalOpen = ref(false);
 
+  const selectedUserEmailToPromote = ref<string | null>(null);
+  const selectedUserNameToPromote = ref<string | null>(null);
+  const selectedUserEmailToDemote = ref<string | null>(null);
+  const selectedUserNameToDemote = ref<string | null>(null);
   const selectedGroupToDelete = ref<GroupOutDto | null>(null);
   const selectedGroupToLeave = ref<GroupOutDto | null>(null);
   const selectedGroupToJoin = ref<GroupInvitesOutDto | null>(null);
   const selectedGroupToDecline = ref<GroupInvitesOutDto | null>(null);
   const selectedUserEmailToRemove = ref<string | null>(null);
+  const selectedUserProfile = ref<UserProfileModalDto | null>(null);
 
   // Create modal
   const openCreateModal = () => {
@@ -101,6 +110,43 @@ export const useGroupsStore = defineStore('groups', () => {
     selectedUserEmailToRemove.value = null;
   };
 
+  // Promote User Modal
+  const openPromoteUserModal = (email: string, name: string) => {
+    selectedUserEmailToPromote.value = email;
+    selectedUserNameToPromote.value = name;
+    isPromoteUserModalOpen.value = true;
+  };
+
+  const closePromoteUserModal = () => {
+    isPromoteUserModalOpen.value = false;
+    selectedUserEmailToPromote.value = null;
+    selectedUserNameToPromote.value = null;
+  };
+
+  //Demote User Modal
+  const openDemoteUserModal = (email: string, name: string) => {
+    selectedUserEmailToDemote.value = email;
+    selectedUserNameToDemote.value = name;
+    isDemoteUserModalOpen.value = true;
+  };
+
+  const closeDemoteUserModal = () => {
+    isDemoteUserModalOpen.value = false;
+    selectedUserEmailToDemote.value = null;
+    selectedUserNameToDemote.value = null;
+  };
+
+  // Open User Profile Modal
+  const openUserProfileModal = (profile: UserProfileModalDto) => {
+    selectedUserProfile.value = profile;
+    isUserProfileModalOpen.value = true;
+  };
+
+  const closeUserProfileModal = () => {
+    isUserProfileModalOpen.value = false;
+    selectedUserProfile.value = null;
+  };
+
   return {
     isCreateModalOpen,
     isDeleteModalOpen,
@@ -110,6 +156,9 @@ export const useGroupsStore = defineStore('groups', () => {
     isUpdateModalOpen,
     isInviteModalOpen,
     isRemoveUserModalOpen,
+    isPromoteUserModalOpen,
+    isDemoteUserModalOpen,
+    isUserProfileModalOpen,
     groupNameToUpdate,
 
     selectedGroupToLeave,
@@ -117,6 +166,11 @@ export const useGroupsStore = defineStore('groups', () => {
     selectedGroupToDecline,
     selectedGroupToDelete,
     selectedUserEmailToRemove,
+    selectedUserEmailToPromote,
+    selectedUserNameToPromote,
+    selectedUserEmailToDemote,
+    selectedUserNameToDemote,
+    selectedUserProfile,
 
     openCreateModal,
     closeCreateModal,
@@ -134,5 +188,11 @@ export const useGroupsStore = defineStore('groups', () => {
     closeInviteModal,
     openRemoveUserModal,
     closeRemoveUserModal,
+    openPromoteUserModal,
+    closePromoteUserModal,
+    openUserProfileModal,
+    closeUserProfileModal,
+    openDemoteUserModal,
+    closeDemoteUserModal,
   };
 });

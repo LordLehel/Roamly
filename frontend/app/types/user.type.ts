@@ -14,3 +14,11 @@ export interface UserInDto {
   phone_number: string;
   password?: string;
 }
+
+export interface UserProfileModalDto {
+  username: string;
+  email: string;
+  role: string;
+  joinedAt: string;
+  canViewDocuments: boolean;
+}

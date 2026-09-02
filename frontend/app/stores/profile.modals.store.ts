@@ -14,6 +14,7 @@ export const useProfileStore = defineStore('profile', () => {
 
   const selectedUser = ref<UserOutDto | null>(null);
 
+  // Edit Username Modal
   const openEditUsernameModal = (user: UserOutDto) => {
     selectedUser.value = user;
     isEditUsernameModalOpen.value = true;
@@ -23,6 +24,7 @@ export const useProfileStore = defineStore('profile', () => {
     selectedUser.value = null;
   };
 
+  // Edit Email Modal
   const openEditEmailModal = (user: UserOutDto) => {
     selectedUser.value = user;
     isEditEmailModalOpen.value = true;
@@ -32,6 +34,7 @@ export const useProfileStore = defineStore('profile', () => {
     selectedUser.value = null;
   };
 
+  // Change Password Modal
   const openChangePasswordModal = () => {
     isChangePasswordModalOpen.value = true;
   };
@@ -39,6 +42,7 @@ export const useProfileStore = defineStore('profile', () => {
     isChangePasswordModalOpen.value = false;
   };
 
+  // Delete User Modal
   const openDeleteModal = (user: UserOutDto) => {
     selectedUser.value = user;
     isDeleteModalOpen.value = true;
@@ -48,6 +52,7 @@ export const useProfileStore = defineStore('profile', () => {
     selectedUser.value = null;
   };
 
+  // Open Upload Picture Modal
   const openUploadPictureModal = () => {
     isUploadPictureModalOpen.value = true;
   };
@@ -55,6 +60,7 @@ export const useProfileStore = defineStore('profile', () => {
     isUploadPictureModalOpen.value = false;
   };
 
+  // Open View Picture Modal
   const openViewPictureModal = (user: UserOutDto) => {
     selectedUser.value = user;
     isViewPictureModalOpen.value = true;
@@ -64,6 +70,7 @@ export const useProfileStore = defineStore('profile', () => {
     selectedUser.value = null;
   };
 
+  // Open Upload Document Modal
   const openUploadDocumentModal = () => {
     isUploadDocumentModalOpen.value = true;
   };
