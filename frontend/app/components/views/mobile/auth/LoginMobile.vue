@@ -7,9 +7,11 @@
 </template>
 
 <script setup lang="ts">
-//import type { LoginFormState } from '~/utils/schemas/login.schema';
+/* --- IMPORTS --- */
+// import type { LoginFormState } from '~/utils/schemas/login.schema';
 import type { ApiError } from '~/types/apiError.type';
 
+/* --- PROPS & EMITS --- */
 defineProps<{
   isLoading: boolean;
   error: ApiError | Error | null | undefined;

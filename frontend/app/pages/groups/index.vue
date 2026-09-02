@@ -22,26 +22,29 @@
 </template>
 
 <script setup lang="ts">
+/* --- IMPORTS --- */
 import { ref, watch } from 'vue';
 import { useScreenSize } from '~/composables/useScreenSize';
 import { useProtectedPage } from '~/composables/useProtectedPage';
 import { useGroupsQuery } from '~/queries/groups.query';
 import type { GroupOutDto } from '~/types/groups.type';
-
 import IndexDesktop from '~/components/views/desktop/groups/IndexDesktop.vue';
 import IndexMobile from '~/components/views/mobile/groups/IndexMobile.vue';
 
+/* --- PAGE CONFIGURATION --- */
 definePageMeta({ layout: 'general', middleware: ['auth'] });
 
+/* --- COMPOSABLES & STATE --- */
 useProtectedPage();
 const { isMobile } = useScreenSize();
-
-const currentCursor = ref<string | undefined>(undefined);
-const { data: groupsData, isLoading, error } = useGroupsQuery(15, currentCursor);
-
 const groupsList = ref<GroupOutDto[]>([]);
+const currentCursor = ref<string | undefined>(undefined);
 const isFetchingNextPage = ref(false);
 
+/* --- API QUERIES --- */
+const { data: groupsData, isLoading, error } = useGroupsQuery(15, currentCursor);
+
+/* --- WATCHERS (PAGINATION LOGIC) --- */
 watch(
   () => groupsData.value,
   (newData) => {
@@ -66,6 +69,7 @@ watch(
   },
 );
 
+/* --- EVENT HANDLERS --- */
 const fetchNextPage = () => {
   if (
     groupsData.value?.meta.has_next_page &&

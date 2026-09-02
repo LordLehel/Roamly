@@ -4,7 +4,6 @@
     <h1 class="text-xl font-bold text-dark-text">Here will be the mobile view for Groups Index</h1>
     <p class="mt-4 text-brand-500 font-medium">Loaded {{ groupsList.length }} groups so far.</p>
 
-    <!-- Ez a gomb szimulálja a betöltést addig, amíg nincs kész a végtelen görgetés mobilra -->
     <UButton
       v-if="!isLoading && groupsList.length > 0"
       class="mt-4"
@@ -17,9 +16,11 @@
 </template>
 
 <script setup lang="ts">
+/* --- IMPORTS --- */
 import type { GroupOutDto } from '~/types/groups.type';
 import type { ApiError } from '~/types/apiError.type';
 
+/* --- PROPS & EMITS --- */
 defineProps<{
   groupsList: GroupOutDto[];
   isLoading: boolean;

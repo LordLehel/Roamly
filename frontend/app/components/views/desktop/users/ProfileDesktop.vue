@@ -1,11 +1,14 @@
 <!-- frontend/app/components/views/desktop/users/ProfileDesktop.vue -->
 <template>
   <div :class="appConfig.layout.pageWrapper">
+    <!-- PAGE TITLE -->
     <div>
       <h1 :class="appConfig.typography.pageTitle">{{ CONST_PROFILE_HEADING }}</h1>
     </div>
 
+    <!-- CONTENT SECTION -->
     <ClientOnly>
+      <!-- LOADING / ERROR STATES -->
       <div v-if="isLoading" :class="appConfig.typography.statusLoading">
         {{ CONST_LOADING_TEXT }}
       </div>
@@ -14,7 +17,7 @@
       </div>
 
       <div v-else-if="currentUser" class="w-full relative">
-        <!-- PROFILE Card -->
+        <!-- PROFILE CARD SECTION -->
         <div :class="appConfig.layout.profileCard">
           <!-- Delete Button -->
           <div class="absolute top-4 right-4 z-10">
@@ -233,11 +236,13 @@
 </template>
 
 <script setup lang="ts">
+/* --- IMPORTS --- */
 import { useAppConfig } from '#imports';
 import type { useProfileStore } from '~/stores/profile.modals.store';
-import type { UserOutDto } from '~/types/user.type'; // Ellenőrizd, hogy UserDto vagy UserOutDto a pontos neve!
+import type { UserOutDto } from '~/types/user.type';
 import type { ApiError } from '~/types/apiError.type';
 
+/* --- INTERFACES --- */
 interface DummyDocument {
   id: number;
   title: string;
@@ -249,8 +254,10 @@ interface DummyDocument {
   ends: string;
 }
 
+/* --- COMPOSABLES --- */
 const appConfig = useAppConfig();
 
+/* --- PROPS --- */
 defineProps<{
   currentUser: UserOutDto | null | undefined;
   isLoading: boolean;

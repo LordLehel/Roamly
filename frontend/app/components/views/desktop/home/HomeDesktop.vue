@@ -1,6 +1,7 @@
 <!-- frontend/app/components/views/desktop/home/HomeDesktop.vue -->
 <template>
   <div :class="appConfig.layout.homeWrapper">
+    <!-- HERO SECTION -->
     <section id="home" :class="appConfig.layout.homeHeroSection">
       <UButton
         :label="CONST_GET_STARTED ?? 'Get Started'"
@@ -10,6 +11,7 @@
       <p :class="appConfig.typography.homeHeroText">{{ CONST_HOME_DESCRIPTION }}</p>
     </section>
 
+    <!-- FEATURE CARDS SECTION -->
     <section :class="appConfig.layout.homeCardsSection">
       <UCard
         v-for="card in featureCards"
@@ -76,11 +78,13 @@
       </UCard>
     </section>
 
+    <!-- ABOUT SECTION -->
     <section id="about" :class="appConfig.layout.homeContentSection">
       <h2 :class="appConfig.typography.homeSectionTitle">{{ CONST_ABOUT_HERO }}</h2>
       <p :class="appConfig.typography.homeSectionText">{{ CONST_ABOUT_DESCRIPTION }}</p>
     </section>
 
+    <!-- SUPPORT SECTION -->
     <section id="support" :class="appConfig.layout.homeContentSection">
       <h2 :class="appConfig.typography.homeSectionTitle">{{ CONST_SUPPORT_HERO }}</h2>
       <p :class="appConfig.typography.homeSectionText">{{ CONST_SUPPORT_DESCRIPTION }}</p>
@@ -89,10 +93,10 @@
 </template>
 
 <script setup lang="ts">
+/* --- IMPORTS --- */
 import { useAppConfig } from '#imports';
 
-const appConfig = useAppConfig();
-
+/* --- INTERFACES --- */
 interface FeatureCard {
   id: string;
   title: string;
@@ -101,6 +105,10 @@ interface FeatureCard {
   extendedDesc: string;
 }
 
+/* --- COMPOSABLES --- */
+const appConfig = useAppConfig();
+
+/* --- PROPS & EMITS --- */
 defineProps<{
   featureCards: FeatureCard[];
   activeCard: string | null;

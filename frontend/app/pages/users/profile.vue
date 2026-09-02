@@ -22,23 +22,27 @@
 </template>
 
 <script setup lang="ts">
+/* --- IMPORTS --- */
 import { ref } from 'vue';
 import { useScreenSize } from '~/composables/useScreenSize';
 import { useProtectedPage } from '~/composables/useProtectedPage';
 import { useCurrentUserQuery } from '~/queries/user.query';
 import { useProfileStore } from '~/stores/profile.modals.store';
-
 import ProfileDesktop from '~/components/views/desktop/users/ProfileDesktop.vue';
 import ProfileMobile from '~/components/views/mobile/users/ProfileMobile.vue';
 
+/* --- PAGE CONFIGURATION --- */
 definePageMeta({ layout: 'general', middleware: ['auth'] });
 
+/* --- COMPOSABLES & STORES --- */
 useProtectedPage();
 const { isMobile } = useScreenSize();
-
 const profileStore = useProfileStore();
+
+/* --- API QUERIES --- */
 const { data: currentUser, isLoading, error } = useCurrentUserQuery();
 
+/* --- MOCK DATA --- */
 const dummyDocuments = ref([
   {
     id: 1,

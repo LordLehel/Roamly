@@ -18,9 +18,11 @@
 </template>
 
 <script setup lang="ts">
+/* --- IMPORTS --- */
 import type { GroupProfileDto, GroupInfosOutDto } from '~/types/groups.type';
 import type { ApiError } from '~/types/apiError.type';
 
+/* --- PROPS & EMITS --- */
 defineProps<{
   groupInfos: GroupInfosOutDto | undefined | null;
   filteredMembers: GroupProfileDto[];

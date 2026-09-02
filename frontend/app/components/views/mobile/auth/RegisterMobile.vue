@@ -7,9 +7,11 @@
 </template>
 
 <script setup lang="ts">
-//import type { RegisterFormState } from '~/utils/schemas/register.schema';
+/* --- IMPORTS --- */
+// import type { RegisterFormState } from '~/utils/schemas/register.schema';
 import type { ApiError } from '~/types/apiError.type';
 
+/* --- PROPS & EMITS --- */
 defineProps<{
   isLoading: boolean;
   error: ApiError | Error | null | undefined;

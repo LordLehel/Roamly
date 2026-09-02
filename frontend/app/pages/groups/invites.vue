@@ -22,26 +22,29 @@
 </template>
 
 <script setup lang="ts">
+/* --- IMPORTS --- */
 import { ref, watch } from 'vue';
 import { useScreenSize } from '~/composables/useScreenSize';
 import { useProtectedPage } from '~/composables/useProtectedPage';
 import { usePendingInvitesQuery } from '~/queries/groups.query';
 import type { GroupInvitesOutDto } from '~/types/groups.type';
-
 import InvitesDesktop from '~/components/views/desktop/groups/InvitesDesktop.vue';
 import InvitesMobile from '~/components/views/mobile/groups/InvitesMobile.vue';
 
+/* --- PAGE CONFIGURATION --- */
 definePageMeta({ layout: 'general', middleware: ['auth'] });
 
+/* --- COMPOSABLES & STATE --- */
 useProtectedPage();
 const { isMobile } = useScreenSize();
-
-const currentCursor = ref<string | undefined>(undefined);
-const { data: invitesData, isLoading, error } = usePendingInvitesQuery(15, currentCursor);
-
 const invitesList = ref<GroupInvitesOutDto[]>([]);
+const currentCursor = ref<string | undefined>(undefined);
 const isFetchingNextPage = ref(false);
 
+/* --- API QUERIES --- */
+const { data: invitesData, isLoading, error } = usePendingInvitesQuery(15, currentCursor);
+
+/* --- WATCHERS (PAGINATION LOGIC) --- */
 watch(
   () => invitesData.value,
   (newData) => {
@@ -66,6 +69,7 @@ watch(
   },
 );
 
+/* --- EVENT HANDLERS --- */
 const fetchNextPage = () => {
   if (
     invitesData.value?.meta.has_next_page &&

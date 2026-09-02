@@ -34,6 +34,7 @@
 </template>
 
 <script setup lang="ts">
+/* --- IMPORTS --- */
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useScreenSize } from '~/composables/useScreenSize';
@@ -42,27 +43,29 @@ import { useGroupInfosQuery } from '~/queries/groups.query';
 import { useCurrentUserQuery } from '~/queries/user.query';
 import { useGroupsStore } from '~/stores/groups.modals.store';
 import type { GroupOutDto, GroupProfileDto } from '~/types/groups.type';
-
 import MembersMobile from '~/components/views/mobile/groups/MembersMobile.vue';
 import MembersDesktop from '~/components/views/desktop/groups/MembersDesktop.vue';
 
+/* --- PAGE CONFIGURATION --- */
 definePageMeta({ layout: 'general', middleware: ['auth'] });
 
+/* --- COMPOSABLES & STORES --- */
 useProtectedPage();
 const { isMobile } = useScreenSize();
-
 const route = useRoute();
 const groupsStore = useGroupsStore();
 
+/* --- STATE & COMPUTED --- */
 const groupUuid = computed(() => route.params.uuid as string);
-const { data: currentUser } = useCurrentUserQuery();
-const { data: groupInfos, isLoading, error } = useGroupInfosQuery(groupUuid);
-
-// Filter logic
 const searchQuery = ref('');
 const debouncedQuery = ref('');
 let debounceTimeout: ReturnType<typeof setTimeout>;
 
+/* --- API QUERIES --- */
+const { data: currentUser } = useCurrentUserQuery();
+const { data: groupInfos, isLoading, error } = useGroupInfosQuery(groupUuid);
+
+/* --- FILTER LOGIC --- */
 watch(searchQuery, (newVal) => {
   clearTimeout(debounceTimeout);
   debounceTimeout = setTimeout(() => {
@@ -82,6 +85,7 @@ const filteredMembers = computed(() => {
   );
 });
 
+/* --- PERMISSIONS --- */
 const isCurrentUserLeader = computed(() => {
   const profile = groupInfos.value?.group_profiles?.find(
     (p) => p.users.email === currentUser.value?.email,
@@ -89,6 +93,7 @@ const isCurrentUserLeader = computed(() => {
   return profile?.roles.type.toLowerCase() === 'leader';
 });
 
+/* --- MODAL HANDLERS --- */
 const handleLeaveCurrentGroup = () => {
   const currentUserProfile = groupInfos.value?.group_profiles?.find(
     (p) => p.users.email === currentUser.value?.email,

@@ -16,9 +16,11 @@
 </template>
 
 <script setup lang="ts">
+/* --- IMPORTS --- */
 import type { GroupInvitesOutDto } from '~/types/groups.type';
 import type { ApiError } from '~/types/apiError.type';
 
+/* --- PROPS & EMITS --- */
 defineProps<{
   invitesList: GroupInvitesOutDto[];
   isLoading: boolean;

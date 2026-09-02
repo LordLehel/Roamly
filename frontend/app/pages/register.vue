@@ -19,19 +19,22 @@
 </template>
 
 <script setup lang="ts">
+/* --- IMPORTS --- */
 import { useRouter } from 'vue-router';
 import { useScreenSize } from '~/composables/useScreenSize';
 import { useCreateUserMutation } from '~/queries/user.mutation';
 import type { RegisterFormState } from '~/utils/schemas/register.schema';
-
 import RegisterDesktop from '~/components/views/desktop/auth/RegisterDesktop.vue';
 import RegisterMobile from '~/components/views/mobile/auth/RegisterMobile.vue';
 
+/* --- PAGE CONFIGURATION --- */
 definePageMeta({ layout: 'auth', middleware: ['guest'] });
 
+/* --- COMPOSABLES & STORES --- */
 const { isMobile } = useScreenSize();
 const router = useRouter();
 
+/* --- API MUTATIONS --- */
 const {
   mutate: registerUser,
   isLoading,
@@ -41,6 +44,7 @@ const {
   onSuccess: () => router.push('/login'),
 });
 
+/* --- EVENT HANDLERS --- */
 const handleRegister = (data: RegisterFormState) => {
   registerUser({
     email: data.email,

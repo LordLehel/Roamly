@@ -1,15 +1,19 @@
 <!-- frontend/app/components/views/desktop/groups/InvitesDesktop.vue -->
 <template>
   <div :class="appConfig.layout.pageWrapper">
+    <!-- PAGE TITLE -->
     <h1 :class="appConfig.typography.pageTitle">{{ CONST_INVITES_HEADING }}</h1>
 
+    <!-- ACTION BUTTONS -->
     <div :class="appConfig.layout.actionGroup">
       <UTooltip :text="CONST_TOOLTIP_FILTER_INVITES ?? 'Filter'">
         <UButton icon="i-heroicons-funnel" :label="CONST_FILTER_LABEL" variant="glassButton" />
       </UTooltip>
     </div>
 
+    <!-- CONTENT SECTION -->
     <ClientOnly>
+      <!-- LOADING / ERROR STATES -->
       <div v-if="isLoading && invitesList.length === 0" :class="appConfig.typography.statusLoading">
         {{ CONST_LOADING_TEXT }}
       </div>
@@ -17,6 +21,7 @@
         {{ CONST_FETCH_ERROR_TEXT }}
       </div>
 
+      <!-- INVITES GRID -->
       <div v-else-if="invitesList.length > 0" class="flex flex-col gap-6 w-full">
         <div :class="appConfig.layout.cardGrid">
           <UCard
@@ -56,7 +61,7 @@
           </UCard>
         </div>
 
-        <!-- Intersection Observer trigger (pótolva a végtelen görgetéshez) -->
+        <!-- INFINITE SCROLL TRIGGER -->
         <div ref="loadMoreTrigger" class="h-10 w-full flex items-center justify-center">
           <span v-if="isFetchingNextPage" class="text-dark-text/70 text-sm">
             {{ CONST_LOADING_GROUPS_MSG ?? 'Loading more...' }}
@@ -64,6 +69,7 @@
         </div>
       </div>
 
+      <!-- EMPTY STATE -->
       <div v-else :class="appConfig.typography.statusLoading">
         {{ CONST_NO_INVITES_MSG }}
       </div>
@@ -72,6 +78,7 @@
 </template>
 
 <script setup lang="ts">
+/* --- IMPORTS --- */
 import { useAppConfig } from '#imports';
 import { ref } from 'vue';
 import { useIntersectionObserver } from '@vueuse/core';
@@ -79,9 +86,11 @@ import { useGroupsStore } from '~/stores/groups.modals.store';
 import type { GroupInvitesOutDto } from '~/types/groups.type';
 import type { ApiError } from '~/types/apiError.type';
 
+/* --- COMPOSABLES & STORES --- */
 const appConfig = useAppConfig();
 const groupsStore = useGroupsStore();
 
+/* --- PROPS & EMITS --- */
 defineProps<{
   invitesList: GroupInvitesOutDto[];
   isLoading: boolean;
@@ -93,6 +102,7 @@ const emit = defineEmits<{
   (e: 'loadMore'): void;
 }>();
 
+/* --- DOM OBSERVERS (INFINITE SCROLL) --- */
 const loadMoreTrigger = ref<HTMLElement | null>(null);
 useIntersectionObserver(
   loadMoreTrigger,

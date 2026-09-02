@@ -187,14 +187,17 @@
 </template>
 
 <script setup lang="ts">
+/* --- IMPORTS --- */
 import { useAppConfig } from '#imports';
 import { useGroupsStore } from '~/stores/groups.modals.store';
 import type { GroupInfosOutDto, GroupProfileDto } from '~/types/groups.type';
 import type { ApiError } from '~/types/apiError.type';
 
+/* --- COMPOSABLES & STORES --- */
 const appConfig = useAppConfig();
 const groupsStore = useGroupsStore();
 
+/* --- PROPS & EMITS --- */
 const props = defineProps<{
   groupInfos: GroupInfosOutDto | undefined | null;
   filteredMembers: GroupProfileDto[];
@@ -211,6 +214,7 @@ const emit = defineEmits<{
   (e: 'openProfile', profile: GroupProfileDto): void;
 }>();
 
+/* --- HELPERS --- */
 const isCurrentUser = (email: string) => {
   return props.currentUserEmail === email;
 };

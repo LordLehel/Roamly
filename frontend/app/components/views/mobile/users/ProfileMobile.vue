@@ -9,11 +9,13 @@
 </template>
 
 <script setup lang="ts">
-//import { useAppConfig } from '#imports';
+/* --- IMPORTS --- */
+// import { useAppConfig } from '#imports';
 import type { useProfileStore } from '~/stores/profile.modals.store';
 import type { UserOutDto } from '~/types/user.type';
 import type { ApiError } from '~/types/apiError.type';
 
+/* --- INTERFACES --- */
 interface DummyDocument {
   id: number;
   title: string;
@@ -25,8 +27,10 @@ interface DummyDocument {
   ends: string;
 }
 
-//const appConfig = useAppConfig();
+/* --- COMPOSABLES --- */
+// const appConfig = useAppConfig();
 
+/* --- PROPS --- */
 defineProps<{
   currentUser: UserOutDto | null | undefined;
   isLoading: boolean;

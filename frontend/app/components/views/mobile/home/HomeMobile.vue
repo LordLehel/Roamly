@@ -7,6 +7,7 @@
 </template>
 
 <script setup lang="ts">
+/* --- INTERFACES --- */
 interface FeatureCard {
   id: string;
   title: string;
@@ -15,6 +16,7 @@ interface FeatureCard {
   extendedDesc: string;
 }
 
+/* --- PROPS & EMITS --- */
 defineProps<{
   featureCards: FeatureCard[];
   activeCard: string | null;
