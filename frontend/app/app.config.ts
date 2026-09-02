@@ -124,7 +124,7 @@ export default defineAppConfig({
       slots: {
         overlay: 'fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm',
         content:
-          'fixed z-[100] !bg-surface-500/70 backdrop-blur-2xl !rounded-[25px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] !ring-1 !ring-surface-500/50 !divide-none !border-0 focus:!outline-none overflow-hidden flex flex-col',
+          'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[101] w-full !bg-surface-500/70 backdrop-blur-2xl !rounded-[25px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] !ring-1 !ring-surface-500/50 !divide-none !border-0 focus:!outline-none overflow-hidden flex flex-col',
         header: 'p-4 sm:px-6 !border-0 !ring-0',
         body: 'p-4 sm:p-6 !border-0 !ring-0',
         footer: 'p-4 sm:px-6 !border-0 !ring-0',
@@ -138,6 +138,15 @@ export default defineAppConfig({
           'z-[100] bg-surface-500/90 backdrop-blur-md rounded-2xl ring-1 ring-brand-500/30 shadow-xl p-1 w-48',
         item: 'flex items-center gap-2 w-full justify-start text-left cursor-pointer px-4 py-2 text-sm font-medium text-dark-text/80 hover:text-dark-text hover:bg-brand-500/20 data-[highlighted]:bg-brand-500/20 data-[highlighted]:text-dark-text rounded-xl transition-colors',
         itemLeadingIcon: 'w-5 h-5 text-brand-500 shrink-0',
+      },
+    },
+
+    // Tooltip
+    tooltip: {
+      slots: {
+        content:
+          'z-[100] bg-surface-500/90 backdrop-blur-md text-dark-text ring-1 ring-brand-500/30 rounded-xl px-3 py-1.5 text-xs font-semibold shadow-xl',
+        arrow: 'fill-surface-500/90',
       },
     },
   },
@@ -214,7 +223,7 @@ export default defineAppConfig({
     authTitle: 'text-2xl font-medium tracking-wide text-brand-950',
     authTitleWrapper: 'text-center mb-8',
     sectionTitleTransparent: 'text-2xl font-bold text-surface-500 tracking-wide text-center flex-1',
-    statusLoading: 'text-center py-10 text-dark-text/70',
+    statusLoading: 'text-center py-10 text-surface-500',
     statusError: 'text-center py-10 text-error-500',
     formStatusError: 'text-error-400 text-sm text-center font-medium',
     formStatusSuccess: 'text-success-400 text-sm text-center font-medium',

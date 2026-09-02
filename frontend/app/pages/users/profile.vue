@@ -18,11 +18,13 @@
         <div :class="appConfig.layout.profileCard">
           <!-- Delete Button -->
           <div class="absolute top-4 right-4 z-10">
-            <UButton
-              icon="i-heroicons-trash"
-              variant="glassIconButtonDanger"
-              @click="profileStore.openDeleteModal(currentUser)"
-            />
+            <UTooltip :text="CONST_TOOLTIP_DELETE_PROFILE ?? 'Delete Profile'">
+              <UButton
+                icon="i-heroicons-trash"
+                variant="glassIconButtonDanger"
+                @click="profileStore.openDeleteModal(currentUser)"
+              />
+            </UTooltip>
           </div>
 
           <!-- Profile picture -->
@@ -40,18 +42,29 @@
                 class="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-black/50 to-transparent pointer-events-none"
               ></div>
 
-              <UButton
-                icon="i-heroicons-eye"
-                variant="ghostDangerIconButton"
-                class="absolute bottom-2 left-2 text-surface-500"
-                @click="profileStore.openViewPictureModal(currentUser)"
-              />
-              <UButton
-                icon="i-heroicons-arrow-up-tray"
-                variant="ghostDangerIconButton"
-                class="absolute bottom-2 right-2 text-surface-500"
-                @click="profileStore.openUploadPictureModal()"
-              />
+              <UTooltip
+                :text="CONST_TOOLTIP_VIEW_PICTURE ?? 'View Picture'"
+                class="absolute bottom-2 left-2"
+              >
+                <UButton
+                  icon="i-heroicons-eye"
+                  variant="ghostDangerIconButton"
+                  class="text-surface-500"
+                  @click="profileStore.openViewPictureModal(currentUser)"
+                />
+              </UTooltip>
+
+              <UTooltip
+                :text="CONST_TOOLTIP_UPLOAD_PICTURE ?? 'Upload Picture'"
+                class="absolute bottom-2 right-2"
+              >
+                <UButton
+                  icon="i-heroicons-arrow-up-tray"
+                  variant="ghostDangerIconButton"
+                  class="text-surface-500"
+                  @click="profileStore.openUploadPictureModal()"
+                />
+              </UTooltip>
             </div>
           </div>
 
@@ -62,11 +75,13 @@
               <p :class="appConfig.typography.profileLabel">{{ CONST_USERNAME_LABEL }}</p>
               <div :class="appConfig.layout.actionGroup">
                 <p :class="appConfig.typography.profileValue">{{ currentUser.username }}</p>
-                <UButton
-                  icon="i-heroicons-pencil"
-                  variant="ghostDangerIconButton"
-                  @click="profileStore.openEditUsernameModal(currentUser)"
-                />
+                <UTooltip :text="CONST_TOOLTIP_EDIT_USERNAME ?? 'Edit Username'">
+                  <UButton
+                    icon="i-heroicons-pencil"
+                    variant="ghostDangerIconButton"
+                    @click="profileStore.openEditUsernameModal(currentUser)"
+                  />
+                </UTooltip>
               </div>
             </div>
             <!-- Email -->
@@ -74,11 +89,13 @@
               <p :class="appConfig.typography.profileLabel">{{ CONST_EMAIL_LABEL }}</p>
               <div :class="appConfig.layout.actionGroup">
                 <p :class="appConfig.typography.profileValue">{{ currentUser.email }}</p>
-                <UButton
-                  icon="i-heroicons-pencil"
-                  variant="ghostDangerIconButton"
-                  @click="profileStore.openEditEmailModal(currentUser)"
-                />
+                <UTooltip :text="CONST_TOOLTIP_EDIT_EMAIL ?? 'Edit Email'">
+                  <UButton
+                    icon="i-heroicons-pencil"
+                    variant="ghostDangerIconButton"
+                    @click="profileStore.openEditEmailModal(currentUser)"
+                  />
+                </UTooltip>
               </div>
             </div>
             <!-- Password -->
@@ -86,11 +103,13 @@
               <p :class="appConfig.typography.profileLabel">{{ CONST_PASSWORD_LABEL }}</p>
               <div :class="appConfig.layout.actionGroup">
                 <p :class="appConfig.typography.profileValueLg">************</p>
-                <UButton
-                  icon="i-heroicons-pencil"
-                  variant="ghostDangerIconButton"
-                  @click="profileStore.openChangePasswordModal()"
-                />
+                <UTooltip :text="CONST_TOOLTIP_EDIT_PASSWORD ?? 'Edit Password'">
+                  <UButton
+                    icon="i-heroicons-pencil"
+                    variant="ghostDangerIconButton"
+                    @click="profileStore.openChangePasswordModal()"
+                  />
+                </UTooltip>
               </div>
             </div>
             <!-- Registered -->
@@ -113,16 +132,20 @@
         <div :class="appConfig.layout.sectionWrapper">
           <div :class="appConfig.layout.pageHeader">
             <div :class="appConfig.layout.actionGroup">
-              <UButton
-                icon="i-heroicons-funnel"
-                :label="CONST_FILTER_LABEL"
-                variant="glassButton"
-              />
-              <UButton
-                icon="i-heroicons-plus"
-                variant="glassIconButton"
-                @click="profileStore.openUploadDocumentModal()"
-              />
+              <UTooltip :text="CONST_TOOLTIP_FILTER_DOCS ?? 'Filter'">
+                <UButton
+                  icon="i-heroicons-funnel"
+                  :label="CONST_FILTER_LABEL"
+                  variant="glassButton"
+                />
+              </UTooltip>
+              <UTooltip :text="CONST_TOOLTIP_UPLOAD_DOC ?? 'Upload Document'">
+                <UButton
+                  icon="i-heroicons-plus"
+                  variant="glassIconButton"
+                  @click="profileStore.openUploadDocumentModal()"
+                />
+              </UTooltip>
             </div>
             <h2 :class="appConfig.typography.sectionTitleTransparent">
               {{ CONST_DOCUMENTS_HEADING }}
@@ -142,16 +165,20 @@
               <div :class="appConfig.layout.documentCardHeader">
                 <p class="font-bold truncate pr-2 shadow-sm">{{ doc.title }}</p>
                 <div class="flex items-center gap-1">
-                  <UButton
-                    icon="i-heroicons-pencil"
-                    variant="ghostDangerIconButton"
-                    class="text-surface-500"
-                  />
-                  <UButton
-                    icon="i-heroicons-trash"
-                    variant="ghostDangerIconButton"
-                    class="text-surface-500"
-                  />
+                  <UTooltip :text="CONST_TOOLTIP_EDIT_DOC ?? 'Edit'">
+                    <UButton
+                      icon="i-heroicons-pencil"
+                      variant="ghostDangerIconButton"
+                      class="text-surface-500"
+                    />
+                  </UTooltip>
+                  <UTooltip :text="CONST_TOOLTIP_DELETE_DOC ?? 'Delete'">
+                    <UButton
+                      icon="i-heroicons-trash"
+                      variant="ghostDangerIconButton"
+                      class="text-surface-500"
+                    />
+                  </UTooltip>
                 </div>
               </div>
 
@@ -159,8 +186,12 @@
               <div :class="appConfig.layout.documentCardImage">
                 <UIcon name="i-heroicons-photo" class="w-16 h-16 text-surface-500/50" />
                 <div class="absolute bottom-2 px-4 w-full flex justify-between">
-                  <UButton icon="i-heroicons-eye" variant="ghostDangerIconButton" />
-                  <UButton icon="i-heroicons-arrow-down-tray" variant="ghostDangerIconButton" />
+                  <UTooltip :text="CONST_TOOLTIP_VIEW_DOC ?? 'View'">
+                    <UButton icon="i-heroicons-eye" variant="ghostDangerIconButton" />
+                  </UTooltip>
+                  <UTooltip :text="CONST_TOOLTIP_DOWNLOAD_DOC ?? 'Download'">
+                    <UButton icon="i-heroicons-arrow-down-tray" variant="ghostDangerIconButton" />
+                  </UTooltip>
                 </div>
               </div>
 

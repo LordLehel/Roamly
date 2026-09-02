@@ -11,37 +11,51 @@
     >
       <div :class="appConfig.layout.pageHeader">
         <div :class="appConfig.layout.actionGroup" class="flex-1 justify-start">
-          <UButton
-            v-if="isCurrentUserLeader"
-            icon="i-heroicons-trash"
-            variant="glassIconButtonDanger"
-            @click="handleDeleteCurrentGroup"
-          />
-          <UButton
-            icon="i-heroicons-arrow-right-on-rectangle"
-            variant="glassIconButtonDanger"
-            @click="handleLeaveCurrentGroup"
-          />
+          <UTooltip v-if="isCurrentUserLeader" :text="CONST_TOOLTIP_DELETE_GROUP ?? 'Delete Group'">
+            <UButton
+              icon="i-heroicons-trash"
+              variant="glassIconButtonDanger"
+              @click="handleDeleteCurrentGroup"
+            />
+          </UTooltip>
+          <UTooltip :text="CONST_TOOLTIP_LEAVE_GROUP ?? 'Leave Group'">
+            <UButton
+              icon="i-heroicons-arrow-right-on-rectangle"
+              variant="glassIconButtonDanger"
+              @click="handleLeaveCurrentGroup"
+            />
+          </UTooltip>
         </div>
 
         <div class="flex flex-col items-center justify-center shrink-0">
           <div class="flex items-center gap-2">
-            <h1 :class="appConfig.typography.pageTitle">{{ groupInfos?.name || 'Loading...' }}</h1>
-            <UButton
-              v-if="isCurrentUserLeader"
-              icon="i-heroicons-pencil"
-              variant="ghostBrandIconButton"
-              @click="groupsStore.openUpdateModal(groupInfos?.name || '')"
-            />
+            <h1 :class="appConfig.typography.pageTitle">
+              {{ groupInfos?.name || CONST_LOADING_TEXT }}
+            </h1>
+            <UTooltip v-if="isCurrentUserLeader" :text="CONST_TOOLTIP_EDIT_GROUP ?? 'Edit Group'">
+              <UButton
+                icon="i-heroicons-pencil"
+                variant="ghostBrandIconButton"
+                @click="groupsStore.openUpdateModal(groupInfos?.name || '')"
+              />
+            </UTooltip>
           </div>
           <p :class="appConfig.typography.pageSubtitle">Members</p>
         </div>
 
         <div :class="appConfig.layout.actionGroup" class="flex-1 justify-end">
-          <UButton icon="i-heroicons-users" variant="glassIconButtonBrand" to="/" />
-          <UButton icon="i-heroicons-calendar" variant="glassIconButton" to="/" />
-          <UButton icon="i-heroicons-photo" variant="glassIconButton" to="/" />
-          <UButton icon="i-heroicons-document-text" variant="glassIconButton" to="/" />
+          <UTooltip :text="CONST_TOOLTIP_MEMBERS ?? 'Members'">
+            <UButton icon="i-heroicons-users" variant="glassIconButtonBrand" to="/" />
+          </UTooltip>
+          <UTooltip :text="CONST_TOOLTIP_CALENDAR ?? 'Calendar'">
+            <UButton icon="i-heroicons-calendar" variant="glassIconButton" to="/" />
+          </UTooltip>
+          <UTooltip :text="CONST_TOOLTIP_PHOTOS ?? 'Photos'">
+            <UButton icon="i-heroicons-photo" variant="glassIconButton" to="/" />
+          </UTooltip>
+          <UTooltip :text="CONST_TOOLTIP_DOCUMENTS ?? 'Documents'">
+            <UButton icon="i-heroicons-document-text" variant="glassIconButton" to="/" />
+          </UTooltip>
         </div>
       </div>
 
@@ -52,12 +66,13 @@
           placeholder="Filter members..."
           variant="search"
         />
-        <UButton
-          v-if="isCurrentUserLeader"
-          icon="i-heroicons-user-plus"
-          variant="glassIconButtonHighlight"
-          @click="groupsStore.openInviteModal()"
-        />
+        <UTooltip v-if="isCurrentUserLeader" :text="CONST_TOOLTIP_INVITE_USER ?? 'Invite User'">
+          <UButton
+            icon="i-heroicons-user-plus"
+            variant="glassIconButtonHighlight"
+            @click="groupsStore.openInviteModal()"
+          />
+        </UTooltip>
       </div>
     </div>
 
@@ -102,27 +117,38 @@
                       You
                     </p>
                   </div>
-                  <UButton
+                  <UTooltip
                     v-if="isCurrentUserLeader && profile.roles.type.toLowerCase() === 'member'"
-                    icon="i-heroicons-arrow-up-circle"
-                    variant="ghostBrandIconButton"
-                    class="text-dark-text/70"
-                    @click.stop="
-                      groupsStore.openPromoteUserModal(profile.users.email, profile.users.username)
-                    "
-                  />
+                    :text="CONST_TOOLTIP_PROMOTE_USER ?? 'Promote'"
+                  >
+                    <UButton
+                      icon="i-heroicons-arrow-up-circle"
+                      variant="ghostBrandIconButton"
+                      class="text-dark-text/70"
+                      @click.stop="
+                        groupsStore.openPromoteUserModal(
+                          profile.users.email,
+                          profile.users.username,
+                        )
+                      "
+                    />
+                  </UTooltip>
                 </div>
 
                 <div :class="[appConfig.layout.flexBetween, 'items-end mt-4']">
                   <p class="text-sm font-medium text-dark-text/80">
                     Role: <span class="font-bold capitalize">{{ profile.roles.type }}</span>
                   </p>
-                  <UButton
+                  <UTooltip
                     v-if="isCurrentUserLeader && !isCurrentUser(profile.users.email)"
-                    icon="i-heroicons-user-minus"
-                    variant="ghostDangerIconButton"
-                    @click.stop="groupsStore.openRemoveUserModal(profile.users.email)"
-                  />
+                    :text="CONST_TOOLTIP_REMOVE_USER ?? 'Remove'"
+                  >
+                    <UButton
+                      icon="i-heroicons-user-minus"
+                      variant="ghostDangerIconButton"
+                      @click.stop="groupsStore.openRemoveUserModal(profile.users.email)"
+                    />
+                  </UTooltip>
                 </div>
               </div>
             </div>

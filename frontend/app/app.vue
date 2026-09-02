@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <UApp>
     <Transition name="fade">
       <LoadingScreen v-if="isAppLoading" />
     </Transition>
@@ -7,7 +7,7 @@
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
-  </div>
+  </UApp>
 </template>
 
 <script setup lang="ts">

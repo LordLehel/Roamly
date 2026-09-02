@@ -5,13 +5,19 @@
 
     <!-- Action Group -->
     <div :class="appConfig.layout.actionGroup">
-      <UButton icon="i-heroicons-funnel" :label="CONST_FILTER_LABEL" variant="glassButton" />
-      <UButton
-        icon="i-heroicons-plus"
-        variant="glassIconButton"
-        @click="groupsStore.openCreateModal()"
-      />
-      <UButton icon="i-heroicons-envelope" variant="glassIconButton" to="/groups/invites" />
+      <UTooltip :text="CONST_TOOLTIP_FILTER_GROUPS ?? 'Filter'">
+        <UButton icon="i-heroicons-funnel" :label="CONST_FILTER_LABEL" variant="glassButton" />
+      </UTooltip>
+      <UTooltip :text="CONST_TOOLTIP_CREATE_GROUP ?? 'Create Group'">
+        <UButton
+          icon="i-heroicons-plus"
+          variant="glassIconButton"
+          @click="groupsStore.openCreateModal()"
+        />
+      </UTooltip>
+      <UTooltip :text="CONST_TOOLTIP_VIEW_INVITES ?? 'Invites'">
+        <UButton icon="i-heroicons-envelope" variant="glassIconButton" to="/groups/invites" />
+      </UTooltip>
     </div>
 
     <ClientOnly>
@@ -32,19 +38,23 @@
             @click="router.push(`/groups/${group.uuid}/members`)"
           >
             <div class="absolute top-4 left-4 z-10">
-              <UButton
-                icon="i-heroicons-arrow-right-on-rectangle"
-                variant="ghostDangerIconButton"
-                @click.stop="groupsStore.openLeaveModal(group)"
-              />
+              <UTooltip :text="CONST_TOOLTIP_LEAVE_GROUP ?? 'Leave Group'">
+                <UButton
+                  icon="i-heroicons-arrow-right-on-rectangle"
+                  variant="ghostDangerIconButton"
+                  @click.stop="groupsStore.openLeaveModal(group)"
+                />
+              </UTooltip>
             </div>
 
             <div v-if="group.role.toLowerCase() === 'leader'" class="absolute top-4 right-4 z-10">
-              <UButton
-                icon="i-heroicons-trash"
-                variant="ghostDangerIconButton"
-                @click.stop="groupsStore.openDeleteModal(group)"
-              />
+              <UTooltip :text="CONST_TOOLTIP_DELETE_GROUP ?? 'Delete Group'">
+                <UButton
+                  icon="i-heroicons-trash"
+                  variant="ghostDangerIconButton"
+                  @click.stop="groupsStore.openDeleteModal(group)"
+                />
+              </UTooltip>
             </div>
 
             <div :class="appConfig.layout.cardContent">

@@ -4,7 +4,9 @@
     <h1 :class="appConfig.typography.pageTitle">{{ CONST_INVITES_HEADING }}</h1>
 
     <div :class="appConfig.layout.actionGroup">
-      <UButton icon="i-heroicons-funnel" :label="CONST_FILTER_LABEL" variant="glassButton" />
+      <UTooltip :text="CONST_TOOLTIP_FILTER_INVITES ?? 'Filter'">
+        <UButton icon="i-heroicons-funnel" :label="CONST_FILTER_LABEL" variant="glassButton" />
+      </UTooltip>
     </div>
 
     <ClientOnly>
@@ -25,11 +27,13 @@
             @click="groupsStore.openJoinModal(group)"
           >
             <div class="absolute top-4 right-4 z-10">
-              <UButton
-                icon="i-heroicons-x-mark"
-                variant="ghostDangerIconButton"
-                @click.stop="groupsStore.openDeclineModal(group)"
-              />
+              <UTooltip :text="CONST_TOOLTIP_DECLINE_INVITE ?? 'Decline'">
+                <UButton
+                  icon="i-heroicons-x-mark"
+                  variant="ghostDangerIconButton"
+                  @click.stop="groupsStore.openDeclineModal(group)"
+                />
+              </UTooltip>
             </div>
 
             <div :class="appConfig.layout.cardContent">
