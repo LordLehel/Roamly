@@ -1,4 +1,6 @@
+<!-- frontend/app/components/modals/UserProfileModal.vue -->
 <template>
+  <!-- USER PROFILE MODAL -->
   <UModal
     v-model:open="groupsStore.isUserProfileModalOpen"
     title="User Profile"
@@ -7,14 +9,12 @@
     :ui="{ content: appConfig.layout.modalSizeLg }"
   >
     <template #default><div class="hidden"></div></template>
-
     <template #body>
       <div class="flex flex-col gap-6 py-2 max-h-[70vh] overflow-y-auto pr-2">
-        <!-- User info -->
+        <!-- USER INFO -->
         <div
           class="flex items-center gap-5 p-4 bg-surface-500/40 rounded-2xl ring-1 ring-dark-text/10"
         >
-          <!-- ... Avatar ... -->
           <div class="flex flex-col justify-center gap-1.5 overflow-hidden">
             <h3 :class="appConfig.typography.cardTitle">
               {{ groupsStore.selectedUserProfile?.username || 'Unknown' }}
@@ -33,7 +33,7 @@
           </div>
         </div>
 
-        <!-- Images -->
+        <!-- IMAGES SECTION -->
         <div class="flex flex-col gap-3">
           <h4 class="text-sm font-bold text-dark-text tracking-wide flex items-center gap-2">
             <UIcon name="i-heroicons-photo" class="w-4 h-4 text-brand-500" />
@@ -50,7 +50,7 @@
           </div>
         </div>
 
-        <!-- Documents -->
+        <!-- DOCUMENTS SECTION -->
         <div v-if="groupsStore.selectedUserProfile?.canViewDocuments" class="flex flex-col gap-3">
           <h4 class="text-sm font-bold text-dark-text tracking-wide flex items-center gap-2">
             <UIcon name="i-heroicons-document-text" class="w-4 h-4 text-brand-500" />
@@ -80,6 +80,7 @@
     <template #footer>
       <div :class="appConfig.layout.modalActions" class="justify-end">
         <UButton
+          :class="appConfig.typography.modalActionBtnOk"
           label="Close"
           variant="actionOkButton"
           @click="groupsStore.closeUserProfileModal()"
@@ -90,9 +91,11 @@
 </template>
 
 <script setup lang="ts">
+/* --- IMPORTS --- */
 import { useGroupsStore } from '~/stores/groups.modals.store';
 import { useAppConfig } from '#imports';
 
+/* --- COMPOSABLES --- */
 const appConfig = useAppConfig();
 const groupsStore = useGroupsStore();
 </script>

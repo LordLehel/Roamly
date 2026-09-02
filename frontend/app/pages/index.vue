@@ -16,24 +16,6 @@
   </div>
 </template>
 
-<!-- frontend/app/pages/index.vue -->
-<template>
-  <div>
-    <HomeMobile
-      v-if="isMobile"
-      :feature-cards="featureCards"
-      :active-card="activeCard"
-      @toggle-card="toggleCard"
-    />
-    <HomeDesktop
-      v-else
-      :feature-cards="featureCards"
-      :active-card="activeCard"
-      @toggle-card="toggleCard"
-    />
-  </div>
-</template>
-
 <script setup lang="ts">
 /* --- IMPORTS --- */
 import { ref } from 'vue';

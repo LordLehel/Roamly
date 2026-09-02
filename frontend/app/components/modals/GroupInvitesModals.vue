@@ -24,11 +24,13 @@
       <template #footer>
         <div :class="appConfig.layout.modalActions">
           <UButton
+            :class="appConfig.typography.modalActionBtnCancel"
             :label="CONST_CANCEL_BTN_TEXT"
             variant="actionCancelButton"
             @click="groupsStore.closeJoinModal"
           />
           <UButton
+            :class="appConfig.typography.modalActionBtnOk"
             :label="CONST_JOIN_BTN"
             variant="actionOkButton"
             :loading="isJoining"
@@ -64,11 +66,13 @@
       <template #footer>
         <div :class="appConfig.layout.modalActions">
           <UButton
+            :class="appConfig.typography.modalActionBtnCancel"
             :label="CONST_CANCEL_BTN_TEXT"
             variant="actionCancelButton"
             @click="groupsStore.closeDeclineModal"
           />
           <UButton
+            :class="appConfig.typography.modalActionBtnOk"
             :label="CONST_DECLINE_BTN"
             variant="actionOkButton"
             :loading="isLeaving"
@@ -81,23 +85,24 @@
 </template>
 
 <script setup lang="ts">
+/* --- IMPORTS --- */
 import { computed } from 'vue';
 import { useGroupsStore } from '~/stores/groups.modals.store';
 import { useJoinGroupMutation, useLeaveGroupMutation } from '~/queries/groups.mutation';
 import { useAppConfig } from '#imports';
 
+/* --- COMPOSABLES --- */
 const appConfig = useAppConfig();
 const groupsStore = useGroupsStore();
 
+/* --- API MUTATIONS --- */
 const {
   mutate: joinGroup,
   isLoading: isJoining,
   error: joinApiError,
   reset: resetJoin,
 } = useJoinGroupMutation({
-  onSuccess: () => {
-    groupsStore.closeJoinModal();
-  },
+  onSuccess: () => groupsStore.closeJoinModal(),
 });
 
 const {
@@ -106,11 +111,10 @@ const {
   error: declineApiError,
   reset: resetDecline,
 } = useLeaveGroupMutation({
-  onSuccess: () => {
-    groupsStore.closeDeclineModal();
-  },
+  onSuccess: () => groupsStore.closeDeclineModal(),
 });
 
+/* --- COMPUTED --- */
 const joinErrorText = computed(() =>
   joinApiError.value ? getErrorMessage(joinApiError.value) : '',
 );
@@ -118,6 +122,7 @@ const declineErrorText = computed(() =>
   declineApiError.value ? getErrorMessage(declineApiError.value) : '',
 );
 
+/* --- HANDLERS --- */
 const confirmJoin = () => {
   if (!groupsStore.selectedGroupToJoin) return;
   resetJoin();

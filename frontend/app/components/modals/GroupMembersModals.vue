@@ -31,11 +31,13 @@
       <template #footer>
         <div :class="appConfig.layout.modalActions">
           <UButton
+            :class="appConfig.typography.modalActionBtnCancel"
             :label="CONST_CANCEL_BTN_TEXT"
             variant="actionCancelButton"
             @click="groupsStore.closeUpdateModal()"
           />
           <UButton
+            :class="appConfig.typography.modalActionBtnOk"
             :label="CONST_EDIT_BTN"
             variant="actionOkButton"
             type="submit"
@@ -80,9 +82,7 @@
               class="min-w-40"
             />
           </div>
-          <p v-if="inviteError" :class="appConfig.typography.modalErrorBox">
-            {{ inviteError }}
-          </p>
+          <p v-if="inviteError" :class="appConfig.typography.modalErrorBox">{{ inviteError }}</p>
           <p v-if="inviteSuccess" :class="appConfig.typography.modalSuccessBox">
             {{ inviteSuccess }}
           </p>
@@ -91,12 +91,14 @@
       <template #footer>
         <div :class="appConfig.layout.modalActions">
           <UButton
+            :class="appConfig.typography.modalActionBtnCancel"
             :label="CONST_CANCEL_BTN_TEXT"
             variant="actionCancelButton"
             :disabled="!!inviteSuccess"
             @click="groupsStore.closeInviteModal()"
           />
           <UButton
+            :class="appConfig.typography.modalActionBtnOk"
             :label="CONST_INVITE_BTN"
             variant="actionOkButton"
             type="submit"
@@ -129,11 +131,13 @@
       <template #footer>
         <div :class="appConfig.layout.modalActions">
           <UButton
+            :class="appConfig.typography.modalActionBtnCancel"
             :label="CONST_CANCEL_BTN_TEXT"
             variant="actionCancelButton"
             @click="groupsStore.closeRemoveUserModal()"
           />
           <UButton
+            :class="appConfig.typography.modalActionBtnOk"
             :label="CONST_REMOVE_BTN"
             variant="actionOkButton"
             :loading="isRemoving"
@@ -167,11 +171,13 @@
       <template #footer>
         <div :class="appConfig.layout.modalActions">
           <UButton
+            :class="appConfig.typography.modalActionBtnCancel"
             :label="CONST_CANCEL_BTN_TEXT"
             variant="actionCancelButton"
             @click="groupsStore.closePromoteUserModal()"
           />
           <UButton
+            :class="appConfig.typography.modalActionBtnOk"
             label="Promote"
             variant="actionOkButton"
             :loading="isPromoting"
@@ -180,49 +186,50 @@
         </div>
       </template>
     </UModal>
-  </div>
 
-  <!-- DEMOTE USER MODAL -->
-  <UModal
-    v-model:open="groupsStore.isDemoteUserModalOpen"
-    title="Demote User"
-    :dismissible="false"
-    :close="false"
-    :ui="{ content: appConfig.layout.modalSizeSm }"
-  >
-    <template #default><div class="hidden"></div></template>
-    <template #body>
-      <p :class="appConfig.typography.modalText">
-        Are you sure you want to demote
-        <span :class="appConfig.typography.modalInlineHighlight"
-          >„{{ groupsStore.selectedUserNameToDemote }}”</span
-        >
-        to a regular member? They will lose their leadership privileges.
-      </p>
-      <p v-if="demoteErrorText" :class="appConfig.typography.inputError">
-        {{ demoteErrorText }}
-      </p>
-    </template>
-    <template #footer>
-      <div :class="appConfig.layout.modalActions">
-        <UButton
-          :label="CONST_CANCEL_BTN_TEXT"
-          variant="actionCancelButton"
-          @click="groupsStore.closeDemoteUserModal()"
-        />
-        <UButton
-          label="Demote"
-          variant="actionCancelButton"
-          class="text-orange-500 hover:text-white hover:bg-orange-600 ring-orange-500"
-          :loading="isDemoting"
-          @click="handleDemoteUser"
-        />
-      </div>
-    </template>
-  </UModal>
+    <!-- DEMOTE USER MODAL -->
+    <UModal
+      v-model:open="groupsStore.isDemoteUserModalOpen"
+      title="Demote User"
+      :dismissible="false"
+      :close="false"
+      :ui="{ content: appConfig.layout.modalSizeSm }"
+    >
+      <template #default><div class="hidden"></div></template>
+      <template #body>
+        <p :class="appConfig.typography.modalText">
+          Are you sure you want to demote
+          <span :class="appConfig.typography.modalInlineHighlight"
+            >„{{ groupsStore.selectedUserNameToDemote }}”</span
+          >
+          to a regular member? They will lose their leadership privileges.
+        </p>
+        <p v-if="demoteErrorText" :class="appConfig.typography.inputError">{{ demoteErrorText }}</p>
+      </template>
+      <template #footer>
+        <div :class="appConfig.layout.modalActions">
+          <UButton
+            :class="appConfig.typography.modalActionBtnCancel"
+            :label="CONST_CANCEL_BTN_TEXT"
+            variant="actionCancelButton"
+            @click="groupsStore.closeDemoteUserModal()"
+          />
+          <UButton
+            :class="appConfig.typography.modalActionBtnOk"
+            label="Demote"
+            variant="actionCancelButton"
+            class="text-orange-500 hover:text-white hover:bg-orange-600 ring-orange-500"
+            :loading="isDemoting"
+            @click="handleDemoteUser"
+          />
+        </div>
+      </template>
+    </UModal>
+  </div>
 </template>
 
 <script setup lang="ts">
+/* --- IMPORTS --- */
 import { ref, computed, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useGroupsStore } from '~/stores/groups.modals.store';
@@ -235,49 +242,23 @@ import {
 } from '~/queries/groups.mutation';
 import { useAppConfig } from '#imports';
 
+/* --- COMPOSABLES --- */
 const appConfig = useAppConfig();
 const groupsStore = useGroupsStore();
 const route = useRoute();
-
 const membersGroupUuid = computed(() => route.params.uuid as string);
 
+/* --- UPDATE LOGIC --- */
+const updateGroupName = ref('');
+const updateValidationError = ref('');
 const {
   mutate: updateGroup,
   isLoading: isUpdating,
   error: updateApiError,
   reset: resetUpdate,
 } = useUpdateGroupMutation({
-  onSuccess: () => {
-    groupsStore.closeUpdateModal();
-  },
+  onSuccess: () => groupsStore.closeUpdateModal(),
 });
-const {
-  mutate: inviteUser,
-  isLoading: isInviting,
-  error: inviteApiError,
-  status: inviteStatus,
-  reset: resetInvite,
-} = useInviteUserMutation({
-  onSuccess: () => {
-    setTimeout(() => {
-      groupsStore.closeInviteModal();
-    }, 2000);
-  },
-});
-const {
-  mutate: removeUser,
-  isLoading: isRemoving,
-  error: removeApiError,
-  reset: resetRemove,
-} = useRemoveUserMutation({
-  onSuccess: () => {
-    groupsStore.closeRemoveUserModal();
-  },
-});
-
-// Update Group
-const updateGroupName = ref('');
-const updateValidationError = ref('');
 const updateError = computed(
   () =>
     updateValidationError.value ||
@@ -294,7 +275,6 @@ watch(
     }
   },
 );
-
 const handleUpdateGroup = () => {
   resetUpdate();
   updateValidationError.value = '';
@@ -304,16 +284,27 @@ const handleUpdateGroup = () => {
       validationResult.error.issues[0]?.message ?? CONST_INVALID_DATA_ERROR;
     return;
   }
-
-  if (membersGroupUuid.value) {
+  if (membersGroupUuid.value)
     updateGroup({ groupUuid: membersGroupUuid.value, name: validationResult.data.groupName });
-  }
 };
 
-// Invite User
+/* --- INVITE LOGIC --- */
 const inviteEmail = ref('');
 const inviteRole = ref('invitedMember');
 const inviteValidationError = ref('');
+const roleOptions = [
+  { label: 'Member', value: 'invitedMember' },
+  { label: 'Leader', value: 'invitedLeader' },
+];
+const {
+  mutate: inviteUser,
+  isLoading: isInviting,
+  error: inviteApiError,
+  status: inviteStatus,
+  reset: resetInvite,
+} = useInviteUserMutation({
+  onSuccess: () => setTimeout(() => groupsStore.closeInviteModal(), 2000),
+});
 const inviteError = computed(
   () =>
     inviteValidationError.value ||
@@ -322,10 +313,6 @@ const inviteError = computed(
 const inviteSuccess = computed(() =>
   inviteStatus.value === 'success' ? CONST_INVITE_SUCCESS_MSG : '',
 );
-const roleOptions = [
-  { label: 'Member', value: 'invitedMember' },
-  { label: 'Leader', value: 'invitedLeader' },
-];
 
 watch(
   () => groupsStore.isInviteModalOpen,
@@ -337,7 +324,6 @@ watch(
     }
   },
 );
-
 const handleInviteUser = () => {
   resetInvite();
   inviteValidationError.value = '';
@@ -350,8 +336,7 @@ const handleInviteUser = () => {
       validationResult.error.issues[0]?.message ?? CONST_INVALID_DATA_ERROR;
     return;
   }
-
-  if (membersGroupUuid.value) {
+  if (membersGroupUuid.value)
     inviteUser({
       groupUuid: membersGroupUuid.value,
       data: {
@@ -359,10 +344,17 @@ const handleInviteUser = () => {
         inviteWithRole: validationResult.data.role,
       },
     });
-  }
 };
 
-// Remove User
+/* --- REMOVE LOGIC --- */
+const {
+  mutate: removeUser,
+  isLoading: isRemoving,
+  error: removeApiError,
+  reset: resetRemove,
+} = useRemoveUserMutation({
+  onSuccess: () => groupsStore.closeRemoveUserModal(),
+});
 const removeErrorText = computed(() =>
   removeApiError.value ? getErrorMessage(removeApiError.value) : '',
 );
@@ -373,25 +365,21 @@ watch(
     if (!isOpen) resetRemove();
   },
 );
-
 const handleRemoveUser = () => {
   if (!groupsStore.selectedUserEmailToRemove || !membersGroupUuid.value) return;
   resetRemove();
   removeUser({ groupUuid: membersGroupUuid.value, email: groupsStore.selectedUserEmailToRemove });
 };
 
-// Promote User
+/* --- PROMOTE LOGIC --- */
 const {
   mutate: promoteUser,
   isLoading: isPromoting,
   error: promoteApiError,
   reset: resetPromote,
 } = usePromoteUserMutation({
-  onSuccess: () => {
-    groupsStore.closePromoteUserModal();
-  },
+  onSuccess: () => groupsStore.closePromoteUserModal(),
 });
-
 const promoteErrorText = computed(() =>
   promoteApiError.value ? getErrorMessage(promoteApiError.value) : '',
 );
@@ -402,28 +390,21 @@ watch(
     if (!isOpen) resetPromote();
   },
 );
-
 const handlePromoteUser = () => {
   if (!groupsStore.selectedUserEmailToPromote || !membersGroupUuid.value) return;
   resetPromote();
-  promoteUser({
-    groupUuid: membersGroupUuid.value,
-    email: groupsStore.selectedUserEmailToPromote,
-  });
+  promoteUser({ groupUuid: membersGroupUuid.value, email: groupsStore.selectedUserEmailToPromote });
 };
 
-// Demote User
+/* --- DEMOTE LOGIC --- */
 const {
   mutate: demoteUser,
   isLoading: isDemoting,
   error: demoteApiError,
   reset: resetDemote,
 } = useDemoteUserMutation({
-  onSuccess: () => {
-    groupsStore.closeDemoteUserModal();
-  },
+  onSuccess: () => groupsStore.closeDemoteUserModal(),
 });
-
 const demoteErrorText = computed(() =>
   demoteApiError.value ? getErrorMessage(demoteApiError.value) : '',
 );
@@ -434,13 +415,9 @@ watch(
     if (!isOpen) resetDemote();
   },
 );
-
 const handleDemoteUser = () => {
   if (!groupsStore.selectedUserEmailToDemote || !membersGroupUuid.value) return;
   resetDemote();
-  demoteUser({
-    groupUuid: membersGroupUuid.value,
-    email: groupsStore.selectedUserEmailToDemote,
-  });
+  demoteUser({ groupUuid: membersGroupUuid.value, email: groupsStore.selectedUserEmailToDemote });
 };
 </script>

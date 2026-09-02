@@ -124,7 +124,7 @@ export default defineAppConfig({
       slots: {
         overlay: 'fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm',
         content:
-          'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[101] w-full !bg-surface-500/70 backdrop-blur-2xl !rounded-[25px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] !ring-1 !ring-surface-500/50 !divide-none !border-0 focus:!outline-none overflow-hidden flex flex-col',
+          'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[101] w-[95%] sm:w-full !bg-surface-500/70 backdrop-blur-2xl !rounded-[25px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] !ring-1 !ring-surface-500/50 !divide-none !border-0 focus:!outline-none overflow-hidden flex flex-col',
         header: 'p-4 sm:px-6 !border-0 !ring-0',
         body: 'p-4 sm:p-6 !border-0 !ring-0',
         footer: 'p-4 sm:px-6 !border-0 !ring-0',
@@ -186,6 +186,10 @@ export default defineAppConfig({
     memberCardInner: 'flex items-start gap-4 w-full h-full',
     memberCardContent: 'flex-1 flex flex-col justify-between h-full min-h-16',
 
+    // File input
+    fileInput:
+      'w-full text-sm text-dark-text/70 file:mr-4 file:py-2 file:px-6 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-transparent file:text-brand-500 file:ring-1 file:ring-brand-500/40 hover:file:bg-brand-500/20 file:transition-colors file:cursor-pointer cursor-pointer',
+
     // Home layout
     homeWrapper: 'flex-1 flex flex-col items-center px-6 py-12 gap-24 relative z-10 w-full',
     homeHeroSection: 'flex flex-col items-center text-center mt-10 max-w-3xl scroll-mt-24',
@@ -195,20 +199,17 @@ export default defineAppConfig({
 
     // Header layout
     headerBase:
-      'flex items-center justify-between px-6 py-4 bg-surface-500/70 backdrop-blur-md shadow-sm z-50 border-b border-dark-text/10',
+      'flex items-center justify-between px-4 md:px-6 py-4 bg-surface-500/70 backdrop-blur-md shadow-sm z-50 border-b border-dark-text/10',
     headerSticky: 'sticky top-0',
     headerRelative: 'relative',
     logoWrapper: 'flex items-center gap-2 text-dark-text hover:opacity-80 transition-opacity w-max',
     navWrapper: 'hidden md:flex gap-8 font-bold tracking-wide',
-    headerRight: 'flex-1 flex justify-end items-center gap-4',
+    headerRight: 'flex-1 flex justify-end items-center gap-2 md:gap-4',
 
     // Modal layout
     modalForm: 'flex flex-col gap-4 py-2',
-    modalActions: 'flex items-center justify-between w-full',
-    fileInput:
-      'w-full text-sm text-dark-text/70 file:mr-4 file:py-2 file:px-6 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-transparent file:text-brand-500 file:ring-1 file:ring-brand-500/40 hover:file:bg-brand-500/20 file:transition-colors file:cursor-pointer cursor-pointer',
-    loadingOverlay:
-      'fixed inset-0 z-[9999] bg-light-bg/80 backdrop-blur-md flex flex-col items-center justify-center gap-6',
+    modalActions:
+      'flex flex-col-reverse sm:flex-row items-center justify-between w-full gap-3 sm:gap-0',
     modalSizeSm: 'w-full sm:max-w-md',
     modalSizeMd: 'w-full sm:max-w-lg',
     modalSizeLg: 'w-full sm:max-w-3xl',
@@ -237,7 +238,7 @@ export default defineAppConfig({
     homeSectionText: 'mt-8 text-lg text-surface-500 font-medium opacity-90 leading-relaxed',
 
     // Header
-    logoText: 'text-xl font-semibold tracking-wider',
+    logoText: 'text-lg md:text-xl font-semibold tracking-wider',
     navLink: 'hover:text-brand-500 hover:underline underline-offset-4 transition-colors',
 
     // Modal
@@ -248,6 +249,8 @@ export default defineAppConfig({
       'text-xs font-semibold text-error-500 mt-2 bg-error-500/10 p-2 rounded border border-error-500/20',
     modalSuccessBox:
       'text-xs font-semibold text-brand-500 mt-2 bg-brand-500/10 p-2 rounded border border-brand-500/20',
+    modalActionBtnCancel: 'w-full sm:w-auto',
+    modalActionBtnOk: 'w-full sm:w-auto',
     inputLabel: 'block text-sm font-medium text-dark-text mb-1',
     inputError: 'text-xs text-error-500 mt-1',
   },

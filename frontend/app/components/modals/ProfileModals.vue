@@ -1,7 +1,7 @@
 <!-- frontend/app/components/modals/ProfileModals.vue -->
 <template>
   <div>
-    <!-- Edit Username -->
+    <!-- EDIT USERNAME MODAL -->
     <UModal
       v-model:open="profileStore.isEditUsernameModalOpen"
       :title="CONST_EDIT_USERNAME_TITLE"
@@ -26,11 +26,13 @@
       <template #footer>
         <div :class="appConfig.layout.modalActions">
           <UButton
+            :class="appConfig.typography.modalActionBtnCancel"
             :label="CONST_CANCEL_BTN_TEXT"
             variant="actionCancelButton"
             @click="profileStore.closeEditUsernameModal()"
           />
           <UButton
+            :class="appConfig.typography.modalActionBtnOk"
             :label="CONST_EDIT_BTN"
             variant="actionOkButton"
             type="submit"
@@ -41,7 +43,7 @@
       </template>
     </UModal>
 
-    <!-- Edit Email -->
+    <!-- EDIT EMAIL MODAL -->
     <UModal
       v-model:open="profileStore.isEditEmailModalOpen"
       :title="CONST_EDIT_EMAIL_TITLE"
@@ -66,11 +68,13 @@
       <template #footer>
         <div :class="appConfig.layout.modalActions">
           <UButton
+            :class="appConfig.typography.modalActionBtnCancel"
             :label="CONST_CANCEL_BTN_TEXT"
             variant="actionCancelButton"
             @click="profileStore.closeEditEmailModal()"
           />
           <UButton
+            :class="appConfig.typography.modalActionBtnOk"
             :label="CONST_EDIT_BTN"
             variant="actionOkButton"
             type="submit"
@@ -81,7 +85,7 @@
       </template>
     </UModal>
 
-    <!-- Change Password -->
+    <!-- CHANGE PASSWORD MODAL -->
     <UModal
       v-model:open="profileStore.isChangePasswordModalOpen"
       :title="CONST_CHANGE_PASSWORD_TITLE"
@@ -110,11 +114,13 @@
       <template #footer>
         <div :class="appConfig.layout.modalActions">
           <UButton
+            :class="appConfig.typography.modalActionBtnCancel"
             :label="CONST_CANCEL_BTN_TEXT"
             variant="actionCancelButton"
             @click="profileStore.closeChangePasswordModal()"
           />
           <UButton
+            :class="appConfig.typography.modalActionBtnOk"
             :label="CONST_EDIT_BTN"
             variant="actionOkButton"
             type="submit"
@@ -125,7 +131,7 @@
       </template>
     </UModal>
 
-    <!-- Delete Account -->
+    <!-- DELETE ACCOUNT MODAL -->
     <UModal
       v-model:open="profileStore.isDeleteModalOpen"
       :title="CONST_DELETE_ACCOUNT_TITLE"
@@ -141,11 +147,13 @@
       <template #footer>
         <div :class="appConfig.layout.modalActions">
           <UButton
+            :class="appConfig.typography.modalActionBtnCancel"
             :label="CONST_CANCEL_BTN_TEXT"
             variant="actionCancelButton"
             @click="profileStore.closeDeleteModal()"
           />
           <UButton
+            :class="appConfig.typography.modalActionBtnOk"
             :label="CONST_DELETE_BTN"
             variant="actionOkButton"
             :loading="isDeleting"
@@ -155,7 +163,7 @@
       </template>
     </UModal>
 
-    <!-- Upload Picture -->
+    <!-- UPLOAD PICTURE MODAL -->
     <UModal
       v-model:open="profileStore.isUploadPictureModalOpen"
       :title="CONST_UPLOAD_PICTURE_TITLE"
@@ -187,11 +195,13 @@
       <template #footer>
         <div :class="appConfig.layout.modalActions">
           <UButton
+            :class="appConfig.typography.modalActionBtnCancel"
             :label="CONST_CANCEL_BTN_TEXT"
             variant="actionCancelButton"
             @click="profileStore.closeUploadPictureModal()"
           />
           <UButton
+            :class="appConfig.typography.modalActionBtnOk"
             :label="CONST_UPLOAD_BTN"
             variant="actionOkButton"
             type="submit"
@@ -202,7 +212,7 @@
       </template>
     </UModal>
 
-    <!-- View Picture Full -->
+    <!-- VIEW PICTURE FULL MODAL -->
     <UModal
       v-model:open="profileStore.isViewPictureModalOpen"
       :title="CONST_VIEW_PICTURE_TITLE"
@@ -227,6 +237,7 @@
       <template #footer>
         <div class="flex items-center justify-end w-full">
           <UButton
+            :class="appConfig.typography.modalActionBtnOk"
             label="OK"
             variant="actionOkButton"
             @click="profileStore.closeViewPictureModal()"
@@ -235,7 +246,7 @@
       </template>
     </UModal>
 
-    <!-- Upload Document (Dummy) -->
+    <!-- UPLOAD DOCUMENT MODAL -->
     <UModal
       v-model:open="profileStore.isUploadDocumentModalOpen"
       :title="CONST_UPLOAD_DOCUMENT_TITLE"
@@ -280,11 +291,13 @@
       <template #footer>
         <div :class="appConfig.layout.modalActions">
           <UButton
+            :class="appConfig.typography.modalActionBtnCancel"
             :label="CONST_CANCEL_BTN_TEXT"
             variant="actionCancelButton"
             @click="profileStore.closeUploadDocumentModal()"
           />
           <UButton
+            :class="appConfig.typography.modalActionBtnOk"
             :label="CONST_UPLOAD_BTN"
             variant="actionOkButton"
             type="submit"
@@ -297,6 +310,9 @@
 </template>
 
 <script setup lang="ts">
+/* ==========================================
+   IMPORTS & SETUP
+========================================== */
 import { ref, computed, watch, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuth } from '~/composables/useAuth';
@@ -320,13 +336,16 @@ const profileStore = useProfileStore();
 const router = useRouter();
 const { logout } = useAuth();
 
+/* ==========================================
+   SHARED HELPERS
+========================================== */
 const getErrorMessage = (error: unknown) => {
   const apiErr = error as ApiError;
   const msg = apiErr?.response?._data?.message;
   return typeof msg === 'string' ? msg : CONST_INVALID_DATA_ERROR;
 };
 
-// ---- MUTATIONS ----
+const editFormData = reactive({ username: '', email: '' });
 
 const {
   mutate: updateProfile,
@@ -340,49 +359,11 @@ const {
   },
 });
 
-const {
-  mutate: changePwd,
-  isLoading: isChangingPwd,
-  error: pwdApiError,
-  reset: resetPwd,
-} = useChangePasswordMutation({
-  onSuccess: () => {
-    profileStore.closeChangePasswordModal();
-  },
-});
-
-const {
-  mutate: deleteProfile,
-  isLoading: isDeleting,
-  error: deleteApiError,
-  reset: resetDelete,
-} = useDeleteProfileMutation({
-  onSuccess: () => {
-    profileStore.closeDeleteModal();
-    logout();
-    router.push('/login');
-  },
-});
-
-const {
-  mutate: uploadPicture,
-  isLoading: isUploadingPic,
-  error: uploadPicApiError,
-  reset: resetUploadPic,
-} = useUploadProfilePictureMutation({
-  onSuccess: () => {
-    profileStore.closeUploadPictureModal();
-  },
-});
-
-// ---- STATE & LOGIC ----
-
-const editFormData = reactive({ username: '', email: '' });
-const pwdData = reactive({ oldPassword: '', newPassword: '' });
-const selectedPicture = ref<File | null>(null);
-
-// -- Username Edit --
+/* ==========================================
+   FEATURE: EDIT USERNAME
+========================================== */
 const usernameValidationError = ref('');
+
 const usernameError = computed(
   () =>
     usernameValidationError.value ||
@@ -414,8 +395,11 @@ const handleUpdateUsername = () => {
   updateProfile({ username: validationResult.data.username });
 };
 
-// -- Email Edit --
+/* ==========================================
+   FEATURE: EDIT EMAIL
+========================================== */
 const emailValidationError = ref('');
+
 const emailError = computed(
   () =>
     emailValidationError.value ||
@@ -447,8 +431,23 @@ const handleUpdateEmail = () => {
   updateProfile({ email: validationResult.data.email });
 };
 
-// -- Password Change --
+/* ==========================================
+   FEATURE: CHANGE PASSWORD
+========================================== */
+const pwdData = reactive({ oldPassword: '', newPassword: '' });
 const pwdValidationError = ref('');
+
+const {
+  mutate: changePwd,
+  isLoading: isChangingPwd,
+  error: pwdApiError,
+  reset: resetPwd,
+} = useChangePasswordMutation({
+  onSuccess: () => {
+    profileStore.closeChangePasswordModal();
+  },
+});
+
 const passwordError = computed(
   () => pwdValidationError.value || (pwdApiError.value ? getErrorMessage(pwdApiError.value) : ''),
 );
@@ -486,7 +485,22 @@ const handleChangePassword = () => {
   });
 };
 
-// -- Profile Delete --
+/* ==========================================
+   FEATURE: DELETE ACCOUNT
+========================================== */
+const {
+  mutate: deleteProfile,
+  isLoading: isDeleting,
+  error: deleteApiError,
+  reset: resetDelete,
+} = useDeleteProfileMutation({
+  onSuccess: () => {
+    profileStore.closeDeleteModal();
+    logout();
+    router.push('/login');
+  },
+});
+
 const deleteError = computed(() =>
   deleteApiError.value ? getErrorMessage(deleteApiError.value) : '',
 );
@@ -503,8 +517,23 @@ const handleDeleteProfile = () => {
   deleteProfile();
 };
 
-// -- Profile Picture Upload --
+/* ==========================================
+   FEATURE: UPLOAD PICTURE
+========================================== */
+const selectedPicture = ref<File | null>(null);
 const uploadPicValidationError = ref('');
+
+const {
+  mutate: uploadPicture,
+  isLoading: isUploadingPic,
+  error: uploadPicApiError,
+  reset: resetUploadPic,
+} = useUploadProfilePictureMutation({
+  onSuccess: () => {
+    profileStore.closeUploadPictureModal();
+  },
+});
+
 const uploadPicError = computed(
   () =>
     uploadPicValidationError.value ||
