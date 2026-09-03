@@ -17,6 +17,7 @@ model event_participants {
 
 model events {
   event_id           Int                  @id @default(autoincrement())
+  uuid               String               @unique @default(uuid()) @db.Uuid
   group_id           Int
   creator_id         Int
   visibility_id      Int
