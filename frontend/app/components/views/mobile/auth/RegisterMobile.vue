@@ -1,0 +1,151 @@
+<!-- frontend/app/components/views/mobile/auth/RegisterMobile.vue -->
+<template>
+  <div :class="[appConfig.layout.authWrapper, 'px-4 py-6']">
+    <UCard variant="glass">
+      <!-- TITLE -->
+      <div :class="appConfig.typography.authTitleWrapper">
+        <h1 :class="appConfig.typography.authTitle">{{ CONST_REGISTER_HEADING ?? 'Register' }}</h1>
+      </div>
+
+      <!-- FORM -->
+      <UForm
+        :schema="registerSchema"
+        :state="form"
+        :class="appConfig.layout.formWrapper"
+        @submit="onSubmit"
+      >
+        <UFormField name="email" :label="CONST_EMAIL_LABEL ?? 'Email'">
+          <template #default="{ error: fieldError }">
+            <UInput
+              v-model="form.email"
+              type="email"
+              placeholder="ex. sir_real_99@roamly.com"
+              :variant="fieldError ? 'glassError' : 'glass'"
+            />
+          </template>
+        </UFormField>
+
+        <UFormField name="username" :label="CONST_USERNAME_LABEL ?? 'Username'">
+          <template #default="{ error: fieldError }">
+            <UInput
+              v-model="form.username"
+              type="text"
+              placeholder="ex. sir_real_99"
+              :variant="fieldError ? 'glassError' : 'glass'"
+            />
+          </template>
+        </UFormField>
+
+        <UFormField name="phone_number" :label="CONST_PHONE_LABEL ?? 'Phone'">
+          <template #default="{ error: fieldError }">
+            <UInput
+              v-model="form.phone_number"
+              type="tel"
+              placeholder="ex. +40 712 345 678"
+              :variant="fieldError ? 'glassError' : 'glass'"
+            />
+          </template>
+        </UFormField>
+
+        <UFormField name="password" :label="CONST_PASSWORD_LABEL ?? 'Password'">
+          <template #default="{ error: fieldError }">
+            <UInput
+              v-model="form.password"
+              type="password"
+              placeholder="********"
+              :variant="fieldError ? 'glassError' : 'glass'"
+            />
+          </template>
+        </UFormField>
+
+        <UFormField name="repeatPassword" :label="CONST_REPEAT_PASSWORD_LABEL ?? 'Repeat Password'">
+          <template #default="{ error: fieldError }">
+            <UInput
+              v-model="form.repeatPassword"
+              type="password"
+              placeholder="********"
+              :variant="fieldError ? 'glassError' : 'glass'"
+            />
+          </template>
+        </UFormField>
+
+        <div v-if="error" :class="appConfig.typography.formStatusError">
+          {{ getErrorMessage(error) }}
+        </div>
+        <div v-if="status === 'success'" :class="appConfig.typography.formStatusSuccess">
+          {{ CONST_REGISTER_SUCCESS ?? 'Success!' }}
+        </div>
+
+        <!-- ACTIONS (Mobilos elrendezés: egymás alatt, teljes szélességgel) -->
+        <div class="flex flex-col-reverse gap-4 pt-6 w-full">
+          <UButton
+            :label="CONST_CANCEL_BTN_TEXT ?? 'Cancel'"
+            variant="actionCancelButton"
+            :disabled="isLoading"
+            class="w-full"
+            @click="clearForm"
+          />
+          <UButton
+            type="submit"
+            :label="CONST_REGISTER_TITLE ?? 'Register'"
+            variant="actionOkButton"
+            class="w-full"
+            :loading="isLoading"
+          />
+        </div>
+      </UForm>
+    </UCard>
+
+    <div :class="appConfig.layout.singleButtonWrapper">
+      <UButton to="/login" label="Log in instead" variant="actionOkButton" class="w-full" />
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+/* --- IMPORTS --- */
+import { reactive } from 'vue';
+import { useAppConfig } from '#imports';
+import type { FormSubmitEvent } from '#ui/types';
+import { registerSchema, type RegisterFormState } from '~/utils/schemas/register.schema';
+import { getErrorMessage } from '~/utils/error.utils';
+import type { ApiError } from '~/types/apiError.type';
+
+/* --- COMPOSABLES --- */
+const appConfig = useAppConfig();
+
+/* --- PROPS & EMITS --- */
+defineProps<{
+  isLoading: boolean;
+  error: ApiError | Error | null | undefined;
+  status: 'idle' | 'pending' | 'success' | 'error';
+}>();
+
+const emit = defineEmits<{
+  (e: 'submit', data: RegisterFormState): void;
+}>();
+
+/* --- COMPONENT STATE --- */
+const form = reactive<RegisterFormState>({
+  email: '',
+  username: '',
+  phone_number: '',
+  password: '',
+  repeatPassword: '',
+});
+
+/* --- EVENT HANDLERS --- */
+const clearForm = () => {
+  Object.assign(form, {
+    email: '',
+    username: '',
+    phone_number: '',
+    password: '',
+    repeatPassword: '',
+  });
+};
+
+const onSubmit = (event: FormSubmitEvent<RegisterFormState>) => {
+  emit('submit', event.data);
+};
+</script>

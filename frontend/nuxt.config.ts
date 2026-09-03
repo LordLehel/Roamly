@@ -10,6 +10,7 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     '@nuxt/ui',
     '@nuxtjs/google-fonts',
+    '@nuxtjs/device',
   ],
 
   imports: {

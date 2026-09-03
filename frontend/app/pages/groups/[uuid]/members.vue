@@ -1,242 +1,71 @@
 <!-- frontend/app/pages/groups/[uuid]/members.vue -->
 <template>
-  <!-- MAIN CONTAINER: Height is adjusted to ensure navbar and footer fit perfectly without page scrolling -->
-  <div
-    :class="appConfig.layout.pageWrapper"
-    class="h-[calc(100vh-9rem)] py-2! overflow-hidden flex flex-col gap-4"
-  >
-    <!-- HEADER & SEARCH SECTION (20%) -->
-    <div
-      class="flex-2 min-h-0 flex flex-col justify-center gap-4 overflow-y-auto pr-2 scrollbar-none [&::-webkit-scrollbar]:hidden"
-    >
-      <div :class="appConfig.layout.pageHeader">
-        <div :class="appConfig.layout.actionGroup" class="flex-1 justify-start">
-          <UTooltip v-if="isCurrentUserLeader" :text="CONST_TOOLTIP_DELETE_GROUP ?? 'Delete Group'">
-            <UButton
-              icon="i-heroicons-trash"
-              variant="glassIconButtonDanger"
-              @click="handleDeleteCurrentGroup"
-            />
-          </UTooltip>
-          <UTooltip :text="CONST_TOOLTIP_LEAVE_GROUP ?? 'Leave Group'">
-            <UButton
-              icon="i-heroicons-arrow-right-on-rectangle"
-              variant="glassIconButtonDanger"
-              @click="handleLeaveCurrentGroup"
-            />
-          </UTooltip>
-        </div>
+  <div>
+    <MembersMobile
+      v-if="isMobile"
+      :group-infos="groupInfos"
+      :filtered-members="filteredMembers"
+      :is-loading="isLoading"
+      :error="error"
+      :search-query="searchQuery"
+      :is-current-user-leader="isCurrentUserLeader"
+      :current-user-email="currentUser?.email"
+      @update:search-query="searchQuery = $event"
+      @delete-group="handleDeleteCurrentGroup"
+      @leave-group="handleLeaveCurrentGroup"
+      @open-profile="handleOpenProfile"
+    />
 
-        <div class="flex flex-col items-center justify-center shrink-0">
-          <div class="flex items-center gap-2">
-            <h1 :class="appConfig.typography.pageTitle">
-              {{ groupInfos?.name || CONST_LOADING_TEXT }}
-            </h1>
-            <UTooltip v-if="isCurrentUserLeader" :text="CONST_TOOLTIP_EDIT_GROUP ?? 'Edit Group'">
-              <UButton
-                icon="i-heroicons-pencil"
-                variant="ghostBrandIconButton"
-                @click="groupsStore.openUpdateModal(groupInfos?.name || '')"
-              />
-            </UTooltip>
-          </div>
-          <p :class="appConfig.typography.pageSubtitle">Members</p>
-        </div>
-
-        <div :class="appConfig.layout.actionGroup" class="flex-1 justify-end">
-          <UTooltip :text="CONST_TOOLTIP_MEMBERS ?? 'Members'">
-            <UButton icon="i-heroicons-users" variant="glassIconButtonBrand" to="/" />
-          </UTooltip>
-          <UTooltip :text="CONST_TOOLTIP_CALENDAR ?? 'Calendar'">
-            <UButton icon="i-heroicons-calendar" variant="glassIconButton" to="/" />
-          </UTooltip>
-          <UTooltip :text="CONST_TOOLTIP_PHOTOS ?? 'Photos'">
-            <UButton icon="i-heroicons-photo" variant="glassIconButton" to="/" />
-          </UTooltip>
-          <UTooltip :text="CONST_TOOLTIP_DOCUMENTS ?? 'Documents'">
-            <UButton icon="i-heroicons-document-text" variant="glassIconButton" to="/" />
-          </UTooltip>
-        </div>
-      </div>
-
-      <div :class="appConfig.layout.actionGroup">
-        <UInput
-          v-model="searchQuery"
-          icon="i-heroicons-magnifying-glass"
-          placeholder="Filter members..."
-          variant="search"
-        />
-        <UTooltip v-if="isCurrentUserLeader" :text="CONST_TOOLTIP_INVITE_USER ?? 'Invite User'">
-          <UButton
-            icon="i-heroicons-user-plus"
-            variant="glassIconButtonHighlight"
-            @click="groupsStore.openInviteModal()"
-          />
-        </UTooltip>
-      </div>
-    </div>
-
-    <!-- MEMBERS LIST SECTION (60%) -->
-    <div
-      class="flex-6 min-h-0 overflow-y-auto pr-2 relative z-0 scrollbar-none [&::-webkit-scrollbar]:hidden"
-    >
-      <ClientOnly>
-        <div v-if="isLoading" :class="appConfig.typography.statusLoading">
-          {{ CONST_LOADING_TEXT }}
-        </div>
-        <div v-else-if="error" :class="appConfig.typography.statusError">
-          {{ CONST_FETCH_ERROR_TEXT }}
-        </div>
-
-        <div v-else-if="filteredMembers?.length" :class="[appConfig.layout.cardGrid]">
-          <UCard
-            v-for="profile in filteredMembers"
-            :key="profile.users.email"
-            variant="interactiveGlass"
-            class="relative cursor-pointer"
-            @click="handleOpenProfile(profile)"
-          >
-            <div :class="appConfig.layout.memberCardInner">
-              <div class="shrink-0 pt-1">
-                <UAvatar
-                  :alt="profile.users.username"
-                  size="profileLg"
-                  icon="i-heroicons-user"
-                  class="w-16 h-16"
-                />
-              </div>
-
-              <div :class="appConfig.layout.memberCardContent">
-                <div :class="appConfig.layout.flexBetween">
-                  <div>
-                    <h3 :class="appConfig.typography.cardTitle">{{ profile.users.username }}</h3>
-                    <p
-                      v-if="isCurrentUser(profile.users.email)"
-                      class="text-sm text-left font-bold text-brand-500 mt-0.5"
-                    >
-                      You
-                    </p>
-                  </div>
-
-                  <div class="flex items-center gap-1">
-                    <UTooltip
-                      v-if="isCurrentUserLeader && profile.roles.type.toLowerCase() === 'member'"
-                      text="Promote to Leader"
-                    >
-                      <UButton
-                        icon="i-heroicons-arrow-up-circle"
-                        variant="ghostBrandIconButton"
-                        class="text-dark-text/70"
-                        @click.stop="
-                          groupsStore.openPromoteUserModal(
-                            profile.users.email,
-                            profile.users.username,
-                          )
-                        "
-                      />
-                    </UTooltip>
-
-                    <UTooltip
-                      v-if="
-                        isCurrentUserLeader &&
-                        profile.roles.type.toLowerCase() === 'leader' &&
-                        !isCurrentUser(profile.users.email)
-                      "
-                      text="Demote to Member"
-                    >
-                      <UButton
-                        icon="i-heroicons-arrow-down-circle"
-                        variant="ghostBrandIconButton"
-                        class="text-dark-text/70 hover:text-orange-500"
-                        @click.stop="
-                          groupsStore.openDemoteUserModal(
-                            profile.users.email,
-                            profile.users.username,
-                          )
-                        "
-                      />
-                    </UTooltip>
-                  </div>
-                </div>
-
-                <div :class="[appConfig.layout.flexBetween, 'items-end mt-4']">
-                  <p class="text-sm font-medium text-dark-text/80">
-                    Role: <span class="font-bold capitalize">{{ profile.roles.type }}</span>
-                  </p>
-                  <UTooltip
-                    v-if="
-                      isCurrentUserLeader &&
-                      !isCurrentUser(profile.users.email) &&
-                      profile.roles.type.toLowerCase() === 'member'
-                    "
-                    :text="CONST_TOOLTIP_REMOVE_USER ?? 'Remove'"
-                  >
-                    <UButton
-                      icon="i-heroicons-user-minus"
-                      variant="ghostDangerIconButton"
-                      @click.stop="groupsStore.openRemoveUserModal(profile.users.email)"
-                    />
-                  </UTooltip>
-                </div>
-              </div>
-            </div>
-          </UCard>
-        </div>
-      </ClientOnly>
-    </div>
-
-    <!-- UPCOMING EVENTS SECTION (20%) -->
-    <div
-      class="flex-2 min-h-0 flex flex-col shadow-md bg-surface-500/40 rounded-2xl ring-1 ring-dark-text/10 p-4"
-    >
-      <h2 :class="appConfig.typography.cardTitle" class="shrink-0 mb-3 text-surface-600">
-        Upcoming events
-      </h2>
-
-      <div class="flex-1 overflow-y-auto min-h-0 pr-2 scrollbar-none [&::-webkit-scrollbar]:hidden">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 w-full">
-          <UCard v-for="i in 3" :key="i" variant="glass" class="bg-surface-500/70">
-            <div
-              class="flex items-center justify-between border-b border-dark-text/10 pb-1.5 mb-1.5"
-            >
-              <h3 class="text-sm font-bold text-dark-text truncate">Event Name {{ i }}</h3>
-              <UIcon name="i-heroicons-calendar" class="w-4 h-4 text-brand-500 shrink-0" />
-            </div>
-            <div class="flex justify-between items-center text-xs text-dark-text/80">
-              <span>06.15.2023 - 18:00</span>
-              <span class="truncate ml-2 text-right">Sample Location {{ i }}</span>
-            </div>
-          </UCard>
-        </div>
-      </div>
-    </div>
+    <MembersDesktop
+      v-else
+      :group-infos="groupInfos"
+      :filtered-members="filteredMembers"
+      :is-loading="isLoading"
+      :error="error"
+      :search-query="searchQuery"
+      :is-current-user-leader="isCurrentUserLeader"
+      :current-user-email="currentUser?.email"
+      @update:search-query="searchQuery = $event"
+      @delete-group="handleDeleteCurrentGroup"
+      @leave-group="handleLeaveCurrentGroup"
+      @open-profile="handleOpenProfile"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { useAppConfig } from '#imports';
+/* --- IMPORTS --- */
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
+import { useScreenSize } from '~/composables/useScreenSize';
+import { useProtectedPage } from '~/composables/useProtectedPage';
 import { useGroupInfosQuery } from '~/queries/groups.query';
 import { useCurrentUserQuery } from '~/queries/user.query';
 import { useGroupsStore } from '~/stores/groups.modals.store';
 import type { GroupOutDto, GroupProfileDto } from '~/types/groups.type';
+import MembersMobile from '~/components/views/mobile/groups/MembersMobile.vue';
+import MembersDesktop from '~/components/views/desktop/groups/MembersDesktop.vue';
 
+/* --- PAGE CONFIGURATION --- */
 definePageMeta({ layout: 'general', middleware: ['auth'] });
 
-const appConfig = useAppConfig();
+/* --- COMPOSABLES & STORES --- */
+useProtectedPage();
+const { isMobile } = useScreenSize();
 const route = useRoute();
 const groupsStore = useGroupsStore();
 
+/* --- STATE & COMPUTED --- */
 const groupUuid = computed(() => route.params.uuid as string);
-const { data: currentUser } = useCurrentUserQuery();
-const { data: groupInfos, isLoading, error } = useGroupInfosQuery(groupUuid);
-
-// Filter logic
 const searchQuery = ref('');
 const debouncedQuery = ref('');
 let debounceTimeout: ReturnType<typeof setTimeout>;
 
+/* --- API QUERIES --- */
+const { data: currentUser } = useCurrentUserQuery();
+const { data: groupInfos, isLoading, error } = useGroupInfosQuery(groupUuid);
+
+/* --- FILTER LOGIC --- */
 watch(searchQuery, (newVal) => {
   clearTimeout(debounceTimeout);
   debounceTimeout = setTimeout(() => {
@@ -256,6 +85,7 @@ const filteredMembers = computed(() => {
   );
 });
 
+/* --- PERMISSIONS --- */
 const isCurrentUserLeader = computed(() => {
   const profile = groupInfos.value?.group_profiles?.find(
     (p) => p.users.email === currentUser.value?.email,
@@ -263,10 +93,7 @@ const isCurrentUserLeader = computed(() => {
   return profile?.roles.type.toLowerCase() === 'leader';
 });
 
-const isCurrentUser = computed(() => {
-  return (email: string) => currentUser.value?.email === email;
-});
-
+/* --- MODAL HANDLERS --- */
 const handleLeaveCurrentGroup = () => {
   const currentUserProfile = groupInfos.value?.group_profiles?.find(
     (p) => p.users.email === currentUser.value?.email,

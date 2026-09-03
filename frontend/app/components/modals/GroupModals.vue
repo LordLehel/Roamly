@@ -31,12 +31,14 @@
       <template #footer>
         <div :class="appConfig.layout.modalActions">
           <UButton
+            :class="appConfig.typography.modalActionBtnCancel"
             :label="CONST_CANCEL_BTN_TEXT"
             variant="actionCancelButton"
             type="button"
             @click="groupsStore.closeCreateModal"
           />
           <UButton
+            :class="appConfig.typography.modalActionBtnOk"
             :label="CONST_CREATE_BTN"
             variant="actionOkButton"
             type="submit"
@@ -73,11 +75,13 @@
       <template #footer>
         <div :class="appConfig.layout.modalActions">
           <UButton
+            :class="appConfig.typography.modalActionBtnCancel"
             :label="CONST_CANCEL_BTN_TEXT"
             variant="actionCancelButton"
             @click="groupsStore.closeDeleteModal"
           />
           <UButton
+            :class="appConfig.typography.modalActionBtnOk"
             :label="CONST_DELETE_BTN"
             variant="actionOkButton"
             :loading="isDeleting"
@@ -124,11 +128,13 @@
       <template #footer>
         <div :class="appConfig.layout.modalActions">
           <UButton
+            :class="appConfig.typography.modalActionBtnCancel"
             :label="CONST_CANCEL_BTN_TEXT"
             variant="actionCancelButton"
             @click="groupsStore.closeLeaveModal"
           />
           <UButton
+            :class="appConfig.typography.modalActionBtnOk"
             :label="CONST_LEAVE_BTN"
             variant="actionOkButton"
             :loading="isLeaving"
@@ -141,6 +147,7 @@
 </template>
 
 <script setup lang="ts">
+/* --- IMPORTS --- */
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useGroupsStore } from '~/stores/groups.modals.store';
@@ -151,10 +158,16 @@ import {
 } from '~/queries/groups.mutation';
 import { useAppConfig } from '#imports';
 
+/* --- COMPOSABLES --- */
 const appConfig = useAppConfig();
 const groupsStore = useGroupsStore();
 const router = useRouter();
 
+/* --- STATE --- */
+const newGroupName = ref('');
+const formValidationError = ref('');
+
+/* --- API MUTATIONS --- */
 const {
   mutate: createGroup,
   isLoading: isCreating,
@@ -189,8 +202,7 @@ const {
   },
 });
 
-const newGroupName = ref('');
-const formValidationError = ref('');
+/* --- COMPUTED ERRORS --- */
 const createError = computed(
   () =>
     formValidationError.value ||
@@ -203,6 +215,7 @@ const leaveErrorText = computed(() =>
   leaveApiError.value ? getErrorMessage(leaveApiError.value) : '',
 );
 
+/* --- HANDLERS --- */
 const handleCreateGroup = () => {
   resetCreate();
   formValidationError.value = '';
