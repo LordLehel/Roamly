@@ -10,6 +10,7 @@ export const CONST_DELETE_BTN = 'Delete';
 export const CONST_DELETE_EVENT_TITLE = 'Delete event';
 export const CONST_DELETE_EVENT_CONFIRM = 'Are you sure you want to delete this event?';
 
+export const CONST_TOOLTIP_FILTER_EVENTS = 'Filter events';
 export const CONST_FILTER_LABEL = 'Filter';
 export const CONST_SELECT_GROUP_PROMPT = 'Select a group...';
 export const CONST_CALENDAR_SUBTITLE = 'Calendar';

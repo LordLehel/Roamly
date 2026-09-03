@@ -26,6 +26,10 @@
               <UIcon name="i-heroicons-envelope" class="w-4 h-4 text-brand-500 shrink-0" />
               {{ groupsStore.selectedUserProfile?.email }}
             </p>
+            <p class="text-sm text-dark-text/80 truncate flex items-center gap-2">
+              <UIcon name="i-heroicons-phone" class="w-4 h-4 text-brand-500 shrink-0" />
+              {{ /* groupsStore.selectedUserProfile?.phone || */ 'N/A' }}
+            </p>
             <p class="text-xs text-dark-text/70 flex items-center gap-2">
               <UIcon name="i-heroicons-calendar" class="w-4 h-4 text-brand-500 shrink-0" />
               Joined: {{ groupsStore.selectedUserProfile?.joinedAt || 'N/A' }}

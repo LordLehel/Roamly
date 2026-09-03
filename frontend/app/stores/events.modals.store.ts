@@ -8,22 +8,11 @@ export const useEventsStore = defineStore('events', () => {
   const isDeleteDayModalOpen = ref(false);
   const isAddEventModalOpen = ref(false);
   const isDeleteEventModalOpen = ref(false);
+  const isParticipantsModalOpen = ref(false);
 
-  // 'any' cserélve DTO-ra
   const selectedDayToDelete = ref<DayOutDto | null>(null);
   const selectedEventToDelete = ref<EventOutDto | null>(null);
-
-  const openAddDayModal = () => (isAddDayModalOpen.value = true);
-  const closeAddDayModal = () => (isAddDayModalOpen.value = false);
-
-  const openDeleteDayModal = (day: DayOutDto) => {
-    selectedDayToDelete.value = day;
-    isDeleteDayModalOpen.value = true;
-  };
-  const closeDeleteDayModal = () => {
-    isDeleteDayModalOpen.value = false;
-    selectedDayToDelete.value = null;
-  };
+  const currentEventParticipants = ref<MockUser[]>([]);
 
   const openAddEventModal = () => (isAddEventModalOpen.value = true);
   const closeAddEventModal = () => (isAddEventModalOpen.value = false);
@@ -37,20 +26,32 @@ export const useEventsStore = defineStore('events', () => {
     selectedEventToDelete.value = null;
   };
 
+  const openParticipantsModal = (participants: MockUser[]) => {
+    currentEventParticipants.value = participants;
+    isParticipantsModalOpen.value = true;
+  };
+
+  const closeParticipantsModal = () => {
+    isParticipantsModalOpen.value = false;
+    setTimeout(() => {
+      currentEventParticipants.value = [];
+    }, 300);
+  };
+
   return {
     isAddDayModalOpen,
     isDeleteDayModalOpen,
     isAddEventModalOpen,
     isDeleteEventModalOpen,
+    isParticipantsModalOpen,
     selectedDayToDelete,
     selectedEventToDelete,
-    openAddDayModal,
-    closeAddDayModal,
-    openDeleteDayModal,
-    closeDeleteDayModal,
+    currentEventParticipants,
     openAddEventModal,
     closeAddEventModal,
     openDeleteEventModal,
     closeDeleteEventModal,
+    openParticipantsModal,
+    closeParticipantsModal,
   };
 });
