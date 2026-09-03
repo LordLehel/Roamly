@@ -139,6 +139,14 @@ export default defineAppConfig({
         itemLeadingIcon: '!w-6 !h-8 !text-brand-500 shrink-0',
       },
     },
+    wideDropdownMenu: {
+      slots: {
+        content:
+          'z-[100] bg-surface-500/90 backdrop-blur-md rounded-2xl ring-1 ring-brand-500/30 shadow-xl p-1.5 min-w- sm:min-w-64',
+        item: 'flex items-center gap-3 w-full justify-center text-left cursor-pointer px-4 py-2.5 text-md font-medium text-dark-text/80 hover:text-dark-text hover:bg-brand-500/20 data-[highlighted]:bg-brand-500/20 data-[highlighted]:text-dark-text rounded-xl transition-colors',
+        itemLeadingIcon: '!w-6 !h-6 !text-brand-500 shrink-0',
+      },
+    },
     selectMenu: {
       slots: {
         base: 'bg-transparent text-surface-500 font-bold text-xl border-none shadow-none ring-0 focus:ring-0 focus:outline-none cursor-pointer hover:opacity-80 transition-opacity',
