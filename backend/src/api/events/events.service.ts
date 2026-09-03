@@ -1,5 +1,5 @@
 import prisma from '../../prisma';
-import { event_participants, events, users } from '@prisma/client';
+import { event_participants, events, group_profiles, users } from '@prisma/client';
 import { BadRequestError, ForbiddenError } from '../../utils/ServerError';
 import { EVENT_VISIBILITY } from '../../constants/events.constants';
 import { ROLES } from '../../constants/roles.constants';
@@ -32,11 +32,7 @@ export const createEvent = async (
     },
   });
 
-  if (!userGroupInfo) {
-    throw new ForbiddenError(
-      'User either is not part of the group, or the group or the user does not exist!',
-    );
-  }
+  userGroupInfoValidate(userGroupInfo);
 
   // if the event is supposed to be private and there are given participant emails
   let participantIds: number[] = [];
@@ -157,11 +153,7 @@ export const updateEvent = async (
     },
   });
 
-  if (!userGroupInfo) {
-    throw new ForbiddenError(
-      'User either is not part of the group, or the group or the user does not exist!',
-    );
-  }
+  userGroupInfoValidate(userGroupInfo);
 
   const existingEvent = await prisma.events.findUniqueOrThrow({
     where: {
@@ -270,11 +262,7 @@ export const addNewParticipants = async (
     },
   });
 
-  if (!userGroupInfo) {
-    throw new ForbiddenError(
-      'User either is not part of the group, or the group or the user does not exist!',
-    );
-  }
+  userGroupInfoValidate(userGroupInfo);
 
   // can the user update this event
   const existingEvent = await prisma.events.findUniqueOrThrow({
@@ -368,11 +356,7 @@ export const deleteEvent = async (
     },
   });
 
-  if (!userGroupInfo) {
-    throw new ForbiddenError(
-      'User either is not part of the group, or the group or the user does not exist',
-    );
-  }
+  userGroupInfoValidate(userGroupInfo);
 
   const existingEvent = await prisma.events.findUniqueOrThrow({
     where: {
@@ -422,11 +406,7 @@ export const removeParticipantFromEvent = async (
     },
   });
 
-  if (!userGroupInfo) {
-    throw new ForbiddenError(
-      'User either is not part of the group, or the group or the user does not exist',
-    );
-  }
+  userGroupInfoValidate(userGroupInfo);
 
   const existingEvent = await prisma.events.findUniqueOrThrow({
     where: {
@@ -493,11 +473,7 @@ export const listEvents = async (
     },
   });
 
-  if (!userGroupInfo) {
-    throw new ForbiddenError(
-      'User either is not part of the group, or the group or the user does not exist!',
-    );
-  }
+  userGroupInfoValidate(userGroupInfo);
 
   if (userGroupInfo.roles.type !== ROLES.LEADER && userGroupInfo.roles.type !== ROLES.MEMBER) {
     throw new ForbiddenError('User must be part of the group to list events in it!');
@@ -566,6 +542,11 @@ export const listEvents = async (
             {
               creator_id: userGroupInfo.users.user_id,
             },
+            {
+              visibility: {
+                name: EVENT_VISIBILITY.PUBLIC,
+              },
+            },
           ],
     },
 
@@ -617,11 +598,7 @@ export const listEventStartDates = async (
     },
   });
 
-  if (!userGroupInfo) {
-    throw new ForbiddenError(
-      'User either is not part of the group, or the group or the user does not exist!',
-    );
-  }
+  userGroupInfoValidate(userGroupInfo);
 
   if (userGroupInfo.roles.type !== ROLES.LEADER && userGroupInfo.roles.type !== ROLES.MEMBER) {
     throw new ForbiddenError('User must be part of the group to list event dates in it!');
@@ -646,6 +623,11 @@ export const listEventStartDates = async (
             {
               creator_id: userGroupInfo.users.user_id,
             },
+            {
+              visibility: {
+                name: EVENT_VISIBILITY.PUBLIC,
+              },
+            },
           ],
     },
 
@@ -664,3 +646,11 @@ export const listEventStartDates = async (
 
   return uniqueDates;
 };
+
+function userGroupInfoValidate(userGroupInfo: group_profiles | null): asserts userGroupInfo {
+  if (!userGroupInfo) {
+    throw new ForbiddenError(
+      'User either is not part of the group, or the group or the user does not exist!',
+    );
+  }
+}
