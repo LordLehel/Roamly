@@ -9,10 +9,13 @@ export const useEventsStore = defineStore('events', () => {
   const isAddEventModalOpen = ref(false);
   const isDeleteEventModalOpen = ref(false);
   const isParticipantsModalOpen = ref(false);
+  const isPreviewModalOpen = ref(false);
 
   const selectedDayToDelete = ref<DayOutDto | null>(null);
   const selectedEventToDelete = ref<EventOutDto | null>(null);
   const currentEventParticipants = ref<MockUser[]>([]);
+  const previewEvent = ref<ClientEvent | null>(null);
+  const previewDate = ref<string | undefined>(undefined);
 
   const openAddEventModal = () => (isAddEventModalOpen.value = true);
   const closeAddEventModal = () => (isAddEventModalOpen.value = false);
@@ -38,20 +41,39 @@ export const useEventsStore = defineStore('events', () => {
     }, 300);
   };
 
+  const openPreviewModal = (event: ClientEvent, date?: string) => {
+    previewEvent.value = event;
+    previewDate.value = date;
+    isPreviewModalOpen.value = true;
+  };
+
+  const closePreviewModal = () => {
+    isPreviewModalOpen.value = false;
+    previewEvent.value = null;
+    previewDate.value = undefined;
+  };
+
   return {
     isAddDayModalOpen,
     isDeleteDayModalOpen,
     isAddEventModalOpen,
     isDeleteEventModalOpen,
     isParticipantsModalOpen,
+    isPreviewModalOpen,
+
     selectedDayToDelete,
     selectedEventToDelete,
     currentEventParticipants,
+    previewEvent,
+    previewDate,
+
     openAddEventModal,
     closeAddEventModal,
     openDeleteEventModal,
     closeDeleteEventModal,
     openParticipantsModal,
     closeParticipantsModal,
+    openPreviewModal,
+    closePreviewModal,
   };
 });

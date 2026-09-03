@@ -27,3 +27,11 @@ export const CONST_TIME_LBL = 'Time:';
 export const CONST_MEMBERS_LBL = 'Members:';
 export const CONST_DESC_LBL = 'Description:';
 export const CONST_LOC_LBL = 'Location:';
+
+export const CONST_LOADING_DAYS_MSG = 'Loading days...';
+export const CONST_LOADING_EVENTS_MSG = 'Loading events...';
+export const CONST_SEARCH_EVENTS_PLACEHOLDER = 'Search events...';
+export const CONST_NO_MATCHING_EVENTS_MSG = 'No matching events found.';
+export const CONST_START_DATE_LABEL = 'Start Date';
+export const CONST_END_DATE_LABEL = 'End Date';
+export const CONST_APPLY_FILTER_BTN = 'Apply Filter';

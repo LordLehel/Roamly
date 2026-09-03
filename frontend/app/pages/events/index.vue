@@ -1,6 +1,12 @@
 <!-- frontend/app/pages/events/index.vue -->
 <template>
-  <div>
+  <ClientOnly>
+    <template #fallback>
+      <div class="min-h-screen flex items-center justify-center">
+        <span class="opacity-50 font-medium">{{ CONST_LOADING_TEXT }}</span>
+      </div>
+    </template>
+
     <EventsMobile
       v-if="isMobile"
       v-model:search-query="searchQuery"
@@ -33,6 +39,7 @@
       @open-delete-event="handleOpenDeleteEventModal"
       @open-user-profile="openUserProfile"
       @open-all-participants="openAllParticipantsModal"
+      @open-preview-modal="handleOpenPreviewModal"
     />
 
     <EventsDesktop
@@ -68,10 +75,11 @@
       @open-user-profile="openUserProfile"
       @open-all-participants="openAllParticipantsModal"
     />
-  </div>
+  </ClientOnly>
 </template>
 
 <script setup lang="ts">
+/* IMPORTS */
 import { ref, computed, watch, onMounted } from 'vue';
 import { useScreenSize } from '~/composables/useScreenSize';
 import { useCurrentUserQuery } from '~/queries/user.query';
@@ -87,7 +95,6 @@ import {
   type MockUser,
 } from '~/utils/apiMock.utils';
 
-// Import kiszervezett logikák és komponensek
 import {
   processAndSortDays,
   processAndSortEvents,
@@ -187,7 +194,6 @@ const hasPermissionToDelete = computed(() => {
   );
 });
 
-/* SORTING & FILTERING INTEGRATION */
 const sortedDaysList = computed<ProcessedDay[]>(() => processAndSortDays(daysList.value));
 
 const selectedDayDetails = computed<ProcessedDay | undefined>(() => {
@@ -264,5 +270,10 @@ const openAllParticipantsModal = () => {
 
 const handleOpenDeleteEventModal = (event: ClientEvent) => {
   eventsStore.openDeleteEventModal(event);
+};
+
+const handleOpenPreviewModal = (event: ClientEvent) => {
+  selectedEvent.value = event;
+  eventsStore.openPreviewModal(event, selectedDayDetails.value?.date);
 };
 </script>

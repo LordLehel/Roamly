@@ -32,7 +32,7 @@ export default defineAppConfig({
           glassButton:
             'h-10 px-8 rounded-full !min-w-18 flex items-center justify-center text-md bg-surface-500/70 backdrop-blur-xl text-dark-text ring-1 ring-dark-text/10 hover:bg-surface-500/90 transition-colors cursor-pointer',
           glassOutlineButton:
-            'border border-brand-500/50 px-6 py-2.5 rounded-md bg-light-bg/70 hover:bg-light-bg text-dark-text transition-colors backdrop-blur-md cursor-pointer',
+            'border border-brand-500/50 !px-6 !py-2.5 rounded-full bg-surface-500/70 hover:bg-light-bg text-dark-text transition-colors backdrop-blur-md cursor-pointer',
 
           // Icon Buttons (Toolbars, Action Groups)
           glassIconButton:
@@ -326,8 +326,7 @@ export default defineAppConfig({
      ========================================================================== */
   calendar: {
     // Wrapper and Layouts
-    eventsWrapper:
-      'w-full max-w-360 mx-auto px-6 py-8 flex flex-col gap-8 relative h-[calc(100vh-80px)]',
+    eventsWrapper: 'w-full max-w-360 mx-auto px-6 py-8 flex flex-col flex-1 min-h-0 gap-8 relative',
     eventsHeaderRow: 'flex flex-col md:flex-row justify-between items-center w-full gap-6 shrink-0',
     headerActionLeft: 'flex items-center gap-4 flex-1 justify-start',
     headerCenter: 'flex flex-col items-center justify-center shrink-0',
@@ -391,6 +390,27 @@ export default defineAppConfig({
     previewMapPlaceholder:
       'w-full h-64 mt-2 rounded-xl overflow-hidden relative flex items-center justify-center shadow-inner border border-dark-text/20 bg-surface-600/30',
     emptyPreview: 'flex-1 flex items-center justify-center text-dark-text/60 text-sm font-medium',
+
+    // Mobile view styles
+    mobileMainWrapper: 'p-2 flex flex-col gap-3',
+    mobileContentWrapper:
+      'bg-surface-500/50 backdrop-blur-md rounded-xl ring-1 ring-dark-text/10 shadow-lg p-2 mt-4 flex-1 flex flex-col gap-2',
+    mobileTopActions: 'flex items-center justify-between w-full px-2 mb-2',
+    mobileHeader: 'w-full text-center flex flex-col items-center',
+    mobileHeaderButton:
+      'flex flex-col justify-center items-center gap-0.5 p-0 hover:bg-transparent cursor-pointer outline-none w-full',
+    mobileHeaderTitleRow: 'flex items-center gap-2',
+    mobileToolbar: 'flex items-center gap-2 w-full mt-2',
+    mobileFilterButton:
+      'rounded-full px-4 text-sm h-10 shadow-none border-dark-text/20 bg-surface-500/70',
+    mobileDateButton:
+      'flex justify-between items-center rounded-full px-6 bg-surface-500/30 border-dark-text/30 text-dark-text shadow-inner font-bold',
+    mobileEventsWrapper:
+      'flex flex-col w-full mt-2 ring-1 ring-dark-text/10 rounded-xl overflow-hidden bg-surface-500/20',
+    mobileEventItem:
+      'flex items-center justify-between p-4 bg-surface-500/40 backdrop-blur-md cursor-pointer hover:bg-surface-500/60 transition-colors',
+    mobileEventItemBorder: 'border-b border-dark-text/10',
+    mobileEmptyState: 'p-6 text-center text-sm text-dark-text/60 font-medium bg-surface-500/40',
 
     // Participants Area (in Preview)
     participantsGroup: 'flex items-center gap-4',
