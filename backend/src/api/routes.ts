@@ -11,6 +11,6 @@ rootRouter.use('/users', usersRoutes);
 rootRouter.use('/auth', authRoutes);
 rootRouter.use('/groups', groupsRoutes);
 rootRouter.use('/files', filesRoutes);
-rootRouter.use('/enets', eventsRoutes);
+rootRouter.use('/events', eventsRoutes);
 
 export default rootRouter;

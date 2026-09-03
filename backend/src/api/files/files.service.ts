@@ -197,19 +197,46 @@ export const replacePrivateDocument = async (
     where: {
       file_id: fileId,
     },
+    include: {
+      documents: true,
+    },
   });
+
+  // is the file really a document
+  if (!file.documents) {
+    throw new BadRequestError('This file is not a document!');
+  }
 
   // validate authorization
   if (file.user_id !== user.user_id) {
     throw new ForbiddenError('Users can only replace their own files!');
   }
 
+  const effectiveIssueDate =
+    issue_date === undefined
+      ? file.documents.issue_date
+      : issue_date === ''
+        ? null
+        : new Date(issue_date);
+
+  const effectiveExpiryDate =
+    expiry_date === undefined
+      ? file.documents.expiry_date
+      : expiry_date === ''
+        ? null
+        : new Date(expiry_date);
+
+  if (effectiveIssueDate && effectiveExpiryDate && effectiveExpiryDate < effectiveIssueDate) {
+    throw new BadRequestError('Expiry date cannot be earlier than the issue date!');
+  }
+
   const updateData: Prisma.filesUpdateInput = {
+    updated_at: new Date(),
     documents: {
       update: {
         document_type: document_type,
-        issue_date: issue_date ? new Date(issue_date) : undefined,
-        expiry_date: expiry_date ? new Date(expiry_date) : undefined,
+        issue_date: issue_date === undefined ? undefined : effectiveIssueDate,
+        expiry_date: expiry_date === undefined ? undefined : effectiveExpiryDate,
       },
     },
   };
@@ -642,6 +669,24 @@ export const updateGroupDocument = async (
     throw new ForbiddenError(
       'Only the uploader and the leaders of the group can update this file!',
     );
+  }
+
+  const effectiveIssueDate =
+    issue_date === undefined
+      ? file.documents.issue_date
+      : issue_date === ''
+        ? null
+        : new Date(issue_date);
+
+  const effectiveExpiryDate =
+    expiry_date === undefined
+      ? file.documents.expiry_date
+      : expiry_date === ''
+        ? null
+        : new Date(expiry_date);
+
+  if (effectiveIssueDate && effectiveExpiryDate && effectiveExpiryDate < effectiveIssueDate) {
+    throw new BadRequestError('Expiry date cannot be earlier than the issue date!');
   }
 
   const updateData: Prisma.filesUpdateInput = {
