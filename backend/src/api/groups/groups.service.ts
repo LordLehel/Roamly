@@ -8,6 +8,7 @@ import {
 } from '../../types/group.types';
 import { ROLES } from '../../constants/roles.constants';
 import { BadRequestError, ConflictError, ForbiddenError } from '../../utils/ServerError';
+import * as sendMail from '../shared/email.service';
 
 export const createGroup = async (
   creatorUuid: string,
@@ -48,6 +49,13 @@ export const createGroup = async (
         await inviteUsersToYourGroup(creatorUuid, invitee.email, newGroup.uuid, invitee.role);
       }),
     );
+
+    // notify by email
+    initialInvites.forEach(({ email }: { email: string; role: string }) => {
+      sendMail.sendGroupInvitedEmail(email, name, user.username).catch((err: unknown) => {
+        console.error(`[EMAIL ERROR] Failed to send email to ${email}: `, err);
+      });
+    });
   }
 
   return newGroup;
@@ -247,6 +255,7 @@ export const inviteUsersToYourGroup = async (
     },
     include: {
       roles: true,
+      users: true,
     },
   });
 
@@ -277,6 +286,12 @@ export const inviteUsersToYourGroup = async (
       roles: true,
     },
   });
+
+  sendMail
+    .sendGroupInvitedEmail(invitedUser.email, group.name, inviterProfile.users.username)
+    .catch((err: unknown) => {
+      console.error(`[EMAIL ERROR] Failed to send email to ${invitedUser.email}: `, err);
+    });
 
   return createdProfile;
 };

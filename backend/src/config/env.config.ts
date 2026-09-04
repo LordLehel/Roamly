@@ -17,6 +17,10 @@ interface Config {
     privateSecretAccessKey: string;
     privateBucketName: string;
   };
+  email: {
+    resendApiKey: string;
+    fromAddress: string;
+  };
 }
 
 // helper to enforce required variables at startup
@@ -29,6 +33,8 @@ const getEnvVar = (key: string, defaultValue?: string): string => {
 
   return value;
 };
+
+const nodeEnv = getEnvVar('NODE_ENV', 'development');
 
 export const config: Config = {
   port: parseInt(getEnvVar('PORT', '3000'), 10),
@@ -43,5 +49,12 @@ export const config: Config = {
     privateAccessKeyId: getEnvVar('R2_PRIVATE_ACCESS_KEY_ID'),
     privateSecretAccessKey: getEnvVar('R2_PRIVATE_SECRET_ACCESS_KEY'),
     privateBucketName: getEnvVar('R2_PRIVATE_BUCKET_NAME'),
+  },
+
+  email: {
+    resendApiKey:
+      nodeEnv === 'production' ? getEnvVar('RESEND_API_KEY') : process.env.RESEND_API_KEY || '',
+
+    fromAddress: getEnvVar('EMAIL_FROM', 'onboarding@resend.dev'),
   },
 };

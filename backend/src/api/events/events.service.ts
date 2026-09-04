@@ -3,6 +3,7 @@ import { event_participants, events, group_profiles, users } from '@prisma/clien
 import { BadRequestError, ForbiddenError } from '../../utils/ServerError';
 import { EVENT_VISIBILITY } from '../../constants/events.constants';
 import { ROLES } from '../../constants/roles.constants';
+import * as sendMail from '../shared/email.service';
 
 export const createEvent = async (
   userUuid: string,
@@ -121,6 +122,52 @@ export const createEvent = async (
       },
     },
   });
+
+  // private event notification email sending
+  if (
+    data.visibility === EVENT_VISIBILITY.PRIVATE &&
+    data.participant_emails &&
+    data.participant_emails.length > 0
+  ) {
+    const formattedDate = newEvent.start_time.toLocaleDateString();
+
+    data.participant_emails.forEach((email: string) => {
+      sendMail
+        .sendEventAssignedEmail(email, newEvent.title, formattedDate)
+        .catch((err: unknown) => {
+          console.error(`[EMAIL ERROR] Failed to send email to ${email}: `, err);
+        });
+    });
+  }
+
+  // public event notification email sending
+  if (data.visibility === EVENT_VISIBILITY.PUBLIC) {
+    const formattedDate = newEvent.start_time.toLocaleDateString();
+
+    const groupMembers = await prisma.users.findMany({
+      where: {
+        group_profiles: {
+          some: {
+            group_id: userGroupInfo.groups.group_id,
+          },
+        },
+        user_id: {
+          not: userGroupInfo.users.user_id,
+        },
+      },
+      select: {
+        email: true,
+      },
+    });
+
+    groupMembers.forEach((member: { email: string }) => {
+      sendMail
+        .sendEventAssignedEmail(member.email, newEvent.title, formattedDate)
+        .catch((err: unknown) => {
+          console.error(`[EMAIL ERROR] Failed to send email to ${member.email}: `, err);
+        });
+    });
+  }
 
   return newEvent;
 };
@@ -330,6 +377,22 @@ export const addNewParticipants = async (
       },
     },
   });
+
+  if (updatedParticipantList.length > 0) {
+    const formattedDate = existingEvent.start_time.toLocaleDateString();
+
+    updatedParticipantList.forEach((participantRecord: { users: { email: string } }) => {
+      const email = participantRecord.users.email;
+
+      if (email) {
+        sendMail
+          .sendEventAssignedEmail(email, existingEvent.title, formattedDate)
+          .catch((err: unknown) => {
+            console.error(`[EMAIL ERROR] Failed to send email to ${email}: `, err);
+          });
+      }
+    });
+  }
 
   return updatedParticipantList as unknown as event_participants[];
 };
