@@ -2,7 +2,7 @@
 <template>
   <div class="flex flex-col flex-1 gap-4 w-full p-4 pb-20">
     <!-- TOP ACTION BUTTONS -->
-    <div :class="config.calendar.mobileTopActions">
+    <div :class="appConfig.calendar.mobileTopActions">
       <UTooltip :text="CONST_TOOLTIP_MEMBERS ?? 'Members'">
         <UButton icon="i-heroicons-users" variant="glassIconButton" to="/" />
       </UTooltip>
@@ -18,13 +18,13 @@
     </div>
 
     <!-- MAIN WRAPPER -->
-    <div :class="config.calendar.mobileMainWrapper">
+    <div :class="appConfig.calendar.mobileMainWrapper">
       <!-- HEADER SECTION (Group Dropdown) -->
-      <div :class="config.calendar.mobileHeader">
+      <div :class="appConfig.calendar.mobileHeader">
         <UPopover v-model:open="isGroupDropdownOpen" class="w-full">
-          <UButton block variant="ghost" :class="config.calendar.mobileHeaderButton">
-            <div :class="config.calendar.mobileHeaderTitleRow">
-              <h1 :class="config.typography.pageTitle" class="text-2xl! truncate">
+          <UButton block variant="ghost" :class="appConfig.calendar.mobileHeaderButton">
+            <div :class="appConfig.calendar.mobileHeaderTitleRow">
+              <h1 :class="appConfig.typography.pageTitle" class="text-2xl! truncate">
                 {{
                   isLoadingGroups
                     ? (CONST_LOADING_TEXT ?? 'Loading...')
@@ -37,17 +37,22 @@
                 :class="{ 'rotate-180': isGroupDropdownOpen }"
               />
             </div>
-            <p :class="config.typography.pageSubtitle" class="mt-0">
+            <p :class="appConfig.typography.pageSubtitle" class="mt-0">
               {{ CONST_CALENDAR_SUBTITLE }}
             </p>
           </UButton>
 
           <template #content>
-            <div :class="config.ui.wideDropdownMenu.slots.content">
+            <div
+              :class="[
+                appConfig.ui.wideDropdownMenu.slots.content,
+                'max-h-[50vh] overflow-y-auto custom-scrollbar',
+              ]"
+            >
               <button
                 v-for="group in userGroupsList"
                 :key="group.uuid"
-                :class="config.ui.wideDropdownMenu.slots.item"
+                :class="appConfig.ui.wideDropdownMenu.slots.item"
                 @click="$emit('select-group', group.uuid)"
               >
                 <UIcon
@@ -56,7 +61,7 @@
                       ? 'i-heroicons-check'
                       : 'i-heroicons-user-group'
                   "
-                  :class="config.ui.wideDropdownMenu.slots.itemLeadingIcon"
+                  :class="appConfig.ui.wideDropdownMenu.slots.itemLeadingIcon"
                 />
                 <span>{{ group.name }}</span>
               </button>
@@ -66,40 +71,43 @@
       </div>
 
       <!-- TOOLBAR SECTION (Filter, Search, Add) -->
-      <div :class="config.calendar.mobileToolbar">
+      <div :class="appConfig.calendar.mobileToolbar">
         <UPopover v-model:open="isFilterOpen">
           <UTooltip :text="CONST_TOOLTIP_FILTER_EVENTS">
             <UButton
               icon="i-heroicons-funnel"
               :label="CONST_FILTER_LABEL"
               variant="glassOutlineButton"
-              :class="config.calendar.mobileFilterButton"
+              :class="appConfig.calendar.mobileFilterButton"
             />
           </UTooltip>
           <template #content>
-            <div :class="config.calendar.filterDropdownContent" class="w-[calc(100vw-3rem)] mx-2">
-              <div :class="config.calendar.filterFormGroup">
+            <div
+              :class="appConfig.calendar.filterDropdownContent"
+              class="w-[calc(100vw-3rem)] mx-2"
+            >
+              <div :class="appConfig.calendar.filterFormGroup">
                 <div>
-                  <label :class="config.calendar.filterLabel">{{
+                  <label :class="appConfig.calendar.filterLabel">{{
                     CONST_START_DATE_LABEL ?? 'Start Date'
                   }}</label>
                   <input
                     v-model="filterStartDate"
                     type="date"
-                    :class="config.calendar.filterDateInput"
+                    :class="appConfig.calendar.filterDateInput"
                   />
                 </div>
                 <div>
-                  <label :class="config.calendar.filterLabel">{{
+                  <label :class="appConfig.calendar.filterLabel">{{
                     CONST_END_DATE_LABEL ?? 'End Date'
                   }}</label>
                   <input
                     v-model="filterEndDate"
                     type="date"
-                    :class="config.calendar.filterDateInput"
+                    :class="appConfig.calendar.filterDateInput"
                   />
                 </div>
-                <div :class="config.calendar.filterButtonWrapper">
+                <div :class="appConfig.calendar.filterButtonWrapper">
                   <UButton
                     :label="CONST_APPLY_FILTER_BTN ?? 'Apply Filter'"
                     variant="smallPrimaryActionButton"
@@ -128,11 +136,15 @@
         </UTooltip>
       </div>
 
-      <div :class="config.calendar.mobileContentWrapper">
+      <div :class="appConfig.calendar.mobileContentWrapper">
         <!-- DATE SELECTOR (Title-like Dropdown) -->
         <div class="w-full mt-2">
           <UPopover v-model:open="isDateDropdownOpen" class="w-full">
-            <UButton block variant="glassOutlineButton" :class="config.calendar.mobileDateButton">
+            <UButton
+              block
+              variant="glassOutlineButton"
+              :class="appConfig.calendar.mobileDateButton"
+            >
               <span>
                 {{
                   selectedDayDetails
@@ -148,7 +160,7 @@
             </UButton>
             <template #content>
               <div
-                :class="config.ui.wideDropdownMenu.slots.content"
+                :class="appConfig.ui.wideDropdownMenu.slots.content"
                 class="w-[calc(100vw-3rem)] mx-2 max-h-64 overflow-y-auto mt-1"
               >
                 <div v-if="isLoadingDays" class="p-4 text-center text-sm opacity-60">
@@ -159,7 +171,7 @@
                     v-for="day in sortedDaysList"
                     :key="day.id"
                     :class="[
-                      config.ui.wideDropdownMenu.slots.item,
+                      appConfig.ui.wideDropdownMenu.slots.item,
                       selectedDayId === day.id ? 'bg-brand-500/20' : '',
                       day.isExpired ? 'opacity-50 grayscale' : '',
                     ]"
@@ -174,47 +186,53 @@
         </div>
 
         <!-- EVENTS LIST -->
-        <div :class="config.calendar.mobileEventsWrapper">
+        <div :class="appConfig.calendar.mobileEventsWrapper">
           <div v-if="isLoadingEvents" class="p-4 text-center text-sm opacity-60">
-            {{ CONST_LOADING_EVENTS_MSG ?? 'Loading events...' }}
+            Loading events...
           </div>
           <template v-else>
             <div
               v-for="(event, index) in filteredAndSortedEventsList"
-              :key="event.id"
+              :key="event.uuid"
               :class="[
-                config.calendar.mobileEventItem,
+                appConfig.calendar.mobileEventItem,
                 event.isExpired ? 'opacity-50 grayscale' : '',
                 index !== filteredAndSortedEventsList.length - 1
-                  ? config.calendar.mobileEventItemBorder
+                  ? appConfig.calendar.mobileEventItemBorder
                   : '',
               ]"
               @click="$emit('open-preview-modal', event)"
             >
-              <div class="flex items-center gap-3">
+              <div class="flex items-center gap-3 flex-1 min-w-0 pr-2">
                 <UIcon
-                  :name="event.isPrivate ? 'i-heroicons-user' : 'i-heroicons-users'"
-                  class="w-5 h-5 text-dark-text/70"
+                  :name="event.is_private ? 'i-heroicons-user' : 'i-heroicons-users'"
+                  class="w-5 h-5 text-dark-text/70 shrink-0"
                 />
                 <span
-                  class="font-bold text-dark-text text-sm truncate max-w-37.5"
+                  class="font-bold text-dark-text text-sm truncate"
                   :class="event.isExpired ? 'line-through decoration-dark-text/40' : ''"
                   >{{ event.title }}</span
                 >
               </div>
-              <span class="text-xs font-bold text-dark-text/80 whitespace-nowrap">
-                {{ event.timeStart }} - {{ event.timeEnd }}
-              </span>
+              <div class="flex items-center gap-3 shrink-0">
+                <span class="text-xs font-bold text-dark-text/80 whitespace-nowrap">
+                  {{ event.timeStartFormatted }} - {{ event.timeEndFormatted }}
+                </span>
+                <UButton
+                  icon="i-heroicons-trash"
+                  variant="ghostDangerIconButton"
+                  class="p-1 text-error-500 hover:text-error-600"
+                  @click.stop="$emit('open-delete-event', event)"
+                />
+              </div>
             </div>
             <div
               v-if="!filteredAndSortedEventsList?.length"
-              :class="config.calendar.mobileEmptyState"
+              :class="appConfig.calendar.mobileEmptyState"
+              class="flex flex-col items-center justify-center py-12 gap-2"
             >
-              {{
-                searchQuery
-                  ? (CONST_NO_MATCHING_EVENTS_MSG ?? 'No matching events found.')
-                  : CONST_NO_EVENTS_MSG
-              }}
+              <UIcon name="i-heroicons-calendar" class="w-8 h-8 opacity-40" />
+              <span>{{ searchQuery ? 'No matching events found.' : 'No events found.' }}</span>
             </div>
           </template>
         </div>
@@ -228,39 +246,38 @@
 import { ref } from 'vue';
 import { useAppConfig } from '#imports';
 import type { GroupOutDto } from '~/types/groups.type';
-import type { MockUser } from '~/utils/apiMock.utils';
-import type { ProcessedDay, ClientEvent } from '~/utils/sort.utils';
+import type { EventCreatorDto, UiDay, UiEvent } from '~/types/events.type';
 
 /* CONSTANTS */
-const config = useAppConfig();
+const appConfig = useAppConfig();
 
 defineProps<{
   userGroupsList: GroupOutDto[];
   selectedGroupUuid?: string;
   selectedGroupDetails?: GroupOutDto;
   selectedDayId?: string;
-  selectedEvent: ClientEvent | null | undefined;
+  selectedEvent: UiEvent | null | undefined;
   isLoadingGroups: boolean;
   isLoadingDays: boolean;
   isLoadingEvents: boolean;
-  sortedDaysList: ProcessedDay[];
-  filteredAndSortedEventsList: ClientEvent[];
-  selectedDayDetails?: ProcessedDay;
+  sortedDaysList: UiDay[];
+  filteredAndSortedEventsList: UiEvent[];
+  selectedDayDetails?: UiDay;
   isCurrentUserLeader: boolean;
   hasPermissionToDelete: boolean;
-  displayParticipants: MockUser[];
+  displayParticipants: EventCreatorDto[];
   extraParticipantsCount: number;
 }>();
 
 const emit = defineEmits<{
   (e: 'select-group', uuid: string): void;
   (e: 'update:selected-day-id', id: string | undefined): void;
-  (e: 'update:selected-event', event: ClientEvent | null): void;
+  (e: 'update:selected-event', event: UiEvent | null): void;
   (
     e: 'delete-group' | 'leave-group' | 'apply-filter' | 'open-add-event' | 'open-all-participants',
   ): void;
-  (e: 'open-delete-event' | 'open-preview-modal', event: ClientEvent): void;
-  (e: 'open-user-profile', user: MockUser): void;
+  (e: 'open-delete-event' | 'open-preview-modal', event: UiEvent): void;
+  (e: 'open-user-profile', user: EventCreatorDto): void;
 }>();
 
 const searchQuery = defineModel<string>('searchQuery', { default: '' });

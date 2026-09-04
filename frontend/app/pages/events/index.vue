@@ -3,7 +3,7 @@
   <ClientOnly>
     <template #fallback>
       <div class="min-h-screen flex items-center justify-center">
-        <span class="opacity-50 font-medium">{{ CONST_LOADING_TEXT }}</span>
+        <span class="opacity-50 font-medium">{{ CONST_LOADING_TEXT ?? 'Loading...' }}</span>
       </div>
     </template>
 
@@ -20,7 +20,7 @@
       :selected-day-id="selectedDayId"
       :selected-event="selectedEvent"
       :is-loading-groups="isLoadingGroups"
-      :is-loading-days="isLoadingDays"
+      :is-loading-days="isLoadingEvents"
       :is-loading-events="isLoadingEvents"
       :sorted-days-list="sortedDaysList"
       :filtered-and-sorted-events-list="filteredAndSortedEventsList"
@@ -55,7 +55,7 @@
       :selected-day-id="selectedDayId"
       :selected-event="selectedEvent"
       :is-loading-groups="isLoadingGroups"
-      :is-loading-days="isLoadingDays"
+      :is-loading-days="isLoadingEvents"
       :is-loading-events="isLoadingEvents"
       :sorted-days-list="sortedDaysList"
       :filtered-and-sorted-events-list="filteredAndSortedEventsList"
@@ -79,92 +79,91 @@
 </template>
 
 <script setup lang="ts">
-/* IMPORTS */
-import { ref, computed, watch, onMounted } from 'vue';
+/* --- IMPORTS --- */
+import { ref, computed, watch } from 'vue';
 import { useScreenSize } from '~/composables/useScreenSize';
 import { useCurrentUserQuery } from '~/queries/user.query';
+import { useGroupsQuery } from '~/queries/groups.query';
+import { useEventsQuery } from '~/queries/events.query';
 import { useEventsStore } from '~/stores/events.modals.store';
 import { useGroupsStore } from '~/stores/groups.modals.store';
-import type { GroupOutDto } from '~/types/groups.type';
-import {
-  fetchMockGroups,
-  fetchMockDays,
-  fetchMockEvents,
-  type MockDay,
-  type MockEvent,
-  type MockUser,
-} from '~/utils/apiMock.utils';
 
-import {
-  processAndSortDays,
-  processAndSortEvents,
-  type ProcessedDay,
-  type ClientEvent,
-} from '~/utils/sort.utils';
+import type { GroupOutDto } from '~/types/groups.type';
+import type { UiDay, UiEvent, EventCreatorDto } from '~/types/events.type';
+import { processAvailableDates, processAndSortEvents } from '~/utils/sort.utils';
 import { filterEventsByQuery } from '~/utils/filter.utils';
+
 import EventsDesktop from '~/components/views/desktop/events/EventsDesktop.vue';
 import EventsMobile from '~/components/views/mobile/events/EventsMobile.vue';
 
+/* --- META --- */
 definePageMeta({ layout: 'general', middleware: ['auth'] });
 
-/* STORES & QUERIES */
+/* --- PAGE CONFIGURATION --- */
 const { isMobile } = useScreenSize();
 const eventsStore = useEventsStore();
 const groupsStore = useGroupsStore();
 const { data: currentUser } = useCurrentUserQuery();
 
-/* STATE */
-const userGroupsList = ref<GroupOutDto[]>([]);
-const daysList = ref<MockDay[]>([]);
-const eventsList = ref<MockEvent[]>([]);
-
 const selectedGroupUuid = ref<string | undefined>(undefined);
 const selectedDayId = ref<string | undefined>(undefined);
-const selectedEvent = ref<ClientEvent | null | undefined>(null);
+const selectedEvent = ref<UiEvent | null | undefined>(null);
 
-const isLoadingGroups = ref(true);
-const isLoadingDays = ref(false);
-const isLoadingEvents = ref(false);
 const isGroupDropdownOpen = ref(false);
-
+const isFilterOpen = ref(false);
 const searchQuery = ref('');
 const debouncedSearchQuery = ref('');
 let searchTimeout: ReturnType<typeof setTimeout>;
 
-const isFilterOpen = ref(false);
 const filterStartDate = ref('');
 const filterEndDate = ref('');
+const activeFilterStartDate = ref('');
+const activeFilterEndDate = ref('');
 
-/* LIFECYCLE & WATCHERS */
-onMounted(async () => {
-  isLoadingGroups.value = true;
-  userGroupsList.value = await fetchMockGroups();
-  isLoadingGroups.value = false;
+/* --- DATA --- */
+const { data: groupsData, isLoading: isLoadingGroups } = useGroupsQuery();
+const userGroupsList = computed<GroupOutDto[]>(() => groupsData.value?.items || []);
 
-  if (userGroupsList.value.length > 0) {
-    selectedGroupUuid.value = userGroupsList.value[0]?.uuid;
+watch(
+  userGroupsList,
+  (newGroups) => {
+    if (newGroups.length > 0 && !selectedGroupUuid.value) {
+      selectedGroupUuid.value = newGroups[0]?.uuid;
+    }
+  },
+  { immediate: true },
+);
+
+watch(selectedGroupUuid, (newUuid) => {
+  eventsStore.selectedGroupUuid = newUuid;
+});
+
+const { data: eventsResponse, isLoading: isLoadingEvents } = useEventsQuery(
+  selectedGroupUuid,
+  activeFilterStartDate,
+  activeFilterEndDate,
+);
+
+/* --- PROCESS --- */
+const sortedDaysList = computed<UiDay[]>(() => {
+  if (!eventsResponse.value?.available_dates) return [];
+  return processAvailableDates(eventsResponse.value.available_dates);
+});
+
+watch(sortedDaysList, (newDays) => {
+  if (newDays.length > 0 && !selectedDayId.value) {
+    const validDay = newDays.find((d) => !d.isExpired) || newDays[0];
+    selectedDayId.value = validDay?.id;
   }
 });
 
-watch(selectedGroupUuid, async (newUuid) => {
-  if (!newUuid) return;
-  isLoadingDays.value = true;
-  daysList.value = await fetchMockDays(newUuid);
-  isLoadingDays.value = false;
+const selectedDayDetails = computed<UiDay | undefined>(() =>
+  sortedDaysList.value.find((d) => d.id === selectedDayId.value),
+);
 
-  const validDay = sortedDaysList.value.find((d) => !d.isExpired) || sortedDaysList.value[0];
-  selectedDayId.value = validDay?.id;
-});
-
-watch(selectedDayId, async (newDayId) => {
-  if (!newDayId) {
-    eventsList.value = [];
-    return;
-  }
-  isLoadingEvents.value = true;
-  eventsList.value = await fetchMockEvents(newDayId);
-  isLoadingEvents.value = false;
-  searchQuery.value = '';
+const sortedEventsList = computed<UiEvent[]>(() => {
+  if (!eventsResponse.value?.events) return [];
+  return processAndSortEvents(eventsResponse.value.events, selectedDayDetails.value);
 });
 
 watch(searchQuery, (newVal) => {
@@ -174,16 +173,26 @@ watch(searchQuery, (newVal) => {
   }, 300);
 });
 
-/* COMPUTED PROPERTIES */
-const selectedGroupDetails = computed(() => {
-  if (!selectedGroupUuid.value) return undefined;
-  return userGroupsList.value.find((g) => g.uuid === selectedGroupUuid.value);
+const filteredAndSortedEventsList = computed<UiEvent[]>(() =>
+  filterEventsByQuery(sortedEventsList.value, debouncedSearchQuery.value),
+);
+
+watch(filteredAndSortedEventsList, (newList) => {
+  const currentExistsInNewList = newList.find((e) => e.uuid === selectedEvent.value?.uuid);
+  if (newList.length > 0 && !currentExistsInNewList) {
+    selectedEvent.value = newList[0];
+  } else if (newList.length === 0) {
+    selectedEvent.value = null;
+  }
 });
 
-const isCurrentUserLeader = computed(() => {
-  const group = selectedGroupDetails.value;
-  return group?.role?.toLowerCase() === 'leader';
-});
+/* --- PERMISSIONS & HELPERS --- */
+const selectedGroupDetails = computed(() =>
+  userGroupsList.value.find((g) => g.uuid === selectedGroupUuid.value),
+);
+const isCurrentUserLeader = computed(
+  () => selectedGroupDetails.value?.role?.toLowerCase() === 'leader',
+);
 
 const hasPermissionToDelete = computed(() => {
   const creatorName = selectedEvent.value?.creator?.username;
@@ -194,85 +203,51 @@ const hasPermissionToDelete = computed(() => {
   );
 });
 
-const sortedDaysList = computed<ProcessedDay[]>(() => processAndSortDays(daysList.value));
-
-const selectedDayDetails = computed<ProcessedDay | undefined>(() => {
-  return sortedDaysList.value.find((d) => d.id === selectedDayId.value);
-});
-
-const sortedEventsList = computed<ClientEvent[]>(() =>
-  processAndSortEvents(eventsList.value, selectedDayDetails.value),
-);
-
-const filteredAndSortedEventsList = computed<ClientEvent[]>(() =>
-  filterEventsByQuery(sortedEventsList.value, debouncedSearchQuery.value),
-);
-
-watch(filteredAndSortedEventsList, (newList) => {
-  const currentExistsInNewList = newList.find((e) => e.id === selectedEvent.value?.id);
-  if (newList.length > 0 && !currentExistsInNewList) {
-    selectedEvent.value = newList[0];
-  } else if (newList.length === 0) {
-    selectedEvent.value = null;
-  }
-});
-
 const displayParticipants = computed(() => selectedEvent.value?.members?.slice(0, 5) || []);
 const extraParticipantsCount = computed(() =>
   Math.max(0, (selectedEvent.value?.members?.length || 0) - 5),
 );
 
-/* EVENT HANDLERS */
+/* --- EVENT HANDLERS --- */
 const selectGroup = (uuid: string) => {
   selectedGroupUuid.value = uuid;
   isGroupDropdownOpen.value = false;
+  selectedDayId.value = undefined;
 };
 
 const applyDateFilter = () => {
+  activeFilterStartDate.value = filterStartDate.value;
+  activeFilterEndDate.value = filterEndDate.value;
   isFilterOpen.value = false;
 };
 
 const handleDeleteCurrentGroup = () => {
-  const group = selectedGroupDetails.value;
-  if (!group) return;
-
-  groupsStore.openDeleteModal({
-    uuid: group.uuid,
-    name: group.name,
-    role: group.role ?? 'leader',
-    current_size: group.current_size ?? 1,
-    created_at: group.created_at ?? '',
-  });
+  if (selectedGroupDetails.value) groupsStore.openDeleteModal(selectedGroupDetails.value);
 };
-
 const handleLeaveCurrentGroup = () => {
-  const group = selectedGroupDetails.value;
-  if (!group) return;
-  groupsStore.openLeaveModal(group);
+  if (selectedGroupDetails.value) groupsStore.openLeaveModal(selectedGroupDetails.value);
 };
 
-const openUserProfile = (user: MockUser) => {
+const openUserProfile = (user: EventCreatorDto) => {
   groupsStore.selectedUserProfile = {
     username: user.username,
-    email: user.email,
-    role: user.role || 'Participant',
-    joinedAt: user.joinedAt || 'Unknown',
-    canViewDocuments: user.canViewDocuments ?? false,
+    email: 'N/A',
+    role: 'Participant',
+    joinedAt: 'Unknown',
+    canViewDocuments: false,
   };
   groupsStore.isUserProfileModalOpen = true;
 };
 
 const openAllParticipantsModal = () => {
-  if (selectedEvent.value && selectedEvent.value.members) {
-    eventsStore.openParticipantsModal(selectedEvent.value.members);
-  }
+  if (selectedEvent.value?.members) eventsStore.openParticipantsModal(selectedEvent.value.members);
 };
 
-const handleOpenDeleteEventModal = (event: ClientEvent) => {
+const handleOpenDeleteEventModal = (event: UiEvent) => {
   eventsStore.openDeleteEventModal(event);
 };
 
-const handleOpenPreviewModal = (event: ClientEvent) => {
+const handleOpenPreviewModal = (event: UiEvent) => {
   selectedEvent.value = event;
   eventsStore.openPreviewModal(event, selectedDayDetails.value?.date);
 };

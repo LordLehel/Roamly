@@ -105,6 +105,20 @@ export default defineAppConfig({
       },
     },
 
+    textarea: {
+      slots: { root: 'w-full' },
+      variants: {
+        variant: {
+          glass: {
+            base: 'bg-input-bg text-dark-text rounded-xl ring-1 ring-input-border placeholder:text-text-muted focus:ring-2 focus:ring-brand-500 transition-colors h-11 !px-5 shadow-none',
+          },
+          glassError: {
+            base: 'bg-error-50 text-error-900 rounded-xl ring-1 ring-error-500 placeholder:text-error-300 focus:ring-2 focus:ring-error-500 transition-colors h-11 !px-5 shadow-none',
+          },
+        },
+      },
+    },
+
     // ------------------- AVATAR -------------------
     avatar: {
       slots: {
@@ -216,7 +230,8 @@ export default defineAppConfig({
 
     // ------------------- AUTH PAGES (Login / Register) -------------------
     mainAuth: 'flex-1 flex items-center justify-center p-6',
-    authWrapper: 'w-full max-w-md mx-auto flex flex-col gap-6',
+    authWrapper: 'w-full w-md max-w-md mx-auto flex flex-col gap-6',
+    mobileAuthWrapper: 'w-full max-w-md mx-auto flex flex-col gap-6',
     formWrapper: 'w-full flex flex-col gap-4',
     formActions: 'flex items-center justify-between pt-6',
 

@@ -1,9 +1,11 @@
 // frontend/app/stores/events.modals.store.ts
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import type { DayOutDto, EventOutDto } from '~/types/events.type'; // <-- Típusok betöltése
+import type { UiEvent, EventCreatorDto } from '~/types/events.type';
 
 export const useEventsStore = defineStore('events', () => {
+  const selectedGroupUuid = ref<string | undefined>(undefined);
+
   const isAddDayModalOpen = ref(false);
   const isDeleteDayModalOpen = ref(false);
   const isAddEventModalOpen = ref(false);
@@ -11,37 +13,35 @@ export const useEventsStore = defineStore('events', () => {
   const isParticipantsModalOpen = ref(false);
   const isPreviewModalOpen = ref(false);
 
-  const selectedDayToDelete = ref<DayOutDto | null>(null);
-  const selectedEventToDelete = ref<EventOutDto | null>(null);
-  const currentEventParticipants = ref<MockUser[]>([]);
-  const previewEvent = ref<ClientEvent | null>(null);
+  const selectedEventToDelete = ref<UiEvent | null>(null);
+  const currentEventParticipants = ref<EventCreatorDto[]>([]);
+  const previewEvent = ref<UiEvent | null>(null);
   const previewDate = ref<string | undefined>(undefined);
 
   const openAddEventModal = () => (isAddEventModalOpen.value = true);
   const closeAddEventModal = () => (isAddEventModalOpen.value = false);
 
-  const openDeleteEventModal = (event: EventOutDto) => {
+  const openDeleteEventModal = (event: UiEvent) => {
     selectedEventToDelete.value = event;
     isDeleteEventModalOpen.value = true;
   };
+
   const closeDeleteEventModal = () => {
     isDeleteEventModalOpen.value = false;
     selectedEventToDelete.value = null;
   };
 
-  const openParticipantsModal = (participants: MockUser[]) => {
+  const openParticipantsModal = (participants: EventCreatorDto[]) => {
     currentEventParticipants.value = participants;
     isParticipantsModalOpen.value = true;
   };
 
   const closeParticipantsModal = () => {
     isParticipantsModalOpen.value = false;
-    setTimeout(() => {
-      currentEventParticipants.value = [];
-    }, 300);
+    currentEventParticipants.value = [];
   };
 
-  const openPreviewModal = (event: ClientEvent, date?: string) => {
+  const openPreviewModal = (event: UiEvent, date?: string) => {
     previewEvent.value = event;
     previewDate.value = date;
     isPreviewModalOpen.value = true;
@@ -54,19 +54,17 @@ export const useEventsStore = defineStore('events', () => {
   };
 
   return {
+    selectedGroupUuid,
     isAddDayModalOpen,
     isDeleteDayModalOpen,
     isAddEventModalOpen,
     isDeleteEventModalOpen,
     isParticipantsModalOpen,
     isPreviewModalOpen,
-
-    selectedDayToDelete,
     selectedEventToDelete,
     currentEventParticipants,
     previewEvent,
     previewDate,
-
     openAddEventModal,
     closeAddEventModal,
     openDeleteEventModal,

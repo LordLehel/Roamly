@@ -38,7 +38,12 @@
           </UButton>
 
           <template #content>
-            <div :class="appConfig.ui.wideDropdownMenu.slots.content">
+            <div
+              :class="[
+                appConfig.ui.wideDropdownMenu.slots.content,
+                'max-h-[50vh] overflow-y-auto custom-scrollbar',
+              ]"
+            >
               <button
                 v-for="group in userGroupsList"
                 :key="group.uuid"
@@ -182,37 +187,53 @@
           <template v-else>
             <div
               v-for="event in filteredAndSortedEventsList"
-              :key="event.id"
+              :key="event.uuid"
               :class="[
                 appConfig.calendar.listItem,
                 appConfig.calendar.listItemHover,
-                selectedEvent?.id === event.id ? appConfig.calendar.eventListItemSelected : '',
+                selectedEvent?.uuid === event.uuid ? appConfig.calendar.eventListItemSelected : '',
                 event.isExpired ? appConfig.calendar.expiredItemWrapper : '',
+                'group relative flex items-center justify-between',
               ]"
               @click="$emit('update:selected-event', event)"
             >
-              <div :class="appConfig.calendar.eventItemWrapper">
+              <div :class="appConfig.calendar.eventItemWrapper" class="flex-1 min-w-0 pr-2">
                 <UIcon
-                  :name="event.isPrivate ? 'i-heroicons-user' : 'i-heroicons-users'"
+                  :name="event.is_private ? 'i-heroicons-user' : 'i-heroicons-users'"
                   :class="appConfig.calendar.eventItemIcon"
+                  class="shrink-0"
                 />
                 <span
                   :class="[
                     appConfig.calendar.eventItemTitle,
                     event.isExpired ? appConfig.calendar.expiredItemText : '',
                   ]"
+                  class="truncate"
                   >{{ event.title }}</span
                 >
               </div>
-              <span :class="appConfig.calendar.eventItemTime"
-                >{{ event.timeStart }} - {{ event.timeEnd }}</span
-              >
+
+              <div class="flex items-center gap-2 shrink-0">
+                <span :class="appConfig.calendar.eventItemTime">
+                  {{ event.timeStartFormatted }} - {{ event.timeEndFormatted }}
+                </span>
+                <UTooltip text="Delete Event">
+                  <UButton
+                    icon="i-heroicons-trash"
+                    variant="ghostDangerIconButton"
+                    class="opacity-0 group-hover:opacity-100 transition-opacity p-1"
+                    @click.stop="$emit('open-delete-event', event)"
+                  />
+                </UTooltip>
+              </div>
             </div>
+
             <div
               v-if="!filteredAndSortedEventsList?.length"
-              class="p-6 text-center text-sm text-dark-text/60 font-medium"
+              class="p-8 text-center text-sm text-dark-text/60 font-medium flex flex-col items-center justify-center h-48 gap-2"
             >
-              {{ searchQuery ? 'No matching events found.' : 'No events found.' }}
+              <UIcon name="i-heroicons-calendar" class="w-8 h-8 opacity-40" />
+              <span>{{ searchQuery ? 'No matching events found.' : 'No events found.' }}</span>
             </div>
           </template>
         </div>
@@ -228,11 +249,11 @@
           <div :class="appConfig.calendar.previewTitleRow">
             <div :class="appConfig.calendar.previewTypeWrapper">
               <UIcon
-                :name="selectedEvent.isPrivate ? 'i-heroicons-user' : 'i-heroicons-users'"
+                :name="selectedEvent.is_private ? 'i-heroicons-user' : 'i-heroicons-users'"
                 :class="appConfig.calendar.previewTypeIcon"
               />
               <span :class="appConfig.calendar.previewTypeText">{{
-                selectedEvent.isPrivate ? 'Private' : 'Group'
+                selectedEvent.is_private ? 'Private' : 'Group'
               }}</span>
             </div>
             <h2 :class="appConfig.calendar.previewMainTitle">
@@ -267,7 +288,7 @@
             <div :class="appConfig.calendar.metaRowItem">
               <span :class="appConfig.calendar.metaLabel">Time:</span>
               <span :class="appConfig.calendar.metaValue"
-                >{{ selectedEvent.timeStart }} - {{ selectedEvent.timeEnd }}</span
+                >{{ selectedEvent.timeStartFormatted }} - {{ selectedEvent.timeEndFormatted }}</span
               >
             </div>
 
@@ -282,10 +303,10 @@
                       : appConfig.calendar.participantsGap,
                   ]"
                 >
-                  <UTooltip v-for="p in displayParticipants" :key="p.id" :text="p.username">
+                  <UTooltip v-for="p in displayParticipants" :key="p.uuid" :text="p.username">
                     <UAvatar
                       :alt="p.username"
-                      :src="p.avatar || undefined"
+                      :src="p.profile_image_url || undefined"
                       icon="i-heroicons-user"
                       size="sm"
                       :class="[
@@ -350,10 +371,8 @@
 <script setup lang="ts">
 import { useAppConfig } from '#imports';
 import type { GroupOutDto } from '~/types/groups.type';
-import type { MockUser } from '~/utils/apiMock.utils';
-import type { ProcessedDay, ClientEvent } from '~/utils/sort.utils';
+import type { EventCreatorDto, UiDay, UiEvent } from '~/types/events.type';
 
-// TS18046 fix: Explicit type casting
 const appConfig = useAppConfig();
 
 defineProps<{
@@ -361,28 +380,28 @@ defineProps<{
   selectedGroupUuid?: string;
   selectedGroupDetails?: GroupOutDto;
   selectedDayId?: string;
-  selectedEvent: ClientEvent | null | undefined;
+  selectedEvent: UiEvent | null | undefined;
   isLoadingGroups: boolean;
   isLoadingDays: boolean;
   isLoadingEvents: boolean;
-  sortedDaysList: ProcessedDay[];
-  filteredAndSortedEventsList: ClientEvent[];
-  selectedDayDetails?: ProcessedDay;
+  sortedDaysList: UiDay[];
+  filteredAndSortedEventsList: UiEvent[];
+  selectedDayDetails?: UiDay;
   isCurrentUserLeader: boolean;
   hasPermissionToDelete: boolean;
-  displayParticipants: MockUser[];
+  displayParticipants: EventCreatorDto[];
   extraParticipantsCount: number;
 }>();
 
 defineEmits<{
   (e: 'select-group', uuid: string): void;
   (e: 'update:selected-day-id', id: string | undefined): void;
-  (e: 'update:selected-event', event: ClientEvent | null): void;
+  (e: 'update:selected-event', event: UiEvent | null): void;
   (
     e: 'delete-group' | 'leave-group' | 'apply-filter' | 'open-add-event' | 'open-all-participants',
   ): void;
-  (e: 'open-delete-event', event: ClientEvent): void;
-  (e: 'open-user-profile', user: MockUser): void;
+  (e: 'open-delete-event', event: UiEvent): void;
+  (e: 'open-user-profile', user: EventCreatorDto): void;
 }>();
 
 const searchQuery = defineModel<string>('searchQuery', { default: '' });

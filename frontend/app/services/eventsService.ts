@@ -1,58 +1,29 @@
-// frontend/app/services/eventsService.ts
-import type { DayOutDto, EventOutDto, EventInDto } from '~/types/events.type';
+// frontend/app/services/events.service.ts
+import type { EventInDto, EventsResponseDto } from '~/types/events.type';
 
 export const eventsService = {
-  // Dummy hálózat szimuláció
-  async getDays(_groupUuid: string): Promise<DayOutDto[]> {
-    return Promise.resolve([
-      { id: '1', date: '12.10', dayOfWeek: 'Sat.' },
-      { id: '2', date: '13.10', dayOfWeek: 'Sun.' },
-      { id: '3', date: '14.10', dayOfWeek: 'Mon.' },
-    ]);
+  async getEvents(
+    groupUuid: string,
+    startDate?: string,
+    endDate?: string,
+  ): Promise<EventsResponseDto> {
+    const query = new URLSearchParams();
+    if (startDate) query.append('start_date', startDate);
+    if (endDate) query.append('end_date', endDate);
+
+    return await $fetch<EventsResponseDto>(`/api/groups/${groupUuid}/events?${query.toString()}`);
   },
 
-  async getEvents(_groupUuid: string, _dayId: string): Promise<EventOutDto[]> {
-    return Promise.resolve([
-      {
-        id: '1',
-        title: 'Morning Hike',
-        isPrivate: false,
-        timeStart: '08:00',
-        timeEnd: '12:00',
-        creator: { username: 'sir_real_99', avatar: null },
-        description: 'Fun event xd xd',
-        location: 'google.maps.coordinate',
-      },
-      {
-        id: '2',
-        title: 'Secret Meeting',
-        isPrivate: true,
-        timeStart: '14:00',
-        timeEnd: '15:30',
-        creator: { username: 'john_doe', avatar: null },
-        description: 'Classified discussion.',
-        location: 'google.maps.coordinate',
-      },
-    ]);
-  },
-
-  async addDay(_groupUuid: string, date: string): Promise<DayOutDto> {
-    return Promise.resolve({ id: Math.random().toString(), date, dayOfWeek: 'New' });
-  },
-
-  async deleteDay(_dayId: string): Promise<void> {
-    return Promise.resolve();
-  },
-
-  async addEvent(_groupUuid: string, eventData: EventInDto): Promise<EventOutDto> {
-    return Promise.resolve({
-      id: Math.random().toString(),
-      ...eventData,
-      creator: { username: 'me', avatar: null },
+  async createEvent(groupUuid: string, payload: EventInDto): Promise<void> {
+    return await $fetch(`/api/groups/${groupUuid}/events`, {
+      method: 'POST',
+      body: payload,
     });
   },
 
-  async deleteEvent(_eventId: string): Promise<void> {
-    return Promise.resolve();
+  async deleteEvent(eventUuid: string): Promise<void> {
+    return await $fetch(`/api/events/${eventUuid}`, {
+      method: 'DELETE',
+    });
   },
 };

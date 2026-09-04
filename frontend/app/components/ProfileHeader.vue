@@ -50,7 +50,7 @@
               :content="{ align: 'start', side: 'left', alignOffset: -18 }"
               :ui="{
                 content:
-                  'w-30 bg-surface-500/90 backdrop-blur-md rounded-full ring-1 ring-brand-500/30 shadow-xl p-1',
+                  'w-36 bg-surface-500/90 backdrop-blur-md rounded-full ring-1 ring-brand-500/30 shadow-xl',
                 itemLeadingIcon: 'w-10 h-10 text-brand-500 shrink-0',
                 item: 'text-md font-semibold',
               }"

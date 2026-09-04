@@ -1,82 +1,53 @@
-// frontend/utils/sort.utils.ts
-import type { MockDay, MockEvent } from '~/utils/apiMock.utils';
+// frontend/app/utils/sort.utils.ts
+import type { EventOutDto, UiDay, UiEvent } from '~/types/events.type';
 
-export type ProcessedDay = MockDay & { dayDate: Date; isExpired: boolean };
-export type ClientEvent = MockEvent & { isExpired?: boolean };
-
-/**
- * Returns the current date and the midnight time for accurate comparison.
- */
-export const getCurrentParsedDate = () => {
+export const processAvailableDates = (dates: string[]): UiDay[] => {
   const now = new Date();
-  return {
-    now,
-    todayMidnight: new Date(now.getFullYear(), now.getMonth(), now.getDate()),
-  };
+  const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  return dates
+    .map((dateStr) => {
+      const dateObj = new Date(dateStr);
+      const isExpired = dateObj < todayMidnight;
+      const dayOfWeek = dateObj.toLocaleDateString('en-US', { weekday: 'short' }) + '.';
+      const formattedDate = `${String(dateObj.getMonth() + 1).padStart(2, '0')}.${String(
+        dateObj.getDate(),
+      ).padStart(2, '0')}`;
+
+      return { id: dateStr, date: formattedDate, dayOfWeek, dateObj, isExpired };
+    })
+    .sort((a, b) => a.dateObj.getTime() - b.dateObj.getTime());
 };
 
-/**
- * Processes a list of days, determining if they are expired based on the current date,
- * and sorts them (active days first, then expired days).
- */
-export const processAndSortDays = (daysList: MockDay[]): ProcessedDay[] => {
-  const { todayMidnight } = getCurrentParsedDate();
-  const currentYear = todayMidnight.getFullYear();
+export const processAndSortEvents = (events: EventOutDto[], selectedDay?: UiDay): UiEvent[] => {
+  if (!selectedDay) return [];
 
-  const processed = daysList.map((day) => {
-    const [month, dayOfMonth] = day.date.split('.').map(Number);
-    const dayDate = new Date(currentYear, (month ?? 1) - 1, dayOfMonth ?? 1);
-    const isExpired = dayDate < todayMidnight;
+  const now = new Date();
+  // const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-    return { ...day, dayDate, isExpired };
-  });
+  return events
+    .filter((ev) => {
+      // Csak a kiválasztott naphoz tartozó eseményeket tartjuk meg
+      const evDate = new Date(ev.start_time);
+      const evMidnight = new Date(evDate.getFullYear(), evDate.getMonth(), evDate.getDate());
+      return evMidnight.getTime() === selectedDay.dateObj.getTime();
+    })
+    .map((ev) => {
+      const startTime = new Date(ev.start_time);
+      const endTime = new Date(ev.end_time);
 
-  const active = processed
-    .filter((d) => !d.isExpired)
-    .sort((a, b) => a.dayDate.getTime() - b.dayDate.getTime());
+      // Kiszámoljuk a lejárati státuszt és formázzuk az időpontokat
+      const isExpired = selectedDay.isExpired || endTime < now;
+      const timeStartFormatted = startTime.toLocaleTimeString('hu-HU', {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+      const timeEndFormatted = endTime.toLocaleTimeString('hu-HU', {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
 
-  const expired = processed
-    .filter((d) => d.isExpired)
-    .sort((a, b) => a.dayDate.getTime() - b.dayDate.getTime());
-
-  return [...active, ...expired];
-};
-
-/**
- * Processes a list of events for a specific day, determining their expiration status
- * based on the end time, and sorts them chronologically.
- */
-export const processAndSortEvents = (
-  eventsList: MockEvent[],
-  dayDetails?: ProcessedDay,
-): ClientEvent[] => {
-  if (!dayDetails) return [];
-
-  const { now } = getCurrentParsedDate();
-
-  const processed = eventsList.map((event) => {
-    let isExpired = dayDetails.isExpired;
-
-    if (!isExpired) {
-      const [endHours, endMinutes] = event.timeEnd.split(':').map(Number);
-      const eventEndDate = new Date(dayDetails.dayDate);
-      eventEndDate.setHours(endHours ?? 0, endMinutes ?? 0, 0, 0);
-
-      if (eventEndDate < now) {
-        isExpired = true;
-      }
-    }
-
-    return { ...event, isExpired };
-  });
-
-  const active = processed
-    .filter((e) => !e.isExpired)
-    .sort((a, b) => a.timeStart.localeCompare(b.timeStart));
-
-  const expired = processed
-    .filter((e) => e.isExpired)
-    .sort((a, b) => a.timeStart.localeCompare(b.timeStart));
-
-  return [...active, ...expired];
+      return { ...ev, isExpired, timeStartFormatted, timeEndFormatted };
+    })
+    .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
 };
