@@ -14,50 +14,72 @@
         <h3 class="text-xl font-bold text-dark-text">Add Event</h3>
       </template>
       <template #body>
+        <!-- A validációt és beküldést az UForm intézi automatikusan -->
         <UForm
-          :schema="schema"
+          :schema="createEventSchema"
           :state="formState"
           :class="appConfig.layout.modalForm"
           @submit="onSubmit"
         >
-          <UFormGroup label="Event Title" name="title">
-            <UInput v-model="formState.title" placeholder="e.g., Morning Standup" variant="glass" />
-          </UFormGroup>
+          <UFormField name="title" label="Event Title">
+            <template #default="{ error: fieldError }">
+              <UInput
+                v-model="formState.title"
+                placeholder="e.g., Morning Standup"
+                :variant="fieldError ? 'glassError' : 'glass'"
+              />
+            </template>
+          </UFormField>
 
           <div class="grid grid-cols-2 gap-4">
-            <UFormGroup label="Start Time" name="start_time">
-              <UInput v-model="formState.start_time" type="datetime-local" variant="glass" />
-            </UFormGroup>
-            <UFormGroup label="End Time" name="end_time">
-              <UInput v-model="formState.end_time" type="datetime-local" variant="glass" />
-            </UFormGroup>
+            <UFormField name="start_time" label="Start Time">
+              <template #default="{ error: fieldError }">
+                <UInput
+                  v-model="formState.start_time"
+                  type="datetime-local"
+                  :variant="fieldError ? 'glassError' : 'glass'"
+                />
+              </template>
+            </UFormField>
+
+            <UFormField name="end_time" label="End Time">
+              <template #default="{ error: fieldError }">
+                <UInput
+                  v-model="formState.end_time"
+                  type="datetime-local"
+                  :variant="fieldError ? 'glassError' : 'glass'"
+                />
+              </template>
+            </UFormField>
           </div>
 
-          <UFormGroup label="Location" name="location">
-            <UInput
-              v-model="formState.location"
-              placeholder="e.g., Conference Room A"
-              variant="glass"
-            />
-          </UFormGroup>
+          <UFormField name="description" label="Description">
+            <template #default="{ error: fieldError }">
+              <UTextarea
+                v-model="formState.description"
+                placeholder="Event details..."
+                :variant="fieldError ? 'glassError' : 'glass'"
+              />
+            </template>
+          </UFormField>
 
-          <UFormGroup label="Description" name="description">
-            <UTextarea
-              v-model="formState.description"
-              placeholder="Event details..."
+          <div class="mt-2 flex items-center justify-between">
+            <UCheckbox
+              v-model="formState.is_private"
               variant="glass"
+              :label="CONTS_MARK_EVENTS_AS_PRIVATE"
             />
-          </UFormGroup>
-
-          <UFormGroup name="is_private">
-            <UCheckbox v-model="formState.is_private" label="Mark as Private Event" />
-          </UFormGroup>
+          </div>
 
           <div :class="[appConfig.layout.flexBetween, 'mt-4']">
-            <UButton label="Cancel" variant="actionCancelButton" @click="closeAndResetForm" />
+            <UButton
+              :label="CONST_CANCEL_BTN_TEXT ?? 'Cancel'"
+              variant="actionCancelButton"
+              @click="closeAndResetForm"
+            />
             <UButton
               type="submit"
-              label="Save Event"
+              :label="CONST_ADD_BTN ?? 'Save'"
               variant="actionOkButton"
               :loading="createEventMutation.isLoading.value"
             />
@@ -76,22 +98,26 @@
       <template #default><div class="hidden"></div></template>
       <template #close><div class="hidden"></div></template>
       <template #header>
-        <h3 class="text-xl font-bold text-dark-text">Delete Event</h3>
+        <h3 class="text-xl font-bold text-dark-text">
+          {{ CONST_DELETE_EVENT_TITLE ?? 'Delete Event' }}
+        </h3>
       </template>
       <template #body>
         <p :class="appConfig.typography.modalText">
-          Are you sure you want to delete "{{ eventsStore.selectedEventToDelete?.title }}"?
+          {{ CONST_DELETE_EVENT_CONFIRM ?? 'Are you sure you want to delete' }} "{{
+            eventsStore.selectedEventToDelete?.title
+          }}"?
         </p>
       </template>
       <template #footer>
         <div :class="appConfig.layout.flexBetween">
           <UButton
-            label="Cancel"
+            :label="CONST_CANCEL_BTN_TEXT ?? 'Cancel'"
             variant="actionCancelButton"
             @click="eventsStore.closeDeleteEventModal()"
           />
           <UButton
-            label="Delete"
+            :label="CONST_DELETE_BTN ?? 'Delete'"
             variant="actionOkButton"
             class="bg-error-500 hover:bg-error-600 text-white"
             :loading="deleteEventMutation.isLoading.value"
@@ -144,7 +170,7 @@
       <template #footer>
         <div class="flex justify-end w-full">
           <UButton
-            label="Close"
+            :label="CONST_CANCEL_BTN_TEXT ?? 'Close'"
             variant="actionCancelButton"
             @click="eventsStore.closeParticipantsModal()"
           />
@@ -182,11 +208,11 @@
                 :class="appConfig.calendar.previewTypeIcon"
               />
               <span :class="appConfig.calendar.previewTypeText">{{
-                eventsStore.previewEvent.is_private ? 'Private' : 'Group'
+                eventsStore.previewEvent.is_private ? CONST_PRIVATE_LBL : CONST_GROUP_EVENT_LBL
               }}</span>
             </div>
 
-            <UTooltip v-if="hasPermissionToDelete" text="Delete Event">
+            <UTooltip v-if="hasPermissionToDelete" :text="CONST_DELETE_EVENT_TITLE">
               <UButton
                 icon="i-heroicons-trash"
                 variant="ghostDangerIconButton"
@@ -207,19 +233,19 @@
 
           <div :class="appConfig.calendar.previewMetaRow">
             <div :class="appConfig.calendar.metaRowItem">
-              <span :class="appConfig.calendar.metaLabel">Creator:</span>
+              <span :class="appConfig.calendar.metaLabel">{{ CONST_CREATOR_LBL }}</span>
               <span :class="appConfig.calendar.metaValue">{{
                 eventsStore.previewEvent.creator?.username
               }}</span>
             </div>
             <div :class="appConfig.calendar.metaRowItem">
-              <span :class="appConfig.calendar.metaLabel">Date:</span>
+              <span :class="appConfig.calendar.metaLabel">{{ CONST_DATE_LBL }}</span>
               <span :class="appConfig.calendar.metaValue">{{
                 eventsStore.previewDate || 'N/A'
               }}</span>
             </div>
             <div :class="appConfig.calendar.metaRowItem">
-              <span :class="appConfig.calendar.metaLabel">Time:</span>
+              <span :class="appConfig.calendar.metaLabel">{{ CONST_TIME_LBL }}</span>
               <span :class="appConfig.calendar.metaValue"
                 >{{ eventsStore.previewEvent.timeStartFormatted }} -
                 {{ eventsStore.previewEvent.timeEndFormatted }}</span
@@ -227,7 +253,7 @@
             </div>
 
             <div :class="appConfig.calendar.metaRowItemCenter">
-              <span :class="appConfig.calendar.metaLabel">Members:</span>
+              <span :class="appConfig.calendar.metaLabel">{{ CONST_MEMBERS_LBL }}</span>
               <div :class="appConfig.calendar.participantsGroup">
                 <div
                   :class="[
@@ -269,36 +295,18 @@
             </div>
 
             <div :class="[appConfig.calendar.metaRowItem, 'mt-2 flex-col gap-1!']">
-              <span :class="appConfig.calendar.metaLabel">Description:</span>
+              <span :class="appConfig.calendar.metaLabel">{{ CONST_DESC_LBL }}</span>
               <span :class="appConfig.calendar.metaValue">{{
                 eventsStore.previewEvent.description
               }}</span>
             </div>
-            <div :class="appConfig.calendar.metaRowItem">
-              <span :class="appConfig.calendar.metaLabel">Location:</span>
-              <span :class="[appConfig.calendar.metaValue, appConfig.calendar.metaValueLink]">{{
-                eventsStore.previewEvent.location
-              }}</span>
-            </div>
-          </div>
-
-          <div :class="appConfig.calendar.previewMapPlaceholder" class="h-48!">
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2756.295222740354!2d25.294699376865182!3d46.30397407701674!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x474b172fd7417c99%3A0xfcc71cd3e524ef71!2sWebGurus!5e0!3m2!1shu!2sro!4v1788172972596!5m2!1shu!2sro"
-              width="100%"
-              height="100%"
-              style="border: 0"
-              allowfullscreen="false"
-              loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade"
-            ></iframe>
           </div>
         </div>
       </template>
       <template #footer>
         <div class="flex justify-end w-full">
           <UButton
-            label="Close"
+            :label="CONST_CANCEL_BTN_TEXT ?? 'Close'"
             variant="actionCancelButton"
             @click="eventsStore.closePreviewModal()"
           />
@@ -310,27 +318,36 @@
 
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
-import { z } from 'zod';
+import type { z } from 'zod';
 import type { FormSubmitEvent } from '#ui/types';
-import { useAppConfig } from '#imports';
+import { useAppConfig, useToast } from '#imports';
 import { useEventsStore } from '~/stores/events.modals.store';
 import { useGroupsStore } from '~/stores/groups.modals.store';
 import { useCurrentUserQuery } from '~/queries/user.query';
 import { useDeleteEventMutation, useCreateEventMutation } from '~/queries/events.mutation';
 import type { EventCreatorDto } from '~/types/events.type';
+import { createEventSchema } from '~/utils/schemas/events.schema';
+import { getErrorMessage } from '~/utils/error.utils';
 
 const appConfig = useAppConfig();
+const toast = useToast();
 const eventsStore = useEventsStore();
 const groupsStore = useGroupsStore();
 const { data: currentUser } = useCurrentUserQuery();
 
-/* --- MUTATIONS --- */
+/* --- MUTATIONS WITH PINIA COLADA ERROR HANDLING --- */
 const deleteEventMutation = useDeleteEventMutation(
   computed(() => eventsStore.selectedGroupUuid),
   {
     onSuccess: () => {
+      console.log('[Delete Mutation] Success!');
       eventsStore.closeDeleteEventModal();
       eventsStore.closePreviewModal();
+      toast.add({ title: 'Success', description: 'Event deleted successfully!' });
+    },
+    onError: (err) => {
+      console.log('[Delete Mutation] Error:', err);
+      toast.add({ title: 'Error', description: getErrorMessage(err) });
     },
   },
 );
@@ -339,35 +356,26 @@ const createEventMutation = useCreateEventMutation(
   computed(() => eventsStore.selectedGroupUuid),
   {
     onSuccess: () => {
+      console.log('[Create Mutation] Success!');
       closeAndResetForm();
+      toast.add({ title: 'Success', description: 'Event created successfully!' });
+    },
+    onError: (err) => {
+      console.log('[Create Mutation] Error:', err);
+      toast.add({ title: 'Error', description: getErrorMessage(err) });
     },
   },
 );
 
-/* --- ADD EVENT FORM STATE & VALIDATION --- */
-const schema = z
-  .object({
-    title: z.string().min(1, 'Title is required'),
-    is_private: z.boolean(),
-    start_time: z.string().min(1, 'Start time is required'),
-    end_time: z.string().min(1, 'End time is required'),
-    description: z.string(),
-    location: z.string(),
-  })
-  .refine((data) => new Date(data.start_time) < new Date(data.end_time), {
-    message: 'End time must be after start time',
-    path: ['end_time'],
-  });
+type FormSchemaType = z.output<typeof createEventSchema>;
 
-type FormSchemaType = z.output<typeof schema>;
-
+/* --- ADD EVENT FORM STATE --- */
 const formState = reactive({
   title: '',
   is_private: false,
   start_time: '',
   end_time: '',
   description: '',
-  location: '',
 });
 
 const closeAndResetForm = () => {
@@ -378,33 +386,39 @@ const closeAndResetForm = () => {
     start_time: '',
     end_time: '',
     description: '',
-    location: '',
   });
 };
 
-const onSubmit = async (_event: FormSubmitEvent<FormSchemaType>) => {
-  try {
-    const payload = {
-      ...formState,
-      start_time: new Date(formState.start_time).toISOString(),
-      end_time: new Date(formState.end_time).toISOString(),
-    };
-    await createEventMutation.mutateAsync(payload);
-  } catch (error) {
-    console.error('Failed to create event:', error);
-  }
+const onSubmit = (event: FormSubmitEvent<FormSchemaType>) => {
+  console.log('[Form] Sikeres Zod validáció. Nyers adatok:', event.data);
+
+  const payload = {
+    title: event.data.title,
+    description: event.data.description || undefined,
+    start_time: new Date(event.data.start_time).toISOString(),
+    end_time: event.data.end_time
+      ? new Date(event.data.end_time).toISOString()
+      : new Date(event.data.start_time).toISOString(),
+    visibility: formState.is_private ? 'private' : 'public',
+    participant_emails: [],
+  };
+
+  console.log('[Form] Payload:', payload);
+  createEventMutation.mutate(payload);
 };
 
 /* --- HANDLERS --- */
-const handleConfirmDelete = async () => {
+const handleConfirmDelete = () => {
   const eventToDelete = eventsStore.selectedEventToDelete;
-  if (!eventToDelete) return;
+  console.log('[Delete] Event to delete:', eventToDelete);
 
-  try {
-    await deleteEventMutation.mutateAsync(eventToDelete.uuid);
-  } catch (error) {
-    console.error('Failed to delete event:', error);
+  if (!eventToDelete) {
+    console.error('[Delete] No event to delete!');
+    return;
   }
+
+  console.log('[Delete] Event to delete:', eventToDelete);
+  deleteEventMutation.mutate(eventToDelete.uuid);
 };
 
 const handleOpenUserProfile = (user: EventCreatorDto) => {
@@ -413,7 +427,7 @@ const handleOpenUserProfile = (user: EventCreatorDto) => {
 
   groupsStore.selectedUserProfile = {
     username: user.username,
-    email: 'N/A',
+    email: user.email || 'N/A',
     role: 'Participant',
     joinedAt: 'Unknown',
     canViewDocuments: false,

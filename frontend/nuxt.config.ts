@@ -23,6 +23,10 @@ export default defineNuxtConfig({
     },
   },
 
+  routeRules: {
+    '/api/**': { proxy: 'http://localhost:3000/api/**' },
+  },
+
   devServer: {
     port: 5000,
   },

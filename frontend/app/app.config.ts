@@ -53,6 +53,17 @@ export default defineAppConfig({
       },
     },
 
+    checkbox: {
+      slots: { root: 'flex items-center gap-2' },
+      variants: {
+        variant: {
+          glass: {
+            root: 'text-dark-text/70 hover:text-dark-text transition-colors cursor-pointer bg-black/5 hover:bg-dark-text/10 rounded-full p-2',
+          },
+        },
+      },
+    },
+
     // ------------------- CARDS -------------------
     card: {
       slots: { root: 'w-full', body: 'p-8' },
@@ -426,6 +437,11 @@ export default defineAppConfig({
       'flex items-center justify-between p-4 bg-surface-500/40 backdrop-blur-md cursor-pointer hover:bg-surface-500/60 transition-colors',
     mobileEventItemBorder: 'border-b border-dark-text/10',
     mobileEmptyState: 'p-6 text-center text-sm text-dark-text/60 font-medium bg-surface-500/40',
+
+    mobileShowActiveButton:
+      'border border-brand-500/50 !px-6 !py-2.5 rounded-full bg-surface-500/70 hover:bg-light-bg text-dark-text transition-colors backdrop-blur-md cursor-pointer ring-2 ring-success-500 text-success-600',
+    mobileShowAllButton:
+      'w-10 h-10 rounded-full font-semibold flex items-center justify-center p-0 cursor-pointer bg-surface-500/70 backdrop-blur-xl text-dark-text ring-1 ring-dark-text/10 hover:bg-surface-500/90 transition-colors shrink-0 flex items-center justify-center',
 
     // Participants Area (in Preview)
     participantsGroup: 'flex items-center gap-4',

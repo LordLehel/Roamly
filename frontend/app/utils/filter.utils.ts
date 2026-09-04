@@ -11,6 +11,6 @@ export const filterEventsByQuery = (events: UiEvent[], query: string): UiEvent[]
   return events.filter(
     (event) =>
       event.title.toLowerCase().includes(lowerCaseQuery) ||
-      event.description.toLowerCase().includes(lowerCaseQuery),
+      event.description?.toLowerCase().includes(lowerCaseQuery),
   );
 };

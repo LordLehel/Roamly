@@ -1,17 +1,14 @@
 // frontend/app/utils/constants/events.constants.ts
 export const CONST_ADD_DAY_TITLE = 'Add a new day';
 export const CONST_SELECT_DATE_LABEL = 'Select date';
-export const CONST_CANCEL_BTN_TEXT = 'Cancel';
 export const CONST_ADD_BTN = 'Add';
 export const CONST_DELETE_DAY_TITLE = 'Delete day';
 export const CONST_DELETE_DAY_CONFIRM =
   'Are you sure you want to delete this day and all its events?';
-export const CONST_DELETE_BTN = 'Delete';
 export const CONST_DELETE_EVENT_TITLE = 'Delete event';
 export const CONST_DELETE_EVENT_CONFIRM = 'Are you sure you want to delete this event?';
 
 export const CONST_TOOLTIP_FILTER_EVENTS = 'Filter events';
-export const CONST_FILTER_LABEL = 'Filter';
 export const CONST_SELECT_GROUP_PROMPT = 'Select a group...';
 export const CONST_CALENDAR_SUBTITLE = 'Calendar';
 export const CONST_DAYS_HEADER = 'Days';
@@ -35,3 +32,4 @@ export const CONST_NO_MATCHING_EVENTS_MSG = 'No matching events found.';
 export const CONST_START_DATE_LABEL = 'Start Date';
 export const CONST_END_DATE_LABEL = 'End Date';
 export const CONST_APPLY_FILTER_BTN = 'Apply Filter';
+export const CONTS_MARK_EVENTS_AS_PRIVATE = 'Mark events as private';

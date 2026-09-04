@@ -14,13 +14,14 @@
       v-model:filter-end-date="filterEndDate"
       v-model:is-group-dropdown-open="isGroupDropdownOpen"
       v-model:is-filter-open="isFilterOpen"
+      v-model:show-only-active-events="showOnlyActiveEvents"
       :user-groups-list="userGroupsList"
       :selected-group-uuid="selectedGroupUuid"
       :selected-group-details="selectedGroupDetails"
       :selected-day-id="selectedDayId"
       :selected-event="selectedEvent"
       :is-loading-groups="isLoadingGroups"
-      :is-loading-days="isLoadingEvents"
+      :is-loading-days="isLoadingDays"
       :is-loading-events="isLoadingEvents"
       :sorted-days-list="sortedDaysList"
       :filtered-and-sorted-events-list="filteredAndSortedEventsList"
@@ -49,13 +50,14 @@
       v-model:filter-end-date="filterEndDate"
       v-model:is-group-dropdown-open="isGroupDropdownOpen"
       v-model:is-filter-open="isFilterOpen"
+      v-model:show-only-active-events="showOnlyActiveEvents"
       :user-groups-list="userGroupsList"
       :selected-group-uuid="selectedGroupUuid"
       :selected-group-details="selectedGroupDetails"
       :selected-day-id="selectedDayId"
       :selected-event="selectedEvent"
       :is-loading-groups="isLoadingGroups"
-      :is-loading-days="isLoadingEvents"
+      :is-loading-days="isLoadingDays"
       :is-loading-events="isLoadingEvents"
       :sorted-days-list="sortedDaysList"
       :filtered-and-sorted-events-list="filteredAndSortedEventsList"
@@ -84,7 +86,7 @@ import { ref, computed, watch } from 'vue';
 import { useScreenSize } from '~/composables/useScreenSize';
 import { useCurrentUserQuery } from '~/queries/user.query';
 import { useGroupsQuery } from '~/queries/groups.query';
-import { useEventsQuery } from '~/queries/events.query';
+import { useDatesQuery, useEventsQuery } from '~/queries/events.query';
 import { useEventsStore } from '~/stores/events.modals.store';
 import { useGroupsStore } from '~/stores/groups.modals.store';
 
@@ -117,8 +119,7 @@ let searchTimeout: ReturnType<typeof setTimeout>;
 
 const filterStartDate = ref('');
 const filterEndDate = ref('');
-const activeFilterStartDate = ref('');
-const activeFilterEndDate = ref('');
+const showOnlyActiveEvents = ref(true);
 
 /* --- DATA --- */
 const { data: groupsData, isLoading: isLoadingGroups } = useGroupsQuery();
@@ -134,36 +135,47 @@ watch(
   { immediate: true },
 );
 
-watch(selectedGroupUuid, (newUuid) => {
-  eventsStore.selectedGroupUuid = newUuid;
-});
-
-const { data: eventsResponse, isLoading: isLoadingEvents } = useEventsQuery(
+watch(
   selectedGroupUuid,
-  activeFilterStartDate,
-  activeFilterEndDate,
+  (newUuid) => {
+    eventsStore.selectedGroupUuid = newUuid;
+  },
+  { immediate: true },
 );
 
-/* --- PROCESS --- */
+const { data: datesResponse, isLoading: isLoadingDays } = useDatesQuery(selectedGroupUuid);
+
 const sortedDaysList = computed<UiDay[]>(() => {
-  if (!eventsResponse.value?.available_dates) return [];
-  return processAvailableDates(eventsResponse.value.available_dates);
+  return processAvailableDates(datesResponse.value || []);
 });
 
-watch(sortedDaysList, (newDays) => {
-  if (newDays.length > 0 && !selectedDayId.value) {
-    const validDay = newDays.find((d) => !d.isExpired) || newDays[0];
-    selectedDayId.value = validDay?.id;
-  }
-});
+watch(
+  sortedDaysList,
+  (newDays) => {
+    if (newDays.length > 0) {
+      const currentDayExists = newDays.some((d) => d.id === selectedDayId.value);
+      if (!selectedDayId.value || !currentDayExists) {
+        selectedDayId.value = 'ALL';
+      }
+    } else {
+      selectedDayId.value = undefined;
+    }
+  },
+  { immediate: true },
+);
 
 const selectedDayDetails = computed<UiDay | undefined>(() =>
   sortedDaysList.value.find((d) => d.id === selectedDayId.value),
 );
 
+// 2. Események lekérése a kiválasztott dátum alapján (újrahívódik, ha a selectedDayId változik)
+const { data: eventsData, isLoading: isLoadingEvents } = useEventsQuery(
+  selectedGroupUuid,
+  selectedDayId,
+);
+
 const sortedEventsList = computed<UiEvent[]>(() => {
-  if (!eventsResponse.value?.events) return [];
-  return processAndSortEvents(eventsResponse.value.events, selectedDayDetails.value);
+  return processAndSortEvents(eventsData.value || []);
 });
 
 watch(searchQuery, (newVal) => {
@@ -173,18 +185,30 @@ watch(searchQuery, (newVal) => {
   }, 300);
 });
 
-const filteredAndSortedEventsList = computed<UiEvent[]>(() =>
-  filterEventsByQuery(sortedEventsList.value, debouncedSearchQuery.value),
-);
+const filteredAndSortedEventsList = computed<UiEvent[]>(() => {
+  let filtered = filterEventsByQuery(sortedEventsList.value, debouncedSearchQuery.value);
 
-watch(filteredAndSortedEventsList, (newList) => {
-  const currentExistsInNewList = newList.find((e) => e.uuid === selectedEvent.value?.uuid);
-  if (newList.length > 0 && !currentExistsInNewList) {
-    selectedEvent.value = newList[0];
-  } else if (newList.length === 0) {
-    selectedEvent.value = null;
+  if (showOnlyActiveEvents.value) {
+    filtered = filtered.filter((e) => !e.isExpired);
   }
+
+  return filtered;
 });
+
+watch(
+  filteredAndSortedEventsList,
+  (newList) => {
+    if (newList.length > 0) {
+      const currentExistsInNewList = newList.find((e) => e.uuid === selectedEvent.value?.uuid);
+      if (!currentExistsInNewList) {
+        selectedEvent.value = newList[0];
+      }
+    } else {
+      selectedEvent.value = null;
+    }
+  },
+  { immediate: true },
+);
 
 /* --- PERMISSIONS & HELPERS --- */
 const selectedGroupDetails = computed(() =>
@@ -216,9 +240,9 @@ const selectGroup = (uuid: string) => {
 };
 
 const applyDateFilter = () => {
-  activeFilterStartDate.value = filterStartDate.value;
-  activeFilterEndDate.value = filterEndDate.value;
   isFilterOpen.value = false;
+  // A manuális dátumszűrést jelenleg lefedi a nap kiválasztása,
+  // de ha egyedi tartományra szűrnének, itt lehet kibővíteni a selectedDayId felülírásával.
 };
 
 const handleDeleteCurrentGroup = () => {

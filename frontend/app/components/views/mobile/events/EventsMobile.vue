@@ -137,15 +137,16 @@
       </div>
 
       <div :class="appConfig.calendar.mobileContentWrapper">
-        <!-- DATE SELECTOR (Title-like Dropdown) -->
-        <div class="w-full mt-2">
-          <UPopover v-model:open="isDateDropdownOpen" class="w-full">
+        <!-- DATE SELECTOR & ACTIVE EVENTS TOGGLE -->
+        <div class="w-full mt-2 flex items-center gap-2">
+          <!-- DATE SELECTOR -->
+          <UPopover v-model:open="isDateDropdownOpen" class="flex-1 min-w-0">
             <UButton
               block
               variant="glassOutlineButton"
               :class="appConfig.calendar.mobileDateButton"
             >
-              <span>
+              <span class="truncate">
                 {{
                   selectedDayDetails
                     ? `${selectedDayDetails.date} (${selectedDayDetails.dayOfWeek})`
@@ -183,6 +184,20 @@
               </div>
             </template>
           </UPopover>
+
+          <!-- ACTIVE EVENTS TOGGLE -->
+          <UTooltip :text="showOnlyActiveEvents ? 'Show All Events' : 'Hide Expired Events'">
+            <UButton
+              icon="i-heroicons-clock"
+              :label="showOnlyActiveEvents ? 'Active' : 'All'"
+              :variant="showOnlyActiveEvents ? 'glassOutlineButton' : 'glassButton'"
+              :class="[
+                showOnlyActiveEvents ? 'ring-2 ring-success-500 text-success-600' : '',
+                'shrink-0 whitespace-nowrap px-4 py-2 min-w-22!',
+              ]"
+              @click="showOnlyActiveEvents = !showOnlyActiveEvents"
+            />
+          </UTooltip>
         </div>
 
         <!-- EVENTS LIST -->
@@ -285,6 +300,7 @@ const filterStartDate = defineModel<string>('filterStartDate', { default: '' });
 const filterEndDate = defineModel<string>('filterEndDate', { default: '' });
 const isGroupDropdownOpen = defineModel<boolean>('isGroupDropdownOpen', { default: false });
 const isFilterOpen = defineModel<boolean>('isFilterOpen', { default: false });
+const showOnlyActiveEvents = defineModel<boolean>('showOnlyActiveEvents', { default: true });
 
 const isDateDropdownOpen = ref(false);
 

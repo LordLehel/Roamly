@@ -22,6 +22,7 @@ export const useCreateEventMutation = (
     },
     onSuccess: () => {
       queryCache.invalidateQueries({ key: ['events', groupUuid.value ?? null] });
+      queryCache.invalidateQueries({ key: ['events-dates', groupUuid.value ?? null] });
       options?.onSuccess?.();
     },
     onError: (error: Error) => {
@@ -37,9 +38,13 @@ export const useDeleteEventMutation = (
   const queryCache = useQueryCache();
 
   return useMutation({
-    mutation: (eventUuid: string) => eventsService.deleteEvent(eventUuid),
+    mutation: (eventUuid: string) => {
+      if (!groupUuid.value) throw new Error('Group UUID is required.');
+      return eventsService.deleteEvent(groupUuid.value, eventUuid);
+    },
     onSuccess: () => {
       queryCache.invalidateQueries({ key: ['events', groupUuid.value ?? null] });
+      queryCache.invalidateQueries({ key: ['events-dates', groupUuid.value ?? null] });
       options?.onSuccess?.();
     },
     onError: (error: Error) => {

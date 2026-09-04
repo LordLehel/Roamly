@@ -130,6 +130,19 @@
             </div>
           </template>
         </UPopover>
+
+        <UTooltip :text="showOnlyActiveEvents ? 'Show All Events' : 'Hide Expired Events'">
+          <UButton
+            icon="i-heroicons-clock"
+            :label="showOnlyActiveEvents ? 'Active' : 'All'"
+            :variant="showOnlyActiveEvents ? 'glassOutlineButton' : 'glassButton'"
+            :class="[
+              showOnlyActiveEvents ? 'ring-2 ring-success-500 text-success-600' : '',
+              'shrink-0 whitespace-nowrap px-4 py-2 min-w-22!',
+            ]"
+            @click="showOnlyActiveEvents = !showOnlyActiveEvents"
+          />
+        </UTooltip>
       </div>
 
       <div class="shrink-0 w-full sm:w-auto flex justify-end">
@@ -343,9 +356,9 @@
             </div>
             <div :class="appConfig.calendar.metaRowItem">
               <span :class="appConfig.calendar.metaLabel">Location:</span>
-              <span :class="[appConfig.calendar.metaValue, appConfig.calendar.metaValueLink]">{{
+              <!-- <span :class="[appConfig.calendar.metaValue, appConfig.calendar.metaValueLink]">{{
                 selectedEvent.location
-              }}</span>
+              }}</span> -->
             </div>
           </div>
 
@@ -409,4 +422,5 @@ const filterStartDate = defineModel<string>('filterStartDate', { default: '' });
 const filterEndDate = defineModel<string>('filterEndDate', { default: '' });
 const isGroupDropdownOpen = defineModel<boolean>('isGroupDropdownOpen', { default: false });
 const isFilterOpen = defineModel<boolean>('isFilterOpen', { default: false });
+const showOnlyActiveEvents = defineModel<boolean>('showOnlyActiveEvents', { default: true });
 </script>
