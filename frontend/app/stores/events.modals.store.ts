@@ -12,11 +12,16 @@ export const useEventsStore = defineStore('events', () => {
   const isDeleteEventModalOpen = ref(false);
   const isParticipantsModalOpen = ref(false);
   const isPreviewModalOpen = ref(false);
+  const isAddMembersModalOpen = ref(false);
+  const isLeaveEventModalOpen = ref(false);
+  const isRemoveParticipantModalOpen = ref(false);
 
   const selectedEventToDelete = ref<UiEvent | null>(null);
+  const selectedEventToLeave = ref<UiEvent | null>(null);
   const currentEventParticipants = ref<EventCreatorDto[]>([]);
   const previewEvent = ref<UiEvent | null>(null);
   const previewDate = ref<string | undefined>(undefined);
+  const participantToRemove = ref<EventCreatorDto | null>(null);
 
   const openAddEventModal = () => (isAddEventModalOpen.value = true);
   const closeAddEventModal = () => (isAddEventModalOpen.value = false);
@@ -24,6 +29,7 @@ export const useEventsStore = defineStore('events', () => {
   const openDeleteEventModal = (event: UiEvent) => {
     selectedEventToDelete.value = event;
     isDeleteEventModalOpen.value = true;
+    isPreviewModalOpen.value = false;
   };
 
   const closeDeleteEventModal = () => {
@@ -34,6 +40,7 @@ export const useEventsStore = defineStore('events', () => {
   const openParticipantsModal = (participants: EventCreatorDto[]) => {
     currentEventParticipants.value = participants;
     isParticipantsModalOpen.value = true;
+    isPreviewModalOpen.value = false;
   };
 
   const closeParticipantsModal = () => {
@@ -53,6 +60,38 @@ export const useEventsStore = defineStore('events', () => {
     previewDate.value = undefined;
   };
 
+  const openAddMembersModal = (event: UiEvent) => {
+    previewEvent.value = event;
+    isAddMembersModalOpen.value = true;
+    isPreviewModalOpen.value = false;
+    isParticipantsModalOpen.value = false;
+  };
+
+  const closeAddMembersModal = () => {
+    isAddMembersModalOpen.value = false;
+  };
+
+  const openLeaveEventModal = (event: UiEvent) => {
+    selectedEventToLeave.value = event;
+    isLeaveEventModalOpen.value = true;
+    isPreviewModalOpen.value = false;
+  };
+
+  const closeLeaveEventModal = () => {
+    isLeaveEventModalOpen.value = false;
+    selectedEventToLeave.value = null;
+  };
+
+  const openRemoveParticipantModal = (user: EventCreatorDto) => {
+    participantToRemove.value = user;
+    isRemoveParticipantModalOpen.value = true;
+  };
+
+  const closeRemoveParticipantModal = () => {
+    isRemoveParticipantModalOpen.value = false;
+    participantToRemove.value = null;
+  };
+
   return {
     selectedGroupUuid,
     isAddDayModalOpen,
@@ -61,10 +100,15 @@ export const useEventsStore = defineStore('events', () => {
     isDeleteEventModalOpen,
     isParticipantsModalOpen,
     isPreviewModalOpen,
+    isAddMembersModalOpen,
+    isLeaveEventModalOpen,
+    isRemoveParticipantModalOpen,
     selectedEventToDelete,
+    selectedEventToLeave,
     currentEventParticipants,
     previewEvent,
     previewDate,
+    participantToRemove,
     openAddEventModal,
     closeAddEventModal,
     openDeleteEventModal,
@@ -73,5 +117,11 @@ export const useEventsStore = defineStore('events', () => {
     closeParticipantsModal,
     openPreviewModal,
     closePreviewModal,
+    openAddMembersModal,
+    closeAddMembersModal,
+    openLeaveEventModal,
+    closeLeaveEventModal,
+    openRemoveParticipantModal,
+    closeRemoveParticipantModal,
   };
 });

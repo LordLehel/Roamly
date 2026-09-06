@@ -6,7 +6,7 @@ import type { ApiResponse } from '~/types/api.type';
 const mapRawEventToDto = (raw: RawEventDto): EventOutDto => ({
   uuid: raw.uuid,
   title: raw.title,
-  visibility: raw.visibility?.name || 'public',
+  visibility: raw.visibility_id === 2 ? 'private' : 'public',
   start_time: raw.start_time,
   end_time: raw.end_time,
   description: raw.description,
@@ -47,6 +47,25 @@ export const eventsService = {
   async deleteEvent(groupUuid: string, eventUuid: string): Promise<void> {
     const api = useApi();
     return await api(`/events/${groupUuid}/${eventUuid}`, {
+      method: 'DELETE',
+    });
+  },
+
+  async addParticipants(
+    groupUuid: string,
+    eventUuid: string,
+    participant_emails: string[],
+  ): Promise<void> {
+    const api = useApi();
+    return await api(`/events/${groupUuid}/${eventUuid}/participants`, {
+      method: 'POST',
+      body: { participant_emails },
+    });
+  },
+
+  async removeParticipant(groupUuid: string, eventUuid: string, targetUuid: string): Promise<void> {
+    const api = useApi();
+    return await api(`/events/${groupUuid}/${eventUuid}/participants/${targetUuid}`, {
       method: 'DELETE',
     });
   },

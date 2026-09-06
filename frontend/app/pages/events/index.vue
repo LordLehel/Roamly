@@ -27,9 +27,7 @@
       :filtered-and-sorted-events-list="filteredAndSortedEventsList"
       :selected-day-details="selectedDayDetails"
       :is-current-user-leader="isCurrentUserLeader"
-      :has-permission-to-delete="hasPermissionToDelete"
-      :display-participants="displayParticipants"
-      :extra-participants-count="extraParticipantsCount"
+      :current-user-email="currentUserEmail"
       @select-group="selectGroup"
       @update:selected-day-id="selectedDayId = $event"
       @update:selected-event="selectedEvent = $event"
@@ -41,6 +39,8 @@
       @open-user-profile="openUserProfile"
       @open-all-participants="openAllParticipantsModal"
       @open-preview-modal="handleOpenPreviewModal"
+      @open-leave-event="eventsStore.openLeaveEventModal"
+      @open-add-members="handleOpenAddMembersModal"
     />
 
     <EventsDesktop
@@ -63,9 +63,7 @@
       :filtered-and-sorted-events-list="filteredAndSortedEventsList"
       :selected-day-details="selectedDayDetails"
       :is-current-user-leader="isCurrentUserLeader"
-      :has-permission-to-delete="hasPermissionToDelete"
-      :display-participants="displayParticipants"
-      :extra-participants-count="extraParticipantsCount"
+      :current-user-email="currentUserEmail"
       @select-group="selectGroup"
       @update:selected-day-id="selectedDayId = $event"
       @update:selected-event="selectedEvent = $event"
@@ -76,12 +74,13 @@
       @open-delete-event="handleOpenDeleteEventModal"
       @open-user-profile="openUserProfile"
       @open-all-participants="openAllParticipantsModal"
+      @open-leave-event="eventsStore.openLeaveEventModal"
+      @open-add-members="handleOpenAddMembersModal"
     />
   </ClientOnly>
 </template>
 
 <script setup lang="ts">
-/* --- IMPORTS --- */
 import { ref, computed, watch } from 'vue';
 import { useScreenSize } from '~/composables/useScreenSize';
 import { useCurrentUserQuery } from '~/queries/user.query';
@@ -98,10 +97,8 @@ import { filterEventsByQuery } from '~/utils/filter.utils';
 import EventsDesktop from '~/components/views/desktop/events/EventsDesktop.vue';
 import EventsMobile from '~/components/views/mobile/events/EventsMobile.vue';
 
-/* --- META --- */
 definePageMeta({ layout: 'general', middleware: ['auth'] });
 
-/* --- PAGE CONFIGURATION --- */
 const { isMobile } = useScreenSize();
 const eventsStore = useEventsStore();
 const groupsStore = useGroupsStore();
@@ -121,7 +118,8 @@ const filterStartDate = ref('');
 const filterEndDate = ref('');
 const showOnlyActiveEvents = ref(true);
 
-/* --- DATA --- */
+const currentUserEmail = computed(() => currentUser.value?.email);
+
 const { data: groupsData, isLoading: isLoadingGroups } = useGroupsQuery();
 const userGroupsList = computed<GroupOutDto[]>(() => groupsData.value?.items || []);
 
@@ -129,7 +127,16 @@ watch(
   userGroupsList,
   (newGroups) => {
     if (newGroups.length > 0 && !selectedGroupUuid.value) {
-      selectedGroupUuid.value = newGroups[0]?.uuid;
+      let initialUuid = newGroups[0]?.uuid;
+
+      if (typeof window !== 'undefined') {
+        const savedUuid = localStorage.getItem('roamly_last_group_uuid');
+        if (savedUuid && newGroups.some((g) => g.uuid === savedUuid)) {
+          initialUuid = savedUuid;
+        }
+      }
+
+      selectedGroupUuid.value = initialUuid;
     }
   },
   { immediate: true },
@@ -139,24 +146,23 @@ watch(
   selectedGroupUuid,
   (newUuid) => {
     eventsStore.selectedGroupUuid = newUuid;
+    if (newUuid && typeof window !== 'undefined') {
+      localStorage.setItem('roamly_last_group_uuid', newUuid);
+    }
   },
   { immediate: true },
 );
 
 const { data: datesResponse, isLoading: isLoadingDays } = useDatesQuery(selectedGroupUuid);
 
-const sortedDaysList = computed<UiDay[]>(() => {
-  return processAvailableDates(datesResponse.value || []);
-});
+const sortedDaysList = computed<UiDay[]>(() => processAvailableDates(datesResponse.value || []));
 
 watch(
   sortedDaysList,
   (newDays) => {
     if (newDays.length > 0) {
       const currentDayExists = newDays.some((d) => d.id === selectedDayId.value);
-      if (!selectedDayId.value || !currentDayExists) {
-        selectedDayId.value = 'ALL';
-      }
+      if (!selectedDayId.value || !currentDayExists) selectedDayId.value = 'ALL';
     } else {
       selectedDayId.value = undefined;
     }
@@ -168,15 +174,11 @@ const selectedDayDetails = computed<UiDay | undefined>(() =>
   sortedDaysList.value.find((d) => d.id === selectedDayId.value),
 );
 
-// 2. Események lekérése a kiválasztott dátum alapján (újrahívódik, ha a selectedDayId változik)
 const { data: eventsData, isLoading: isLoadingEvents } = useEventsQuery(
   selectedGroupUuid,
   selectedDayId,
 );
-
-const sortedEventsList = computed<UiEvent[]>(() => {
-  return processAndSortEvents(eventsData.value || []);
-});
+const sortedEventsList = computed<UiEvent[]>(() => processAndSortEvents(eventsData.value || []));
 
 watch(searchQuery, (newVal) => {
   clearTimeout(searchTimeout);
@@ -188,8 +190,17 @@ watch(searchQuery, (newVal) => {
 const filteredAndSortedEventsList = computed<UiEvent[]>(() => {
   let filtered = filterEventsByQuery(sortedEventsList.value, debouncedSearchQuery.value);
 
-  if (showOnlyActiveEvents.value) {
-    filtered = filtered.filter((e) => !e.isExpired);
+  if (showOnlyActiveEvents.value) filtered = filtered.filter((e) => !e.isExpired);
+
+  if (filterStartDate.value) {
+    const startTarget = new Date(filterStartDate.value).getTime();
+    filtered = filtered.filter((e) => new Date(e.start_time).getTime() >= startTarget);
+  }
+
+  if (filterEndDate.value) {
+    const endTarget = new Date(filterEndDate.value);
+    endTarget.setHours(23, 59, 59, 999);
+    filtered = filtered.filter((e) => new Date(e.start_time).getTime() <= endTarget.getTime());
   }
 
   return filtered;
@@ -199,8 +210,10 @@ watch(
   filteredAndSortedEventsList,
   (newList) => {
     if (newList.length > 0) {
-      const currentExistsInNewList = newList.find((e) => e.uuid === selectedEvent.value?.uuid);
-      if (!currentExistsInNewList) {
+      const currentInNewList = newList.find((e) => e.uuid === selectedEvent.value?.uuid);
+      if (currentInNewList) {
+        selectedEvent.value = currentInNewList;
+      } else {
         selectedEvent.value = newList[0];
       }
     } else {
@@ -210,7 +223,6 @@ watch(
   { immediate: true },
 );
 
-/* --- PERMISSIONS & HELPERS --- */
 const selectedGroupDetails = computed(() =>
   userGroupsList.value.find((g) => g.uuid === selectedGroupUuid.value),
 );
@@ -218,21 +230,6 @@ const isCurrentUserLeader = computed(
   () => selectedGroupDetails.value?.role?.toLowerCase() === 'leader',
 );
 
-const hasPermissionToDelete = computed(() => {
-  const creatorName = selectedEvent.value?.creator?.username;
-  const currentUserName = currentUser.value?.username;
-  return (
-    isCurrentUserLeader.value ||
-    (!!creatorName && !!currentUserName && creatorName === currentUserName)
-  );
-});
-
-const displayParticipants = computed(() => selectedEvent.value?.members?.slice(0, 5) || []);
-const extraParticipantsCount = computed(() =>
-  Math.max(0, (selectedEvent.value?.members?.length || 0) - 5),
-);
-
-/* --- EVENT HANDLERS --- */
 const selectGroup = (uuid: string) => {
   selectedGroupUuid.value = uuid;
   isGroupDropdownOpen.value = false;
@@ -241,21 +238,26 @@ const selectGroup = (uuid: string) => {
 
 const applyDateFilter = () => {
   isFilterOpen.value = false;
-  // A manuális dátumszűrést jelenleg lefedi a nap kiválasztása,
-  // de ha egyedi tartományra szűrnének, itt lehet kibővíteni a selectedDayId felülírásával.
 };
-
 const handleDeleteCurrentGroup = () => {
   if (selectedGroupDetails.value) groupsStore.openDeleteModal(selectedGroupDetails.value);
 };
 const handleLeaveCurrentGroup = () => {
   if (selectedGroupDetails.value) groupsStore.openLeaveModal(selectedGroupDetails.value);
 };
+const handleOpenDeleteEventModal = (event: UiEvent) => {
+  eventsStore.openDeleteEventModal(event);
+};
+
+const handleOpenPreviewModal = (event: UiEvent) => {
+  selectedEvent.value = event;
+  eventsStore.openPreviewModal(event, selectedDayDetails.value?.date);
+};
 
 const openUserProfile = (user: EventCreatorDto) => {
   groupsStore.selectedUserProfile = {
     username: user.username,
-    email: 'N/A',
+    email: user.email || 'N/A',
     role: 'Participant',
     joinedAt: 'Unknown',
     canViewDocuments: false,
@@ -267,12 +269,8 @@ const openAllParticipantsModal = () => {
   if (selectedEvent.value?.members) eventsStore.openParticipantsModal(selectedEvent.value.members);
 };
 
-const handleOpenDeleteEventModal = (event: UiEvent) => {
-  eventsStore.openDeleteEventModal(event);
-};
-
-const handleOpenPreviewModal = (event: UiEvent) => {
+const handleOpenAddMembersModal = (event: UiEvent) => {
   selectedEvent.value = event;
-  eventsStore.openPreviewModal(event, selectedDayDetails.value?.date);
+  eventsStore.openAddMembersModal(event);
 };
 </script>

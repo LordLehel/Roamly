@@ -43,4 +43,17 @@ export default defineNuxtConfig({
     },
     display: 'swap',
   },
+
+  icon: {
+    serverBundle: {
+      collections: ['heroicons'],
+    },
+
+    clientBundle: {
+      scan: {
+        globInclude: ['**/*.{vue,jsx,tsx,md,mdc,mdx,ts}'],
+      },
+    },
+    fallbackToApi: false,
+  },
 });

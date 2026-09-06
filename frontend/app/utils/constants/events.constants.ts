@@ -32,4 +32,6 @@ export const CONST_NO_MATCHING_EVENTS_MSG = 'No matching events found.';
 export const CONST_START_DATE_LABEL = 'Start Date';
 export const CONST_END_DATE_LABEL = 'End Date';
 export const CONST_APPLY_FILTER_BTN = 'Apply Filter';
-export const CONTS_MARK_EVENTS_AS_PRIVATE = 'Mark events as private';
+export const CONTS_MARK_EVENT_AS_PRIVATE = 'Mark event as private';
+export const CONST_REMOVE_PARTICIPANT = 'Remove participant';
+export const CONST_NO_PARTICIPANTS_FOUND = 'No participants found.';

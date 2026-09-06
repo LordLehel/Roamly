@@ -52,3 +52,70 @@ export const useDeleteEventMutation = (
     },
   });
 };
+
+export const useAddParticipantsMutation = (
+  groupUuid: Ref<string | undefined>,
+  options?: MutationOptions,
+) => {
+  const queryCache = useQueryCache();
+
+  return useMutation({
+    mutation: (data: { eventUuid: string; participant_emails: string[] }) => {
+      if (!groupUuid.value) throw new Error('Group UUID is required.');
+      return eventsService.addParticipants(
+        groupUuid.value,
+        data.eventUuid,
+        data.participant_emails,
+      );
+    },
+    onSuccess: () => {
+      queryCache.invalidateQueries({ key: ['events', groupUuid.value ?? null] });
+      options?.onSuccess?.();
+    },
+    onError: (error: Error) => {
+      options?.onError?.(error);
+    },
+  });
+};
+
+export const useLeaveEventMutation = (
+  groupUuid: Ref<string | undefined>,
+  options?: MutationOptions,
+) => {
+  const queryCache = useQueryCache();
+
+  return useMutation({
+    mutation: (data: { eventUuid: string; targetUuid: string }) => {
+      if (!groupUuid.value) throw new Error('Group UUID is required.');
+      return eventsService.removeParticipant(groupUuid.value, data.eventUuid, data.targetUuid);
+    },
+    onSuccess: () => {
+      queryCache.invalidateQueries({ key: ['events', groupUuid.value ?? null] });
+      options?.onSuccess?.();
+    },
+    onError: (error: Error) => {
+      options?.onError?.(error);
+    },
+  });
+};
+
+export const useRemoveParticipantMutation = (
+  groupUuid: Ref<string | undefined>,
+  options?: MutationOptions,
+) => {
+  const queryCache = useQueryCache();
+
+  return useMutation({
+    mutation: (data: { eventUuid: string; targetUuid: string }) => {
+      if (!groupUuid.value) throw new Error('Group UUID is required.');
+      return eventsService.removeParticipant(groupUuid.value, data.eventUuid, data.targetUuid);
+    },
+    onSuccess: () => {
+      queryCache.invalidateQueries({ key: ['events', groupUuid.value ?? null] });
+      options?.onSuccess?.();
+    },
+    onError: (error: Error) => {
+      options?.onError?.(error);
+    },
+  });
+};

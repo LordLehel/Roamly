@@ -13,7 +13,7 @@ export interface RawEventParticipant {
 export interface RawEventDto {
   uuid: string;
   title: string;
-  visibility?: { name: string };
+  visibility_id?: number;
   start_time: string;
   end_time: string;
   description: string | null;
