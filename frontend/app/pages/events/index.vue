@@ -93,12 +93,15 @@ import type { GroupOutDto } from '~/types/groups.type';
 import type { UiDay, UiEvent, EventCreatorDto } from '~/types/events.type';
 import { processAvailableDates, processAndSortEvents } from '~/utils/sort.utils';
 import { filterEventsByQuery } from '~/utils/filter.utils';
+import { useRoute, useRouter } from 'vue-router';
 
 import EventsDesktop from '~/components/views/desktop/events/EventsDesktop.vue';
 import EventsMobile from '~/components/views/mobile/events/EventsMobile.vue';
 
 definePageMeta({ layout: 'general', middleware: ['auth'] });
 
+const route = useRoute();
+const router = useRouter();
 const { isMobile } = useScreenSize();
 const eventsStore = useEventsStore();
 const groupsStore = useGroupsStore();
@@ -210,6 +213,24 @@ watch(
   filteredAndSortedEventsList,
   (newList) => {
     if (newList.length > 0) {
+      const queryEventId = route.query.eventId as string;
+
+      if (queryEventId) {
+        const targetEvent = newList.find((e) => e.uuid === queryEventId);
+        if (targetEvent) {
+          selectedEvent.value = targetEvent;
+
+          setTimeout(() => {
+            if (isMobile.value) {
+              handleOpenPreviewModal(targetEvent);
+            }
+            router.replace({ query: {} });
+          }, 150);
+
+          return;
+        }
+      }
+
       const currentInNewList = newList.find((e) => e.uuid === selectedEvent.value?.uuid);
       if (currentInNewList) {
         selectedEvent.value = currentInNewList;

@@ -24,6 +24,8 @@ export const CONST_TIME_LBL = 'Time:';
 export const CONST_MEMBERS_LBL = 'Members:';
 export const CONST_DESC_LBL = 'Description:';
 export const CONST_LOC_LBL = 'Location:';
+export const CONST_EVERYONE_LBL = 'Everyone';
+export const CONST_PARTICIPANTS_LBL = 'Participants:';
 
 export const CONST_LOADING_DAYS_MSG = 'Loading days...';
 export const CONST_LOADING_EVENTS_MSG = 'Loading events...';
@@ -35,3 +37,5 @@ export const CONST_APPLY_FILTER_BTN = 'Apply Filter';
 export const CONTS_MARK_EVENT_AS_PRIVATE = 'Mark event as private';
 export const CONST_REMOVE_PARTICIPANT = 'Remove participant';
 export const CONST_NO_PARTICIPANTS_FOUND = 'No participants found.';
+export const CONST_UPCOMING_EVENTS_HEADING = 'Upcoming events today';
+export const CONST_NO_UPCOMING_EVENTS_MSG = 'No upcoming events scheduled for today.';
