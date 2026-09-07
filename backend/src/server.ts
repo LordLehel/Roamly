@@ -4,9 +4,13 @@ import helmet from 'helmet';
 import rootRouter from './api/routes';
 import { errorHandler } from './middlewares/error.middleware';
 import './config/env.config';
+import { startCronJobs } from './api/shared/cron.service';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// starting Cron background processes
+startCronJobs();
 
 app.use(express.json());
 

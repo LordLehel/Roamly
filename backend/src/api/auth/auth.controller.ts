@@ -8,11 +8,22 @@ class AuthController extends BaseController {
   public registerUser = this.handleAsync(async (req: Request, res: Response): Promise<void> => {
     const { username, email, password, phone_number } = req.body;
 
-    const newUser = await authService.registerUser(username, email, password, phone_number);
+    await authService.registerUser(username, email, password, phone_number);
 
-    res.status(201).json({
+    res.status(200).json({
       status: 'success',
-      message: `User created with username: ${newUser.username}!`,
+      message: 'Registration initiated! Verification code was sent to the user on email!',
+    });
+  });
+
+  public verifyEmail = this.handleAsync(async (req: Request, res: Response): Promise<void> => {
+    const { email, otp } = req.body;
+
+    const newUser = await authService.verifyEmailAndCreateUser(email, otp);
+
+    res.status(200).json({
+      status: 'success',
+      message: `Email verified successfully! User created with usernam: ${newUser.username}!`,
     });
   });
 

@@ -51,10 +51,12 @@ export const createGroup = async (
     );
 
     // notify by email
-    initialInvites.forEach(({ email }: { email: string; role: string }) => {
-      sendMail.sendGroupInvitedEmail(email, name, user.username).catch((err: unknown) => {
-        console.error(`[EMAIL ERROR] Failed to send email to ${email}: `, err);
-      });
+    initialInvites.forEach((invitee: { email: string; role: string }) => {
+      sendMail
+        .sendGroupInvitedEmail(invitee.email, name, user.username, invitee.role)
+        .catch((err: unknown) => {
+          console.error(`[EMAIL ERROR] Failed to send email to ${invitee.email}: `, err);
+        });
     });
   }
 
@@ -288,7 +290,12 @@ export const inviteUsersToYourGroup = async (
   });
 
   sendMail
-    .sendGroupInvitedEmail(invitedUser.email, group.name, inviterProfile.users.username)
+    .sendGroupInvitedEmail(
+      invitedUser.email,
+      group.name,
+      inviterProfile.users.username,
+      inviteWithRole,
+    )
     .catch((err: unknown) => {
       console.error(`[EMAIL ERROR] Failed to send email to ${invitedUser.email}: `, err);
     });

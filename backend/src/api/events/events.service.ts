@@ -133,7 +133,7 @@ export const createEvent = async (
 
     data.participant_emails.forEach((email: string) => {
       sendMail
-        .sendEventAssignedEmail(email, newEvent.title, formattedDate)
+        .sendEventAssignedEmail(email, newEvent.title, formattedDate, userGroupInfo.users.username)
         .catch((err: unknown) => {
           console.error(`[EMAIL ERROR] Failed to send email to ${email}: `, err);
         });
@@ -162,7 +162,12 @@ export const createEvent = async (
 
     groupMembers.forEach((member: { email: string }) => {
       sendMail
-        .sendEventAssignedEmail(member.email, newEvent.title, formattedDate)
+        .sendEventAssignedEmail(
+          member.email,
+          newEvent.title,
+          formattedDate,
+          userGroupInfo.users.username,
+        )
         .catch((err: unknown) => {
           console.error(`[EMAIL ERROR] Failed to send email to ${member.email}: `, err);
         });
@@ -386,7 +391,12 @@ export const addNewParticipants = async (
 
       if (email) {
         sendMail
-          .sendEventAssignedEmail(email, existingEvent.title, formattedDate)
+          .sendEventAssignedEmail(
+            email,
+            existingEvent.title,
+            formattedDate,
+            userGroupInfo.users.username,
+          )
           .catch((err: unknown) => {
             console.error(`[EMAIL ERROR] Failed to send email to ${email}: `, err);
           });

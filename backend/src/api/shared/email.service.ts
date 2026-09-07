@@ -41,7 +41,7 @@ async function getDevTransporter(): Promise<nodemailer.Transporter> {
 }
 
 // one sender function for both dev and prod
-export const sendEmail = async ({ to, subject, html, text }: EmailOptions): Promise<void> => {
+const sendEmail = async ({ to, subject, html, text }: EmailOptions): Promise<void> => {
   const fromAddress = config.email.fromAddress || 'onboarding@resend.dev';
 
   if (isProduction && resend) {
@@ -81,13 +81,14 @@ export const sendEventAssignedEmail = async (
   to: string,
   eventTitle: string,
   eventDate: string,
+  inviterName: string,
 ): Promise<void> => {
   await sendEmail({
     to,
     subject: `You have been added to this event: "${eventTitle}"!`,
     html: `
         <h2>New event notification!</h2>
-        <p>You have been added to this event: "${eventTitle}"!</p>
+        <p>You have been added to this event: "${eventTitle}" by ${inviterName}!</p>
         <p><strong>This event will start on this date:</strong> ${eventDate}</p>
         <p>Further information about this event is available on the website, go check it out!</p>
         `,
@@ -98,6 +99,7 @@ export const sendGroupInvitedEmail = async (
   to: string,
   groupName: string,
   inviterName: string,
+  inviteeRole: string,
 ): Promise<void> => {
   await sendEmail({
     to,
@@ -105,8 +107,39 @@ export const sendGroupInvitedEmail = async (
     html: `
         <h2>New group notification!</h2>
         <p>You have been invited to this group: "${groupName}" by ${inviterName}!</p>
-        <p>You can accept the invite on the website.</p>
+        <p>If you accept this invitation you will become a ${inviteeRole} of the group.</p>
+        <p>You can accept the invitation on the website.</p>
         <p>Further information about this invite is available on the website, go check it out!</p>
         `,
+  });
+};
+
+export const sendOtpEmail = async (email: string, otp: string, username: string): Promise<void> => {
+  await sendEmail({
+    to: email,
+    subject: 'Roamly - registration code (OTP)',
+    html: `
+      <h1>Hello ${username}!</h1>
+      <p>To complete your registration please write the 6 characters long registration code below in the webpage:</p>
+      <h2 style="letter-spacing: 5px; font-size: 32px;">${otp}</h2>
+      <p>This code will expire in 15 minutes!</p>
+    `,
+  });
+};
+
+export const sendPasswordResetEmail = async (
+  email: string,
+  otp: string,
+  username: string,
+): Promise<void> => {
+  await sendEmail({
+    to: email,
+    subject: 'Roamly - password reset',
+    html: `
+      <h1>Hello ${username}!</h1>
+      <p>Here is your password reset code:</p>
+      <h2 style="letter-spacing: 5px; font-size: 32px;">${otp}</h2>
+      <p>This code will expire in 15 minutes!</p>
+    `,
   });
 };
