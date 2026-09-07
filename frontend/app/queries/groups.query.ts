@@ -7,6 +7,8 @@ export const useGroupsQuery = (limit: number = 15, cursor?: Ref<string | undefin
   return useQuery({
     key: () => ['groups', 'list', unref(cursor) ?? ''] as const,
     query: () => groupsService.listGroups(limit, unref(cursor)),
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
   });
 };
 
@@ -17,6 +19,8 @@ export const usePendingInvitesQuery = (
   return useQuery({
     key: () => ['groups', 'invites', unref(cursor) ?? ''] as const,
     query: () => groupsService.getPendingInvites(limit, unref(cursor)),
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
   });
 };
 
@@ -24,5 +28,7 @@ export const useGroupInfosQuery = (groupUuid: Ref<string> | string) => {
   return useQuery({
     key: () => ['groups', 'infos', unref(groupUuid)] as const,
     query: () => groupsService.getGroupInfos(unref(groupUuid)),
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
   });
 };

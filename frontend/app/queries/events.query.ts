@@ -8,6 +8,8 @@ export const useDatesQuery = (groupUuid: Ref<string | undefined>) => {
     key: () => ['events-dates', groupUuid.value ?? null],
     query: () => eventsService.getAvailableDates(groupUuid.value!),
     enabled: () => !!groupUuid.value,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
   });
 };
 
@@ -23,5 +25,7 @@ export const useEventsQuery = (
       return eventsService.getEvents(groupUuid.value!, filterDate, filterDate);
     },
     enabled: () => !!groupUuid.value && !!selectedDateId.value,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
   });
 };
