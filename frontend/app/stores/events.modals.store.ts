@@ -37,8 +37,9 @@ export const useEventsStore = defineStore('events', () => {
     selectedEventToDelete.value = null;
   };
 
-  const openParticipantsModal = (participants: EventCreatorDto[]) => {
-    currentEventParticipants.value = participants;
+  const openParticipantsModal = (event: UiEvent) => {
+    previewEvent.value = event;
+    currentEventParticipants.value = event.members || [];
     isParticipantsModalOpen.value = true;
     isPreviewModalOpen.value = false;
   };

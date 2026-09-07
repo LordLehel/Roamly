@@ -46,7 +46,7 @@ export default defineNuxtConfig({
 
   icon: {
     serverBundle: {
-      collections: ['heroicons'],
+      collections: ['heroicons', 'mdi'],
     },
 
     clientBundle: {

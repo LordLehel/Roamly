@@ -150,12 +150,10 @@
             v-for="user in eventsStore.currentEventParticipants"
             :key="user.uuid"
             :class="appConfig.calendar.participantCard"
+            @click="handleOpenUserProfile(user)"
           >
             <div class="flex items-center justify-between w-full">
-              <div
-                class="flex items-center gap-5 cursor-pointer"
-                @click="handleOpenUserProfile(user)"
-              >
+              <div class="flex items-center gap-5 cursor-pointer">
                 <UAvatar
                   :alt="user.username"
                   :src="user.profile_image_url || undefined"
@@ -163,17 +161,21 @@
                   size="xl"
                   :class="appConfig.calendar.participantCardAvatar"
                 />
+
                 <div :class="appConfig.calendar.participantCardInfo">
-                  <div :class="appConfig.calendar.participantCardHeader">
+                  <div class="flex items-center gap-1.5">
                     <h4 :class="appConfig.calendar.participantCardName">{{ user.username }}</h4>
-                    <span :class="appConfig.calendar.participantCardRole">
-                      {{
-                        user.email === eventsStore.previewEvent?.creator?.email
-                          ? 'Creator'
-                          : 'Participant'
-                      }}
-                    </span>
+
+                    <!-- ITT a user.email helyett simán a usert adjuk át -->
+                    <UTooltip v-if="isGroupLeader(user)" text="Group Leader">
+                      <UIcon name="i-heroicons-star" class="w-4 h-4 text-amber-500" />
+                    </UTooltip>
                   </div>
+
+                  <!-- ITT IS a teljes usert adjuk át -->
+                  <span :class="appConfig.calendar.participantCardRole">
+                    {{ isEventCreator(user) ? 'Creator' : 'Participant' }}
+                  </span>
                   <p :class="appConfig.calendar.participantCardEmail">{{ user.email }}</p>
                 </div>
               </div>
@@ -184,7 +186,7 @@
                 :popper="{ placement: 'top', strategy: 'fixed' }"
               >
                 <UButton
-                  icon="i-heroicons-trash"
+                  icon="i-heroicons-user-minus"
                   variant="ghostDangerIconButton"
                   :loading="removeParticipantMutation.isLoading.value"
                   @click="eventsStore.openRemoveParticipantModal(user)"
@@ -719,10 +721,11 @@ const confirmRemoveParticipant = () => {
 const handleOpenUserProfile = (user: EventCreatorDto) => {
   eventsStore.closeParticipantsModal();
   eventsStore.closePreviewModal();
+
   groupsStore.selectedUserProfile = {
     username: user.username,
     email: user.email || 'N/A',
-    role: 'Participant',
+    role: getGroupRole(user),
     joinedAt: 'Unknown',
     canViewDocuments: false,
   };
@@ -730,8 +733,8 @@ const handleOpenUserProfile = (user: EventCreatorDto) => {
 };
 
 const openAllParticipantsModal = () => {
-  if (eventsStore.previewEvent?.members) {
-    eventsStore.openParticipantsModal([...eventsStore.previewEvent.members]);
+  if (eventsStore.previewEvent) {
+    eventsStore.openParticipantsModal(eventsStore.previewEvent);
   }
 };
 
@@ -785,6 +788,49 @@ const availableGroupMembers = computed<EventCreatorDto[]>(() => {
       m.email && !currentEventEmails.includes(m.email) && m.email !== currentUserEmail.value,
   );
 });
+
+const getGroupRole = (user?: EventCreatorDto | null): string => {
+  if (!user || !groupInfosData.value?.group_profiles) return 'Member';
+
+  const profile = groupInfosData.value.group_profiles.find((p) => {
+    const matchEmail =
+      user.email &&
+      p.users?.email &&
+      user.email.trim().toLowerCase() === p.users.email.trim().toLowerCase();
+
+    const matchUsername =
+      user.username &&
+      p.users?.username &&
+      user.username.trim().toLowerCase() === p.users.username.trim().toLowerCase();
+
+    return matchEmail || matchUsername;
+  });
+
+  const roleType = profile?.roles?.type?.toLowerCase();
+  return roleType === 'leader' ? 'Leader' : 'Member';
+};
+
+const isGroupLeader = (user: EventCreatorDto): boolean => {
+  return getGroupRole(user) === 'Leader';
+};
+const isEventCreator = (user: EventCreatorDto): boolean => {
+  const creator = eventsStore.previewEvent?.creator;
+  if (!creator) return false;
+
+  const matchEmail = !!(
+    user.email &&
+    creator.email &&
+    user.email.trim().toLowerCase() === creator.email.trim().toLowerCase()
+  );
+
+  const matchUsername = !!(
+    user.username &&
+    creator.username &&
+    user.username.trim().toLowerCase() === creator.username.trim().toLowerCase()
+  );
+
+  return matchEmail || matchUsername;
+};
 
 const toggleMemberSelection = (email: string) => {
   const index = selectedEmailsToAdd.value.indexOf(email);

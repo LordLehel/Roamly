@@ -36,7 +36,7 @@
       @apply-filter="applyDateFilter"
       @open-add-event="eventsStore.openAddEventModal()"
       @open-delete-event="handleOpenDeleteEventModal"
-      @open-user-profile="openUserProfile"
+      @open-user-profile="handleOpenUserProfile"
       @open-all-participants="openAllParticipantsModal"
       @open-preview-modal="handleOpenPreviewModal"
       @open-leave-event="eventsStore.openLeaveEventModal"
@@ -72,7 +72,7 @@
       @apply-filter="applyDateFilter"
       @open-add-event="eventsStore.openAddEventModal()"
       @open-delete-event="handleOpenDeleteEventModal"
-      @open-user-profile="openUserProfile"
+      @open-user-profile="handleOpenUserProfile"
       @open-all-participants="openAllParticipantsModal"
       @open-leave-event="eventsStore.openLeaveEventModal"
       @open-add-members="handleOpenAddMembersModal"
@@ -84,7 +84,7 @@
 import { ref, computed, watch } from 'vue';
 import { useScreenSize } from '~/composables/useScreenSize';
 import { useCurrentUserQuery } from '~/queries/user.query';
-import { useGroupsQuery } from '~/queries/groups.query';
+import { useGroupsQuery, useGroupInfosQuery } from '~/queries/groups.query';
 import { useDatesQuery, useEventsQuery } from '~/queries/events.query';
 import { useEventsStore } from '~/stores/events.modals.store';
 import { useGroupsStore } from '~/stores/groups.modals.store';
@@ -125,6 +125,8 @@ const currentUserEmail = computed(() => currentUser.value?.email);
 
 const { data: groupsData, isLoading: isLoadingGroups } = useGroupsQuery();
 const userGroupsList = computed<GroupOutDto[]>(() => groupsData.value?.items || []);
+
+const { data: groupInfosData } = useGroupInfosQuery(computed(() => selectedGroupUuid.value || ''));
 
 watch(
   userGroupsList,
@@ -275,11 +277,22 @@ const handleOpenPreviewModal = (event: UiEvent) => {
   eventsStore.openPreviewModal(event, selectedDayDetails.value?.date);
 };
 
-const openUserProfile = (user: EventCreatorDto) => {
+const getGroupRole = (userEmail?: string | null): string => {
+  if (!userEmail || !groupInfosData.value?.group_profiles) return 'Member';
+
+  const profile = groupInfosData.value.group_profiles.find(
+    (p) => p.users?.email?.toLowerCase() === userEmail.toLowerCase(),
+  );
+
+  const roleType = profile?.roles?.type?.toLowerCase();
+  return roleType === 'leader' ? 'Leader' : 'Member';
+};
+
+const handleOpenUserProfile = (user: EventCreatorDto) => {
   groupsStore.selectedUserProfile = {
     username: user.username,
     email: user.email || 'N/A',
-    role: 'Participant',
+    role: getGroupRole(user.email), // <-- ITT VOLT A HARDKÓDOLT 'Participant'!
     joinedAt: 'Unknown',
     canViewDocuments: false,
   };
@@ -287,7 +300,7 @@ const openUserProfile = (user: EventCreatorDto) => {
 };
 
 const openAllParticipantsModal = () => {
-  if (selectedEvent.value?.members) eventsStore.openParticipantsModal(selectedEvent.value.members);
+  if (selectedEvent.value?.members) eventsStore.openParticipantsModal(selectedEvent.value);
 };
 
 const handleOpenAddMembersModal = (event: UiEvent) => {

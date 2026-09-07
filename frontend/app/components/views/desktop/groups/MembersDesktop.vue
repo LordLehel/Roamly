@@ -262,7 +262,7 @@
                       >
                         <div
                           :class="appConfig.calendar.participantMoreBadge"
-                          @click.stop="eventsStore.openParticipantsModal(event.members || [])"
+                          @click.stop="eventsStore.openParticipantsModal(event)"
                         >
                           +{{ (event.members?.length || 0) - 5 }}
                         </div>
