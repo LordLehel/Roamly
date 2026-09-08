@@ -1,4 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import process from 'node:process';
+
 export default defineNuxtConfig({
   compatibilityDate: '2023-10-10',
 
@@ -24,7 +26,9 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    '/api/**': { proxy: 'http://localhost:3000/api/**' },
+    '/api/**': {
+      proxy: `${process.env.NUXT_PUBLIC_API_BASE_URL || 'http://localhost:5000'}/api/**`,
+    },
   },
 
   devServer: {

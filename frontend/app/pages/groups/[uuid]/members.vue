@@ -1,35 +1,42 @@
 <!-- frontend/app/pages/groups/[uuid]/members.vue -->
 <template>
   <div>
-    <MembersMobile
-      v-if="isMobile"
-      :group-infos="groupInfos"
-      :filtered-members="filteredMembers"
-      :is-loading="isLoading"
-      :error="error"
-      :search-query="searchQuery"
-      :is-current-user-leader="isCurrentUserLeader"
-      :current-user-email="currentUser?.email"
-      @update:search-query="searchQuery = $event"
-      @delete-group="handleDeleteCurrentGroup"
-      @leave-group="handleLeaveCurrentGroup"
-      @open-profile="handleOpenProfile"
-    />
+    <ClientOnly>
+      <template #fallback>
+        <div class="min-h-screen flex items-center justify-center">
+          <span class="opacity-50 font-medium">{{ CONST_LOADING_TEXT ?? 'Loading...' }}</span>
+        </div>
+      </template>
+      <MembersMobile
+        v-if="isMobile"
+        :group-infos="groupInfos"
+        :filtered-members="filteredMembers"
+        :is-loading="isLoading"
+        :error="error"
+        :search-query="searchQuery"
+        :is-current-user-leader="isCurrentUserLeader"
+        :current-user-email="currentUser?.email"
+        @update:search-query="searchQuery = $event"
+        @delete-group="handleDeleteCurrentGroup"
+        @leave-group="handleLeaveCurrentGroup"
+        @open-profile="handleOpenProfile"
+      />
 
-    <MembersDesktop
-      v-else
-      :group-infos="groupInfos"
-      :filtered-members="filteredMembers"
-      :is-loading="isLoading"
-      :error="error"
-      :search-query="searchQuery"
-      :is-current-user-leader="isCurrentUserLeader"
-      :current-user-email="currentUser?.email"
-      @update:search-query="searchQuery = $event"
-      @delete-group="handleDeleteCurrentGroup"
-      @leave-group="handleLeaveCurrentGroup"
-      @open-profile="handleOpenProfile"
-    />
+      <MembersDesktop
+        v-else
+        :group-infos="groupInfos"
+        :filtered-members="filteredMembers"
+        :is-loading="isLoading"
+        :error="error"
+        :search-query="searchQuery"
+        :is-current-user-leader="isCurrentUserLeader"
+        :current-user-email="currentUser?.email"
+        @update:search-query="searchQuery = $event"
+        @delete-group="handleDeleteCurrentGroup"
+        @leave-group="handleLeaveCurrentGroup"
+        @open-profile="handleOpenProfile"
+      />
+    </ClientOnly>
   </div>
 </template>
 

@@ -185,7 +185,7 @@
             class="w-full cursor-pointer hover:bg-surface-500/90 transition-colors"
             @click="navigateToEvent(event.uuid)"
           >
-            <div class="flex flex-col gap-2.5">
+            <div class="flex flex-col gap-2.5 w-full">
               <div :class="[appConfig.layout.flexBetween, 'border-b border-dark-text/10 pb-2']">
                 <div class="flex items-center gap-2 min-w-0 pr-2">
                   <UTooltip :text="event.is_private ? 'Private Event' : 'Group Event'">
@@ -292,6 +292,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useGroupsStore } from '~/stores/groups.modals.store';
 import { useEventsStore } from '~/stores/events.modals.store';
 import { useEventsQuery } from '~/queries/events.query';
+import { processAndSortEvents } from '~/utils/sort.utils';
 import type { GroupInfosOutDto, GroupProfileDto } from '~/types/groups.type';
 import type { UiEvent } from '~/types/events.type';
 import type { ApiError } from '~/types/apiError.type';

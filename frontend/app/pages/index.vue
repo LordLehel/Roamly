@@ -1,18 +1,26 @@
 <!-- frontend/app/pages/index.vue -->
 <template>
   <div>
-    <HomeMobile
-      v-if="isMobile"
-      :feature-cards="featureCards"
-      :active-card="activeCard"
-      @toggle-card="toggleCard"
-    />
-    <HomeDesktop
-      v-else
-      :feature-cards="featureCards"
-      :active-card="activeCard"
-      @toggle-card="toggleCard"
-    />
+    <ClientOnly>
+      <template #fallback>
+        <div class="min-h-screen flex items-center justify-center">
+          <span class="opacity-50 font-medium">{{ CONST_LOADING_TEXT ?? 'Loading...' }}</span>
+        </div>
+      </template>
+
+      <HomeMobile
+        v-if="isMobile"
+        :feature-cards="featureCards"
+        :active-card="activeCard"
+        @toggle-card="toggleCard"
+      />
+      <HomeDesktop
+        v-else
+        :feature-cards="featureCards"
+        :active-card="activeCard"
+        @toggle-card="toggleCard"
+      />
+    </ClientOnly>
   </div>
 </template>
 

@@ -162,7 +162,10 @@
 
     <!-- UPCOMING EVENTS SECTION -->
     <div
-      class="appcongig.layout.cardGrid + 'shadow-md bg-surface-500/40 rounded-2xl ring-1 ring-dark-text/10 p-4 w-full mt-4'"
+      :class="[
+        appConfig.layout.cardGrid +
+          'shadow-md bg-surface-500/40 rounded-2xl ring-1 ring-dark-text/10 p-4 w-full mt-4',
+      ]"
     >
       <h2 :class="appConfig.typography.cardTitle" class="text-surface-600 mb-2">
         {{ CONST_UPCOMING_EVENTS_HEADING }}
@@ -187,7 +190,7 @@
             class="w-full cursor-pointer hover:bg-surface-500/90 transition-colors"
             @click="navigateToEvent(event.uuid)"
           >
-            <div class="flex flex-col gap-2.5">
+            <div class="flex flex-col gap-2.5 w-full">
               <div class="flex items-start justify-between border-b border-dark-text/10 pb-2">
                 <div class="flex items-center gap-2 min-w-0 pr-2">
                   <UTooltip :text="event.is_private ? 'Private Event' : 'Group Event'">

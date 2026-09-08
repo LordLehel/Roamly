@@ -1,23 +1,31 @@
 <!-- frontend/app/pages/groups/index.vue -->
 <template>
   <div>
-    <IndexMobile
-      v-if="isMobile"
-      :groups-list="groupsList"
-      :is-loading="isLoading"
-      :error="error"
-      :is-fetching-next-page="isFetchingNextPage"
-      @load-more="fetchNextPage"
-    />
+    <ClientOnly>
+      <template #fallback>
+        <div class="min-h-screen flex items-center justify-center">
+          <span class="opacity-50 font-medium">{{ CONST_LOADING_TEXT ?? 'Loading...' }}</span>
+        </div>
+      </template>
 
-    <IndexDesktop
-      v-else
-      :groups-list="groupsList"
-      :is-loading="isLoading"
-      :error="error"
-      :is-fetching-next-page="isFetchingNextPage"
-      @load-more="fetchNextPage"
-    />
+      <IndexMobile
+        v-if="isMobile"
+        :groups-list="groupsList"
+        :is-loading="isLoading"
+        :error="error"
+        :is-fetching-next-page="isFetchingNextPage"
+        @load-more="fetchNextPage"
+      />
+
+      <IndexDesktop
+        v-else
+        :groups-list="groupsList"
+        :is-loading="isLoading"
+        :error="error"
+        :is-fetching-next-page="isFetchingNextPage"
+        @load-more="fetchNextPage"
+      />
+    </ClientOnly>
   </div>
 </template>
 

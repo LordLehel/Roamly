@@ -1,20 +1,28 @@
 <!-- frontend/app/pages/register.vue -->
 <template>
   <div>
-    <RegisterMobile
-      v-if="isMobile"
-      :is-loading="isLoading"
-      :error="error"
-      :status="status"
-      @submit="handleRegister"
-    />
-    <RegisterDesktop
-      v-else
-      :is-loading="isLoading"
-      :error="error"
-      :status="status"
-      @submit="handleRegister"
-    />
+    <ClientOnly>
+      <template #fallback>
+        <div class="min-h-screen flex items-center justify-center">
+          <span class="opacity-50 font-medium">{{ CONST_LOADING_TEXT ?? 'Loading...' }}</span>
+        </div>
+      </template>
+
+      <RegisterMobile
+        v-if="isMobile"
+        :is-loading="isLoading"
+        :error="error"
+        :status="status"
+        @submit="handleRegister"
+      />
+      <RegisterDesktop
+        v-else
+        :is-loading="isLoading"
+        :error="error"
+        :status="status"
+        @submit="handleRegister"
+      />
+    </ClientOnly>
   </div>
 </template>
 
