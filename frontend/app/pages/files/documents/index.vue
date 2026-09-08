@@ -6,8 +6,11 @@
       v-model:selected-group="selectedGroupUuid"
       v-model:search-query="searchQuery"
       v-model:filter-type="filterType"
+      v-model:member-search-query="memberSearchQuery"
+      v-model:member-filter-type="memberFilterType"
       :documents="filteredDocuments"
       :document-types="documentTypes"
+      :private-document-types="privateDocumentTypes"
       :groups="groupsList"
       :is-loading="isLoadingFiles"
       :is-current-user-leader="isCurrentUserLeader"
@@ -22,8 +25,11 @@
       v-model:selected-group="selectedGroupUuid"
       v-model:search-query="searchQuery"
       v-model:filter-type="filterType"
+      v-model:member-search-query="memberSearchQuery"
+      v-model:member-filter-type="memberFilterType"
       :documents="filteredDocuments"
       :document-types="documentTypes"
+      :private-document-types="privateDocumentTypes"
       :groups="groupsList"
       :is-loading="isLoadingFiles"
       :is-current-user-leader="isCurrentUserLeader"
@@ -60,12 +66,23 @@ const toast = useToast();
 const searchQuery = ref('');
 const filterType = ref('ALL');
 
+const memberSearchQuery = ref('');
+const memberFilterType = ref('ALL');
+
 const documentTypes = [
   { label: 'All Types', value: 'ALL' },
   { label: 'Ticket', value: 'TICKET' },
   { label: 'Booking Confirmation', value: 'BOOKING_CONFIRMATION' },
   { label: 'Hotel Voucher', value: 'HOTEL_VOUCHER' },
   { label: 'Guest Registration Card', value: 'GUEST_REGISTRATION_CARD' },
+  { label: 'Other', value: 'OTHER' },
+];
+
+const privateDocumentTypes = [
+  { label: 'All Types', value: 'ALL' },
+  { label: 'Personal Id', value: 'ID' },
+  { label: 'Passport', value: 'PASSPORT' },
+  { label: 'Driving License', value: 'DRIVING_LICENSE' },
   { label: 'Other', value: 'OTHER' },
 ];
 

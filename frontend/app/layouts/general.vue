@@ -17,7 +17,10 @@
     <ProfileModals />
     <UserProfileModal />
     <EventsModals />
-    <DocumentModals :document-types="GROUP_DOCUMENT_TYPES" />
+    <DocumentModals
+      :document-types="GROUP_DOCUMENT_TYPES"
+      :private-document-types="PRIVATE_DOCUMENT_TYPES"
+    />
   </div>
 </template>
 

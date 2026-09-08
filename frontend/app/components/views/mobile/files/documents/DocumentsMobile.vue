@@ -22,7 +22,7 @@
     </div>
 
     <div :class="appConfig.calendar.mobileMainWrapper">
-      <div :class="appConfig.calendar.mobileHeader">
+      <div :class="appConfig.calendar.mobileHeader" class="mb-8">
         <UPopover v-model:open="isGroupDropdownOpen" class="w-full" :popper="{ strategy: 'fixed' }">
           <UButton block variant="ghost" :class="appConfig.calendar.mobileHeaderButton">
             <div :class="appConfig.calendar.mobileHeaderTitleRow">
@@ -65,6 +65,14 @@
         </UPopover>
       </div>
 
+      <!-- ---------------- -->
+      <!-- MEMBER DOCUMENTS -->
+      <!-- ---------------- -->
+
+      <div :class="appConfig.typography.pageTitle" class="text-2xl font-bold">
+        {{ CONST_GROUP_DOCUMENTS_HEADER }}
+      </div>
+
       <div :class="appConfig.calendar.mobileToolbar">
         <UTooltip text="Filter">
           <UPopover>
@@ -104,7 +112,7 @@
         </UTooltip>
       </div>
 
-      <div class="px-2 pt-2">
+      <div class="px-2 pt-2 mb-8">
         <div v-if="isLoading" :class="appConfig.typography.statusLoading" class="py-4 text-center">
           Loading documents...
         </div>
@@ -218,6 +226,84 @@
         </div>
       </div>
     </div>
+
+    <div :class="appConfig.typography.pageTitle" class="text-2xl font-bold">
+      {{ CONST_MEMBER_DOCUMENTS_HEADER }}
+    </div>
+
+    <div :class="appConfig.calendar.mobileToolbar">
+      <UTooltip text="Filter">
+        <UPopover>
+          <UButton icon="i-heroicons-funnel" variant="glassIconButton" />
+          <template #content="{ close }">
+            <div :class="[appConfig.ui.dropdownMenu.slots.content, 'w-fit']">
+              <button
+                v-for="type in privateDocumentTypes"
+                :key="type.value"
+                :class="appConfig.ui.dropdownMenu.slots.item"
+                @click="
+                  memberFilterType = type.value;
+                  close();
+                "
+              >
+                <UIcon
+                  :name="
+                    memberFilterType === type.value ? 'i-heroicons-check' : 'i-heroicons-funnel'
+                  "
+                  :class="appConfig.ui.dropdownMenu.slots.itemLeadingIcon"
+                />
+                <span>{{ type.label }}</span>
+              </button>
+            </div>
+          </template>
+        </UPopover>
+      </UTooltip>
+
+      <UInput
+        v-model="memberSearchQuery"
+        placeholder="Search private documents..."
+        icon="i-heroicons-magnifying-glass"
+        class="flex-1"
+        variant="search"
+      />
+    </div>
+
+    <div class="px-2 pt-4 flex flex-col gap-6 w-full">
+      <div
+        v-for="type in privateDocumentTypes.filter(
+          (t) => t.value !== 'ALL' && (memberFilterType === 'ALL' || memberFilterType === t.value),
+        )"
+        :key="type.value"
+        class="flex flex-col gap-3 w-full"
+      >
+        <h2 :class="appConfig.typography.pageTitle" class="text-xl font-bold">
+          {{ type.label }}
+        </h2>
+
+        <UCard variant="documentGlass" class="relative w-full p-6">
+          <div class="flex flex-col gap-3">
+            <div class="flex items-center justify-between">
+              <p class="font-bold text-sm text-dark-text">{{ type.label }} Category</p>
+              <span v-if="memberSearchQuery" class="text-xs text-brand-500 font-medium">
+                Active search: "{{ memberSearchQuery }}"
+              </span>
+            </div>
+
+            <div :class="appConfig.layout.divider"></div>
+
+            <div class="py-6 text-center">
+              <UIcon
+                name="i-heroicons-document-text"
+                class="w-12 h-12 text-surface-500/40 mx-auto mb-2"
+              />
+              <p class="text-surface-400 italic text-sm">
+                The documents with '{{ type.label.toLowerCase() }}' type will be listed here...
+              </p>
+            </div>
+          </div>
+        </UCard>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -232,6 +318,8 @@ const appConfig = useAppConfig();
 const selectedGroup = defineModel<string | undefined>('selectedGroup');
 const searchQuery = defineModel<string>('searchQuery', { default: '' });
 const filterType = defineModel<string>('filterType', { default: 'ALL' });
+const memberSearchQuery = defineModel<string>('memberSearchQuery', { default: '' });
+const memberFilterType = defineModel<string>('memberFilterType', { default: 'ALL' });
 
 const props = defineProps<{
   documents: GroupFile[];
@@ -239,6 +327,7 @@ const props = defineProps<{
   isLoading: boolean;
   isCurrentUserLeader: boolean;
   documentTypes: { label: string; value: string }[];
+  privateDocumentTypes: { label: string; value: string }[];
 }>();
 
 const emit = defineEmits<{

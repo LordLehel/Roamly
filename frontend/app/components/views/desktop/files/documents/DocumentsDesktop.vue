@@ -1,7 +1,7 @@
 <!-- frontend/app/components/views/desktop/files/documents/DocumentsDesktop.vue -->
 <template>
   <div :class="appConfig.layout.pageWrapper">
-    <!-- ... HEADER (változatlan) ... -->
+    <!-- HEADER -->
     <div :class="appConfig.layout.pageHeader">
       <div :class="appConfig.layout.actionGroup" class="flex-1 justify-start">
         <UTooltip v-if="isCurrentUserLeader" text="Delete Group">
@@ -129,6 +129,10 @@
           </UPopover>
         </div>
 
+        <div :class="appConfig.typography.pageTitle" class="text-2xl font-bold">
+          {{ CONST_GROUP_DOCUMENTS_HEADER }}
+        </div>
+
         <div class="flex items-center gap-2 flex-1 justify-end shrink-0">
           <UTooltip v-if="isCurrentUserLeader" text="Upload Document">
             <UButton
@@ -244,6 +248,99 @@
       </div>
     </div>
   </div>
+
+  <!-- ---------------- -->
+  <!-- MEMBER DOCUMENTS -->
+  <!-- ---------------- -->
+
+  <div :class="appConfig.layout.pageWrapper">
+    <div class="flex items-center justify-between w-full mb-6 relative">
+      <div class="flex items-center gap-3 flex-1 justify-start">
+        <UInput
+          v-model="memberSearchQuery"
+          icon="i-heroicons-magnifying-glass"
+          placeholder="Search private documents..."
+          variant="search"
+          class="w-1/3! max-w-none!"
+        />
+        <UPopover>
+          <UButton
+            icon="i-heroicons-funnel"
+            :label="
+              memberFilterType === 'ALL'
+                ? 'Filter'
+                : privateDocumentTypes.find((d) => d.value === memberFilterType)?.label
+            "
+            variant="glassButton"
+          />
+          <template #content="{ close }">
+            <div :class="[appConfig.ui.dropdownMenu.slots.content, 'w-fit']">
+              <button
+                v-for="type in privateDocumentTypes"
+                :key="type.value"
+                :class="appConfig.ui.dropdownMenu.slots.item"
+                @click="
+                  memberFilterType = type.value;
+                  close();
+                "
+              >
+                <UIcon
+                  :name="
+                    memberFilterType === type.value ? 'i-heroicons-check' : 'i-heroicons-funnel'
+                  "
+                  :class="appConfig.ui.dropdownMenu.slots.itemLeadingIcon"
+                />
+                <span>{{ type.label }}</span>
+              </button>
+            </div>
+          </template>
+        </UPopover>
+      </div>
+
+      <div :class="appConfig.typography.pageTitle" class="text-2xl font-bold">
+        {{ CONST_MEMBER_DOCUMENTS_HEADER }}
+      </div>
+
+      <div class="flex items-center gap-2 flex-1 justify-end shrink-0">
+        <!-- Empty Div-->
+      </div>
+    </div>
+
+    <div
+      v-for="type in privateDocumentTypes.filter(
+        (t) => t.value !== 'ALL' && (memberFilterType === 'ALL' || memberFilterType === t.value),
+      )"
+      :key="type.value"
+      class="flex flex-col gap-4"
+    >
+      <h2 :class="appConfig.typography.pageTitle" class="text-xl font-bold">
+        {{ type.label }}
+      </h2>
+
+      <UCard variant="documentGlass" class="relative p-6">
+        <div class="flex flex-col gap-3">
+          <div class="flex items-center justify-between">
+            <p class="font-bold text-sm text-dark-text">{{ type.label }} Kategória</p>
+            <span v-if="memberSearchQuery" class="text-xs text-brand-500 font-medium">
+              Active search: "{{ memberSearchQuery }}"
+            </span>
+          </div>
+
+          <div :class="appConfig.layout.divider"></div>
+
+          <div class="py-6 text-center">
+            <UIcon
+              name="i-heroicons-document-text"
+              class="w-12 h-12 text-surface-500/40 mx-auto mb-2"
+            />
+            <p class="text-surface-400 italic text-sm">
+              The documents with '{{ type.label.toLowerCase() }}' type will be listed here...
+            </p>
+          </div>
+        </div>
+      </UCard>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -257,6 +354,8 @@ const appConfig = useAppConfig();
 const selectedGroup = defineModel<string | undefined>('selectedGroup');
 const searchQuery = defineModel<string>('searchQuery', { default: '' });
 const filterType = defineModel<string>('filterType', { default: 'ALL' });
+const memberSearchQuery = defineModel<string>('memberSearchQuery', { default: '' });
+const memberFilterType = defineModel<string>('memberFilterType', { default: 'ALL' });
 
 const props = defineProps<{
   documents: GroupFile[];
@@ -264,6 +363,7 @@ const props = defineProps<{
   isLoading: boolean;
   isCurrentUserLeader: boolean;
   documentTypes: { label: string; value: string }[];
+  privateDocumentTypes: { label: string; value: string }[];
 }>();
 
 const emit = defineEmits<{
