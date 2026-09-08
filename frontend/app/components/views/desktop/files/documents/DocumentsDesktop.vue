@@ -108,7 +108,7 @@
               variant="glassButton"
             />
             <template #content="{ close }">
-              <div :class="appConfig.ui.dropdownMenu.slots.content + 'w-fit'">
+              <div :class="[appConfig.ui.dropdownMenu.slots.content, 'w-fit']">
                 <button
                   v-for="type in documentTypes"
                   :key="type.value"
@@ -130,7 +130,7 @@
         </div>
 
         <div class="flex items-center gap-2 flex-1 justify-end shrink-0">
-          <UTooltip text="Upload Document">
+          <UTooltip v-if="isCurrentUserLeader" text="Upload Document">
             <UButton
               icon="i-heroicons-plus"
               variant="glassIconButtonHighlight"
@@ -148,13 +148,6 @@
           <div :class="appConfig.layout.documentCardHeader">
             <p class="font-bold truncate pr-2 shadow-sm text-sm">{{ doc.file_name }}</p>
             <div class="flex items-center gap-1 shrink-0">
-              <UTooltip text="Edit">
-                <UButton
-                  icon="i-heroicons-pencil"
-                  variant="ghostDangerIconButton"
-                  class="text-surface-500"
-                />
-              </UTooltip>
               <UTooltip v-if="isCurrentUserLeader" text="Delete">
                 <UButton
                   icon="i-heroicons-trash"
@@ -174,6 +167,8 @@
                   icon="i-heroicons-eye"
                   variant="ghostDangerIconButton"
                   class="text-surface-500"
+                  :href="doc.download_url"
+                  target="_blank"
                 />
               </UTooltip>
               <UTooltip text="Download">
@@ -181,9 +176,9 @@
                   icon="i-heroicons-arrow-down-tray"
                   variant="ghostDangerIconButton"
                   class="text-surface-500 hover:text-brand-500"
-                  :href="doc.download_url"
-                  target="_blank"
+                  @click.prevent="emit('download', doc.download_url, doc.file_name)"
                 />
+                <!-- Download needs to be fixed-->
               </UTooltip>
             </div>
           </div>
@@ -259,32 +254,32 @@ import type { GroupOutDto } from '~/types/groups.type';
 
 const appConfig = useAppConfig();
 
+const selectedGroup = defineModel<string | undefined>('selectedGroup');
 const searchQuery = defineModel<string>('searchQuery', { default: '' });
 const filterType = defineModel<string>('filterType', { default: 'ALL' });
 
 const props = defineProps<{
   documents: GroupFile[];
   groups: GroupOutDto[];
-  selectedGroup: string | undefined;
   isLoading: boolean;
   isCurrentUserLeader: boolean;
   documentTypes: { label: string; value: string }[];
 }>();
 
 const emit = defineEmits<{
-  (e: 'update:selectedGroup', value: string | undefined): void;
   (e: 'delete', file: GroupFile): void;
   (e: 'upload' | 'delete-group' | 'leave-group'): void;
+  (e: 'download', url: string | undefined, filename: string): void;
 }>();
 
 const isGroupDropdownOpen = ref(false);
 
 const currentGroupDetails = computed(() =>
-  props.groups.find((g) => g.uuid === props.selectedGroup),
+  props.groups.find((g) => g.uuid === selectedGroup.value),
 );
 
 const selectGroup = (uuid: string) => {
-  emit('update:selectedGroup', uuid);
+  selectedGroup.value = uuid;
   isGroupDropdownOpen.value = false;
 };
 </script>

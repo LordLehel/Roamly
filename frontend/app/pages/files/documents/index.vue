@@ -15,6 +15,7 @@
       @upload="openUploadModal"
       @delete-group="handleDeleteGroup"
       @leave-group="handleLeaveGroup"
+      @download="handleDownload"
     />
     <DocumentsMobile
       v-else
@@ -30,6 +31,7 @@
       @upload="openUploadModal"
       @delete-group="handleDeleteGroup"
       @leave-group="handleLeaveGroup"
+      @download="handleDownload"
     />
   </div>
 </template>
@@ -86,7 +88,13 @@ const currentGroup = computed(() =>
 );
 
 const isCurrentUserLeader = computed(() => {
-  return currentGroup.value?.role?.toLowerCase() === 'leader';
+  if (!currentGroup.value) {
+    return false;
+  }
+
+  const role = currentGroup.value.role;
+
+  return role === 'LEADER' || role === 'leader';
 });
 
 // A query-ben a típus pontosan egyezzen a backend által várt értékkel
@@ -129,6 +137,26 @@ const handleDeleteGroup = () => {
 const handleLeaveGroup = () => {
   if (currentGroup.value) {
     groupsStore.openLeaveModal(currentGroup.value);
+  }
+};
+
+const handleDownload = async (url: string | undefined, filename: string) => {
+  if (!url) return;
+  try {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const blobUrl = window.URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(blobUrl);
+  } catch (error) {
+    console.error('Download failed:', error);
   }
 };
 </script>
