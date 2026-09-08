@@ -142,7 +142,7 @@ model pending_users {
   email        String   @unique @db.VarChar(254)
   username     String   @db.VarChar(64)
   password     String   @db.VarChar(255)
-  phone_number String?  @unique @db.VarChar(20)
+  phone_number String?  @db.VarChar(20)
   otp          String   @db.VarChar(6)
   expires_at   DateTime @db.Timestamp(6)
   created_at   DateTime @default(now()) @db.Timestamp(6)

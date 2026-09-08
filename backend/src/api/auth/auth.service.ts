@@ -4,6 +4,7 @@ import { hashPassword, validatePassword } from '../../utils/password.utils';
 import {
   BadRequestError,
   ConflictError,
+  EmailDeliveryError,
   NotFoundError,
   UnauthorizedError,
 } from '../../utils/ServerError';
@@ -27,14 +28,16 @@ export const registerUser = async (
   }
 
   // is the phone number already in use
-  const existingPhoneNumber = await prisma.users.findUnique({
-    where: {
-      phone_number,
-    },
-  });
+  if (phone_number) {
+    const existingPhoneNumber = await prisma.users.findUnique({
+      where: {
+        phone_number,
+      },
+    });
 
-  if (existingPhoneNumber) {
-    throw new ConflictError('This phone number is already in use!');
+    if (existingPhoneNumber) {
+      throw new ConflictError('This phone number is already in use!');
+    }
   }
 
   const hashedPasswd = await hashPassword(password);
@@ -53,7 +56,7 @@ export const registerUser = async (
     update: {
       username,
       password: hashedPasswd,
-      phone_number,
+      phone_number: phone_number ? phone_number : null,
       otp,
       expires_at: expiresAt,
     },
@@ -61,15 +64,19 @@ export const registerUser = async (
       email,
       username,
       password: hashedPasswd,
-      phone_number,
+      phone_number: phone_number ? phone_number : null,
       otp,
       expires_at: expiresAt,
     },
   });
 
-  sendMail.sendOtpEmail(email, otp, username).catch((err: unknown) => {
-    console.error(`[EMAIL ERROR] Failed to send Otp to ${email}: `, err);
-  });
+  try {
+    await sendMail.sendOtpEmail(email, otp, username);
+  } catch (error: unknown) {
+    console.error(`[EMAIL ERROR] Failed to send Otp to ${email}: `, error);
+
+    throw new EmailDeliveryError('Failed to send email, please try again later!');
+  }
 };
 
 // resend the Otp email
@@ -94,9 +101,13 @@ export const resendVerificationEmail = async (email: string): Promise<void> => {
     },
   });
 
-  sendMail.sendOtpEmail(email, newOtp, pendingUser.username).catch((err: unknown) => {
-    console.error(`[EMAIL ERROR] Failed to resend Otp to ${email}`, err);
-  });
+  try {
+    await sendMail.sendOtpEmail(email, newOtp, pendingUser.username);
+  } catch (error: unknown) {
+    console.error(`[EMAIL ERROR] Failed to resend verification email to ${email}: `, error);
+
+    throw new EmailDeliveryError('Failed to send email, please try again later!');
+  }
 };
 
 export const verifyEmailAndCreateUser = async (email: string, otp: string): Promise<users> => {
@@ -122,7 +133,7 @@ export const verifyEmailAndCreateUser = async (email: string, otp: string): Prom
         email: pendingUser.email,
         username: pendingUser.username,
         password: pendingUser.password,
-        phone_number: pendingUser.phone_number,
+        phone_number: pendingUser.phone_number ? pendingUser.phone_number : null,
       },
     });
 
@@ -159,11 +170,15 @@ export const loginUser = async (email: string, password: string): Promise<users>
 };
 
 export const requestForgottenPasswordReset = async (email: string): Promise<void> => {
-  const user = await prisma.users.findUniqueOrThrow({
+  const user = await prisma.users.findUnique({
     where: {
       email,
     },
   });
+
+  if (!user) {
+    throw new NotFoundError('There is no registered user with this email address!');
+  }
 
   const otp = generateOtp();
   const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
@@ -185,9 +200,13 @@ export const requestForgottenPasswordReset = async (email: string): Promise<void
   });
 
   // sending code in email
-  sendMail.sendPasswordResetEmail(email, otp, user.username).catch((err: unknown) => {
-    console.error(`[EMAIL ERROR] Failed to send reset otp to ${user.username}: `, err);
-  });
+  try {
+    await sendMail.sendPasswordResetEmail(email, otp, user.username);
+  } catch (error: unknown) {
+    console.error(`[EMAIL ERROR] Failed to send otp code to ${email}: `, error);
+
+    throw new EmailDeliveryError('Failed to send email, please try again later!');
+  }
 };
 
 export const resetForgottenPassword = async (

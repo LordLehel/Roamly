@@ -44,3 +44,10 @@ export class NotFoundError extends ServerError {
     super(message, 404);
   }
 }
+
+// automatic email sender error
+export class EmailDeliveryError extends ServerError {
+  constructor(message: string = 'Failed to send email. Please try again later!') {
+    super(message, 503);
+  }
+}
