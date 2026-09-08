@@ -132,11 +132,18 @@ export const createEvent = async (
     const formattedDate = newEvent.start_time.toLocaleDateString();
 
     data.participant_emails.forEach((email: string) => {
-      sendMail
-        .sendEventAssignedEmail(email, newEvent.title, formattedDate, userGroupInfo.users.username)
-        .catch((err: unknown) => {
-          console.error(`[EMAIL ERROR] Failed to send email to ${email}: `, err);
-        });
+      if (email !== userGroupInfo.users.email) {
+        sendMail
+          .sendEventAssignedEmail(
+            email,
+            newEvent.title,
+            formattedDate,
+            userGroupInfo.users.username,
+          )
+          .catch((err: unknown) => {
+            console.error(`[EMAIL ERROR] Failed to send email to ${email}: `, err);
+          });
+      }
     });
   }
 

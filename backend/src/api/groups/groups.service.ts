@@ -46,18 +46,10 @@ export const createGroup = async (
   if (initialInvites && initialInvites.length > 0) {
     await Promise.all(
       initialInvites.map(async (invitee: { email: string; role: string }) => {
+        // email notification is handled in the "inviteUsersToYourGroup" funcion
         await inviteUsersToYourGroup(creatorUuid, invitee.email, newGroup.uuid, invitee.role);
       }),
     );
-
-    // notify by email
-    initialInvites.forEach((invitee: { email: string; role: string }) => {
-      sendMail
-        .sendGroupInvitedEmail(invitee.email, name, user.username, invitee.role)
-        .catch((err: unknown) => {
-          console.error(`[EMAIL ERROR] Failed to send email to ${invitee.email}: `, err);
-        });
-    });
   }
 
   return newGroup;

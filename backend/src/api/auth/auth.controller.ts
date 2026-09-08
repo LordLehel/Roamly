@@ -12,20 +12,35 @@ class AuthController extends BaseController {
 
     res.status(200).json({
       status: 'success',
-      message: 'Registration initiated! Verification code was sent to the user on email!',
+      message: 'Registration initiated! Verification code was sent to the user in email!',
     });
   });
 
-  public verifyEmail = this.handleAsync(async (req: Request, res: Response): Promise<void> => {
-    const { email, otp } = req.body;
+  public resendVerificationEmail = this.handleAsync(
+    async (req: Request, res: Response): Promise<void> => {
+      const { email } = req.body;
 
-    const newUser = await authService.verifyEmailAndCreateUser(email, otp);
+      await authService.resendVerificationEmail(email);
 
-    res.status(200).json({
-      status: 'success',
-      message: `Email verified successfully! User created with usernam: ${newUser.username}!`,
-    });
-  });
+      res.status(200).json({
+        status: 'success',
+        message: 'A new verification code has been sent to your email!',
+      });
+    },
+  );
+
+  public verifyEmailAndCreateUser = this.handleAsync(
+    async (req: Request, res: Response): Promise<void> => {
+      const { email, otp } = req.body;
+
+      const newUser = await authService.verifyEmailAndCreateUser(email, otp);
+
+      res.status(201).json({
+        status: 'success',
+        message: `Email verified successfully! User created with username: ${newUser.username}!`,
+      });
+    },
+  );
 
   public loginUser = this.handleAsync(async (req: Request, res: Response): Promise<void> => {
     const { email, password } = req.body;
@@ -44,6 +59,32 @@ class AuthController extends BaseController {
       throw new UnauthorizedError('Incorrect email or password!');
     }
   });
+
+  public requestForgottenPasswordReset = this.handleAsync(
+    async (req: Request, res: Response): Promise<void> => {
+      const { email } = req.body;
+
+      await authService.requestForgottenPasswordReset(email);
+
+      res.status(200).json({
+        status: 'success',
+        message: 'Password reset email has been sent!',
+      });
+    },
+  );
+
+  public resetForgottenPassword = this.handleAsync(
+    async (req: Request, res: Response): Promise<void> => {
+      const { email, otp, newPassword } = req.body;
+
+      await authService.resetForgottenPassword(email, otp, newPassword);
+
+      res.status(200).json({
+        status: 'success',
+        message: 'Password has been successfully reset!',
+      });
+    },
+  );
 }
 
 export default new AuthController();

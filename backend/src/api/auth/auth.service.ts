@@ -23,7 +23,7 @@ export const registerUser = async (
   const existingUser = await prisma.users.findUnique({ where: { email } });
 
   if (existingUser) {
-    throw new ConflictError('This email address is already is use!');
+    throw new ConflictError('This email address is already in use!');
   }
 
   // is the phone number already in use
@@ -113,7 +113,7 @@ export const verifyEmailAndCreateUser = async (email: string, otp: string): Prom
     throw new BadRequestError('Incorrect code!');
   }
   if (pendingUser.expires_at < new Date()) {
-    throw new BadRequestError('This code already expired! You should ask for a new one!');
+    throw new BadRequestError('This code has already expired! You should ask for a new one!');
   }
 
   const newUser = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
@@ -159,15 +159,11 @@ export const loginUser = async (email: string, password: string): Promise<users>
 };
 
 export const requestForgottenPasswordReset = async (email: string): Promise<void> => {
-  const user = await prisma.users.findUnique({
+  const user = await prisma.users.findUniqueOrThrow({
     where: {
       email,
     },
   });
-
-  if (!user) {
-    throw new NotFoundError('There is no registered user with this email address!');
-  }
 
   const otp = generateOtp();
   const expiresAt = new Date(Date.now() + 15 * 60 * 1000);

@@ -101,13 +101,15 @@ export const sendGroupInvitedEmail = async (
   inviterName: string,
   inviteeRole: string,
 ): Promise<void> => {
+  const futureRole = inviteeRole.replace('invited', '').toLowerCase();
+
   await sendEmail({
     to,
     subject: `You have been invited to this group: "${groupName}"!`,
     html: `
         <h2>New group notification!</h2>
         <p>You have been invited to this group: "${groupName}" by ${inviterName}!</p>
-        <p>If you accept this invitation you will become a ${inviteeRole} of the group.</p>
+        <p>If you accept this invitation you will become a ${futureRole} of the group.</p>
         <p>You can accept the invitation on the website.</p>
         <p>Further information about this invite is available on the website, go check it out!</p>
         `,
