@@ -50,10 +50,13 @@
             ><UButton icon="i-heroicons-calendar" variant="glassIconButton" to="/events"
           /></UTooltip>
           <UTooltip :text="CONST_TOOLTIP_PHOTOS ?? 'Photos'"
-            ><UButton icon="i-heroicons-photo" variant="glassIconButton" to="/media"
+            ><UButton icon="i-heroicons-photo" variant="glassIconButton" to="/files/media"
           /></UTooltip>
           <UTooltip :text="CONST_TOOLTIP_DOCUMENTS ?? 'Documents'"
-            ><UButton icon="i-heroicons-document-text" variant="glassIconButton" to="/documents"
+            ><UButton
+              icon="i-heroicons-document-text"
+              variant="glassIconButton"
+              to="/files/documents"
           /></UTooltip>
         </div>
       </div>

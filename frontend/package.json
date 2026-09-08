@@ -12,6 +12,7 @@
     "format": "prettier --write \"**/*.{js,ts,vue,json,css,scss}\""
   },
   "dependencies": {
+    "@iconify-json/lucide": "^1.2.130",
     "@nuxt/ui": "^4.10.0",
     "@nuxtjs/device": "^4.0.0",
     "@pinia/colada": "^1.4.2",

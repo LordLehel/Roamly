@@ -1,4 +1,4 @@
-<!-- frontend/app/layouts/profile.vue -->
+<!-- frontend/app/layouts/general.vue -->
 <template>
   <div :class="[appConfig.layout.base, bgClass]">
     <ProfileHeader />
@@ -17,6 +17,7 @@
     <ProfileModals />
     <UserProfileModal />
     <EventsModals />
+    <DocumentModals :document-types="GROUP_DOCUMENT_TYPES" />
   </div>
 </template>
 
@@ -29,6 +30,7 @@ import GroupMembersModals from '~/components/modals/GroupMembersModals.vue';
 import ProfileModals from '~/components/modals/ProfileModals.vue';
 import UserProfileModal from '~/components/modals/UserProfileModal.vue';
 import EventsModals from '~/components/modals/EventsModals.vue';
+import DocumentModals from '~/components/modals/GroupDocumentsModals.vue';
 
 const route = useRoute();
 const appConfig = useAppConfig();

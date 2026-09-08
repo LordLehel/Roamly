@@ -1,4 +1,5 @@
 // frontend/services/files.service.ts
+import { useApi } from '~/composables/useApi';
 import type {
   PrivateDocumentMetadata,
   GroupFile,
@@ -10,7 +11,8 @@ import type { ApiResponse } from '~/types/api.type';
 export const filesService = {
   // --- PRIVATE DOCUMENTS ---
   uploadPrivateDocument(formData: FormData): Promise<ApiResponse<PrivateDocumentMetadata>> {
-    return $fetch('/files/documents', {
+    const api = useApi();
+    return api('/files/documents', {
       method: 'POST',
       body: formData,
     });
@@ -21,22 +23,26 @@ export const filesService = {
   ): Promise<
     ApiResponse<{ url: string; file_name: string; mime_type: string; created_at: string }>
   > {
-    return $fetch(`/files/documents/${fileId}`);
+    const api = useApi();
+    return api(`/files/documents/${fileId}`);
   },
 
   deletePrivateDocument(fileId: number): Promise<ApiResponse<null>> {
-    return $fetch(`/files/documents/${fileId}`, { method: 'DELETE' });
+    const api = useApi();
+    return api(`/files/documents/${fileId}`, { method: 'DELETE' });
   },
 
   getAllPrivateDocumentsMetadata(): Promise<ApiResponse<PrivateDocumentMetadata[]>> {
-    return $fetch('/files/documents');
+    const api = useApi();
+    return api('/files/documents');
   },
 
   replacePrivateDocument(
     fileId: number,
     formData: FormData,
   ): Promise<ApiResponse<PrivateDocumentMetadata>> {
-    return $fetch(`/files/documents/${fileId}`, {
+    const api = useApi();
+    return api(`/files/documents/${fileId}`, {
       method: 'PATCH',
       body: formData,
     });
@@ -48,14 +54,16 @@ export const filesService = {
     groupUuid: string,
     accessLevel: string,
   ): Promise<ApiResponse<FileShareDto>> {
-    return $fetch(`/files/documents/share/${fileId}`, {
+    const api = useApi();
+    return api(`/files/documents/share/${fileId}`, {
       method: 'POST',
       body: { groupUuid, accessLevel },
     });
   },
 
   deleteSharing(fileId: number, groupUuid: string): Promise<ApiResponse<null>> {
-    return $fetch(`/files/documents/share/${fileId}/${groupUuid}`, { method: 'DELETE' });
+    const api = useApi();
+    return api(`/files/documents/share/${fileId}/${groupUuid}`, { method: 'DELETE' });
   },
 
   updateSharingConditions(
@@ -63,26 +71,30 @@ export const filesService = {
     groupUuid: string,
     accessLevel: string,
   ): Promise<ApiResponse<FileShareDto>> {
-    return $fetch(`/files/documents/share/${fileId}/${groupUuid}`, {
+    const api = useApi();
+    return api(`/files/documents/share/${fileId}/${groupUuid}`, {
       method: 'PATCH',
       body: { accessLevel },
     });
   },
 
   listDocumentShares(fileId: number): Promise<ApiResponse<FileShareDto[]>> {
-    return $fetch(`/files/documents/${fileId}/shares`);
+    const api = useApi();
+    return api(`/files/documents/${fileId}/shares`);
   },
 
   // --- GROUP FILES ---
   uploadGroupDocument(groupUuid: string, formData: FormData): Promise<ApiResponse<GroupFile>> {
-    return $fetch(`/files/group/${groupUuid}/document`, {
+    const api = useApi();
+    return api(`/files/group/${groupUuid}/document`, {
       method: 'POST',
       body: formData,
     });
   },
 
   uploadGroupMediaFile(groupUuid: string, formData: FormData): Promise<ApiResponse<GroupFile>> {
-    return $fetch(`/files/group/${groupUuid}/media`, {
+    const api = useApi();
+    return api(`/files/group/${groupUuid}/media`, {
       method: 'POST',
       body: formData,
     });
@@ -93,7 +105,8 @@ export const filesService = {
     fileId: number,
     formData: FormData,
   ): Promise<ApiResponse<GroupFile>> {
-    return $fetch(`/files/group/${groupUuid}/document/${fileId}`, {
+    const api = useApi();
+    return api(`/files/group/${groupUuid}/document/${fileId}`, {
       method: 'PATCH',
       body: formData,
     });
@@ -104,14 +117,16 @@ export const filesService = {
     fileId: number,
     formData: FormData,
   ): Promise<ApiResponse<GroupFile>> {
-    return $fetch(`/files/group/${groupUuid}/media/${fileId}`, {
+    const api = useApi();
+    return api(`/files/group/${groupUuid}/media/${fileId}`, {
       method: 'PATCH',
       body: formData,
     });
   },
 
   deleteGroupFile(groupUuid: string, fileId: number): Promise<ApiResponse<null>> {
-    return $fetch(`/files/group/${groupUuid}/${fileId}`, { method: 'DELETE' });
+    const api = useApi();
+    return api(`/files/group/${groupUuid}/${fileId}`, { method: 'DELETE' });
   },
 
   getGroupFiles(
@@ -120,10 +135,11 @@ export const filesService = {
     cursor?: number,
     type?: string,
   ): Promise<ApiResponse<PaginatedGroupFiles>> {
+    const api = useApi();
     const params = new URLSearchParams({ limit: limit.toString() });
     if (cursor) params.append('cursor', cursor.toString());
     if (type) params.append('type', type);
 
-    return $fetch(`/files/group/${groupUuid}?${params.toString()}`);
+    return api(`/files/group/${groupUuid}?${params.toString()}`);
   },
 };

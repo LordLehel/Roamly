@@ -32,5 +32,6 @@ export function useGroupFilesQuery(
       filesService
         .getGroupFiles(groupUuid(), limit(), cursor?.(), type?.())
         .then((res) => res.data),
+    enabled: () => !!groupUuid(),
   });
 }
