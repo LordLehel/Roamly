@@ -39,18 +39,22 @@
         </div>
 
         <div :class="appConfig.layout.actionGroup" class="flex-1 justify-end">
-          <UTooltip :text="CONST_TOOLTIP_MEMBERS ?? 'Members'">
-            <UButton icon="i-heroicons-users" variant="glassIconButtonBrand" to="/" />
-          </UTooltip>
-          <UTooltip :text="CONST_TOOLTIP_CALENDAR ?? 'Calendar'">
-            <UButton icon="i-heroicons-calendar" variant="glassIconButton" to="/" />
-          </UTooltip>
-          <UTooltip :text="CONST_TOOLTIP_PHOTOS ?? 'Photos'">
-            <UButton icon="i-heroicons-photo" variant="glassIconButton" to="/" />
-          </UTooltip>
-          <UTooltip :text="CONST_TOOLTIP_DOCUMENTS ?? 'Documents'">
-            <UButton icon="i-heroicons-document-text" variant="glassIconButton" to="/" />
-          </UTooltip>
+          <UTooltip :text="CONST_TOOLTIP_MEMBERS ?? 'Members'"
+            ><UButton
+              icon="i-heroicons-users"
+              variant="glassIconButton"
+              class="text-brand-500"
+              to="/groups"
+          /></UTooltip>
+          <UTooltip :text="CONST_TOOLTIP_CALENDAR ?? 'Calendar'"
+            ><UButton icon="i-heroicons-calendar" variant="glassIconButton" to="/events"
+          /></UTooltip>
+          <UTooltip :text="CONST_TOOLTIP_PHOTOS ?? 'Photos'"
+            ><UButton icon="i-heroicons-photo" variant="glassIconButton" to="/media"
+          /></UTooltip>
+          <UTooltip :text="CONST_TOOLTIP_DOCUMENTS ?? 'Documents'"
+            ><UButton icon="i-heroicons-document-text" variant="glassIconButton" to="/documents"
+          /></UTooltip>
         </div>
       </div>
 
@@ -157,26 +161,125 @@
     </div>
 
     <!-- UPCOMING EVENTS SECTION -->
-    <div
-      class="flex flex-col shadow-md bg-surface-500/40 rounded-2xl ring-1 ring-dark-text/10 p-4 w-full"
-    >
-      <h2 :class="appConfig.typography.cardTitle" class="shrink-0 mb-4 text-surface-600">
-        Upcoming events
+    <div class="flex flex-col gap-4 w-full mt-8">
+      <h2 :class="appConfig.typography.pageSubtitle" class="mb-2">
+        {{ CONST_UPCOMING_EVENTS_HEADING }}
       </h2>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
-        <!-- Eltávolítva a flex-1 és a scrollbar-none[cite: 23] -->
-        <UCard v-for="i in 3" :key="i" variant="glass" class="bg-surface-500/70">
-          <div class="flex items-center justify-between border-b border-dark-text/10 pb-1.5 mb-1.5">
-            <h3 class="text-sm font-bold text-dark-text truncate">Event Name {{ i }}</h3>
-            <UIcon name="i-heroicons-calendar" class="w-4 h-4 text-brand-500 shrink-0" />
-          </div>
-          <div class="flex justify-between items-center text-xs text-dark-text/80">
-            <span>06.15.2023 - 18:00</span>
-            <span class="truncate ml-2 text-right">Sample Location {{ i }}</span>
-          </div>
-        </UCard>
-      </div>
+      <ClientOnly>
+        <div v-if="isLoadingEvents" :class="appConfig.typography.statusLoading">
+          {{ CONST_LOADING_EVENTS_MSG }}
+        </div>
+        <div
+          v-else-if="todayUpcomingEvents.length === 0"
+          :class="appConfig.typography.statusLoading"
+        >
+          {{ CONST_NO_UPCOMING_EVENTS_MSG }}
+        </div>
+
+        <div v-else :class="appConfig.layout.cardGrid">
+          <UCard
+            v-for="event in todayUpcomingEvents"
+            :key="event.uuid"
+            variant="interactiveGlass"
+            class="w-full cursor-pointer hover:bg-surface-500/90 transition-colors"
+            @click="navigateToEvent(event.uuid)"
+          >
+            <div class="flex flex-col gap-2.5 w-full">
+              <div :class="[appConfig.layout.flexBetween, 'border-b border-dark-text/10 pb-2']">
+                <div class="flex items-center gap-2 min-w-0 pr-2">
+                  <UTooltip :text="event.is_private ? 'Private Event' : 'Group Event'">
+                    <UIcon
+                      :name="event.is_private ? 'i-heroicons-user' : 'i-heroicons-user-group'"
+                      class="w-4 h-4 text-brand-500 shrink-0"
+                    />
+                  </UTooltip>
+                  <h3 :class="appConfig.typography.cardTitle" class="truncate">
+                    {{ event.title }}
+                  </h3>
+                </div>
+                <div
+                  class="flex items-center gap-1 text-brand-600 shrink-0 bg-brand-500/10 px-1.5 py-0.5 rounded text-xs font-bold"
+                >
+                  <UIcon name="i-heroicons-clock" class="w-3.5 h-3.5" />
+                  <span>{{ event.timeStartFormatted }}</span>
+                </div>
+              </div>
+
+              <div class="flex flex-col gap-1.5 text-xs text-dark-text/80">
+                <div :class="appConfig.layout.flexBetween">
+                  <span class="font-medium opacity-70"
+                    >Creator:
+                    <span class="font-bold text-dark-text opacity-100">{{
+                      event.creator?.username
+                    }}</span></span
+                  >
+                  <span class="font-semibold"
+                    >{{ event.timeStartFormatted }} - {{ event.timeEndFormatted }}</span
+                  >
+                </div>
+                <p class="truncate opacity-80" :title="event.description || undefined">
+                  {{ event.description || 'No description provided.' }}
+                </p>
+              </div>
+
+              <div
+                :class="[
+                  appConfig.layout.flexBetween,
+                  'mt-1 pt-2 border-t border-dark-text/5 items-start',
+                ]"
+              >
+                <span class="text-[11px] font-bold text-dark-text/50 uppercase tracking-wider mt-1"
+                  >Participants</span
+                >
+
+                <div :class="appConfig.calendar.participantsGroup">
+                  <template v-if="event.is_private">
+                    <div
+                      :class="[
+                        appConfig.calendar.participantsAvatars,
+                        appConfig.calendar.participantsGap,
+                      ]"
+                    >
+                      <UTooltip
+                        v-for="p in event.members?.slice(0, 5)"
+                        :key="p.uuid"
+                        :text="p.username"
+                      >
+                        <UAvatar
+                          :alt="p.username"
+                          :src="p.profile_image_url || undefined"
+                          icon="i-heroicons-user"
+                          size="sm"
+                          :class="appConfig.calendar.participantAvatar"
+                        />
+                      </UTooltip>
+                      <UTooltip
+                        v-if="(event.members?.length || 0) > 5"
+                        :text="
+                          '+' + ((event.members?.length || 0) - 5).toString() + ' more participants'
+                        "
+                      >
+                        <div
+                          :class="appConfig.calendar.participantMoreBadge"
+                          @click.stop="eventsStore.openParticipantsModal(event)"
+                        >
+                          +{{ (event.members?.length || 0) - 5 }}
+                        </div>
+                      </UTooltip>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-bold text-dark-text">Everyone</span>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </div>
+          </UCard>
+        </div>
+      </ClientOnly>
     </div>
   </div>
 </template>
@@ -184,13 +287,22 @@
 <script setup lang="ts">
 /* --- IMPORTS --- */
 import { useAppConfig } from '#imports';
+import { computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { useGroupsStore } from '~/stores/groups.modals.store';
+import { useEventsStore } from '~/stores/events.modals.store';
+import { useEventsQuery } from '~/queries/events.query';
+import { processAndSortEvents } from '~/utils/sort.utils';
 import type { GroupInfosOutDto, GroupProfileDto } from '~/types/groups.type';
+import type { UiEvent } from '~/types/events.type';
 import type { ApiError } from '~/types/apiError.type';
 
 /* --- COMPOSABLES & STORES --- */
 const appConfig = useAppConfig();
 const groupsStore = useGroupsStore();
+const route = useRoute();
+const router = useRouter();
+const eventsStore = useEventsStore();
 
 /* --- PROPS & EMITS --- */
 const props = defineProps<{
@@ -208,6 +320,43 @@ const emit = defineEmits<{
   (e: 'deleteGroup' | 'leaveGroup'): void;
   (e: 'openProfile', profile: GroupProfileDto): void;
 }>();
+
+const navigateToEvent = (eventUuid: string) => {
+  router.push({ path: '/events', query: { eventId: eventUuid } });
+};
+
+/* --- FETCHING UPCOMING EVENTS --- */
+const groupUuid = computed(() => route.params.uuid as string);
+const selectedDateId = ref<string | undefined>('ALL');
+const { data: eventsData, isLoading: isLoadingEvents } = useEventsQuery(groupUuid, selectedDateId);
+
+const todayUpcomingEvents = computed(() => {
+  const processedEvents = processAndSortEvents(eventsData.value || []);
+  const now = new Date();
+
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const endOfToday = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    23,
+    59,
+    59,
+    999,
+  ).getTime();
+
+  return processedEvents
+    .filter((e: UiEvent) => {
+      if (e.isExpired) return false;
+
+      const eventStart = new Date(e.start_time).getTime();
+      const eventEnd = new Date(e.end_time).getTime();
+
+      return eventStart <= endOfToday && eventEnd >= startOfToday;
+    })
+    .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())
+    .slice(0, 3); // Maximum a 3 legközelebbi
+});
 
 /* --- HELPERS --- */
 const isCurrentUser = (email: string) => {

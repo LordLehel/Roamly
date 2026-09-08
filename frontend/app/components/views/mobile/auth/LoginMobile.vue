@@ -1,6 +1,6 @@
 <!-- frontend/app/components/views/mobile/auth/LoginMobile.vue -->
 <template>
-  <div :class="[appConfig.layout.authWrapper, 'px-4 py-6']">
+  <div :class="[appConfig.layout.mobileAuthWrapper, 'px-4 py-6']">
     <!-- LOGIN FORM CARD -->
     <UCard variant="glass">
       <div :class="appConfig.typography.authTitleWrapper">

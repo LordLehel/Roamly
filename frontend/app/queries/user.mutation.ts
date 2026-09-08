@@ -1,5 +1,5 @@
 // frontend/app/queries/user.mutation.ts
-import { useMutation } from '@pinia/colada';
+import { useMutation, useQueryCache } from '@pinia/colada';
 import { userService } from '~/services/userService';
 import type { UserInDto } from '~/types/user.type';
 

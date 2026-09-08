@@ -1,20 +1,28 @@
 <!-- frontend/app/pages/login.vue -->
 <template>
   <div>
-    <LoginMobile
-      v-if="isMobile"
-      :is-loading="isLoading"
-      :error="error"
-      :status="status"
-      @submit="handleLogin"
-    />
-    <LoginDesktop
-      v-else
-      :is-loading="isLoading"
-      :error="error"
-      :status="status"
-      @submit="handleLogin"
-    />
+    <ClientOnly>
+      <template #fallback>
+        <div class="min-h-screen flex items-center justify-center">
+          <span class="opacity-50 font-medium">{{ CONST_LOADING_TEXT ?? 'Loading...' }}</span>
+        </div>
+      </template>
+
+      <LoginMobile
+        v-if="isMobile"
+        :is-loading="isLoading"
+        :error="error"
+        :status="status"
+        @submit="handleLogin"
+      />
+      <LoginDesktop
+        v-else
+        :is-loading="isLoading"
+        :error="error"
+        :status="status"
+        @submit="handleLogin"
+      />
+    </ClientOnly>
   </div>
 </template>
 

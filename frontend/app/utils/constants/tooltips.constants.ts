@@ -43,3 +43,6 @@ export const CONST_TOOLTIP_DOCUMENTS = 'View group documents';
 export const CONST_TOOLTIP_INVITE_USER = 'Invite a new user';
 export const CONST_TOOLTIP_PROMOTE_USER = 'Promote user to leader';
 export const CONST_TOOLTIP_REMOVE_USER = 'Remove user from group';
+
+// Events
+export const CONST_TOOLTIP_ADD_EVENT = 'Add Event';

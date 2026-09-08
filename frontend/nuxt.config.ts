@@ -1,4 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import process from 'node:process';
+
 export default defineNuxtConfig({
   compatibilityDate: '2023-10-10',
 
@@ -23,6 +25,12 @@ export default defineNuxtConfig({
     },
   },
 
+  routeRules: {
+    '/api/**': {
+      proxy: `${process.env.NUXT_PUBLIC_API_BASE_URL || 'http://localhost:5000'}/api/**`,
+    },
+  },
+
   devServer: {
     port: 5000,
   },
@@ -38,5 +46,18 @@ export default defineNuxtConfig({
       Quicksand: [400, 500, 600, 700],
     },
     display: 'swap',
+  },
+
+  icon: {
+    serverBundle: {
+      collections: ['heroicons', 'mdi'],
+    },
+
+    clientBundle: {
+      scan: {
+        globInclude: ['**/*.{vue,jsx,tsx,md,mdc,mdx,ts}'],
+      },
+    },
+    fallbackToApi: false,
   },
 });

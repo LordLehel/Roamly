@@ -15,9 +15,11 @@ export const createEventSchema = z
       .max(255, 'Description can not be longer than 255 characters!')
       .optional(),
 
-    start_time: z.iso.date('Invalid date format! Use ISO format (YYYY-MM-DD)'),
+    start_time: z.iso.datetime('Invalid date format! Use ISO format (YYYY-MM-DDTHH:MM:SS.MSZ)'),
 
-    end_time: z.iso.date('Invalid date format! Use ISO format (YYYY-MM-DD)').optional(),
+    end_time: z.iso
+      .datetime('Invalid date format! Use ISO format (YYYY-MM-DDTHH:MM:SS.MSZ)')
+      .optional(),
 
     visibility: z.enum([EVENT_VISIBILITY.PUBLIC, EVENT_VISIBILITY.PRIVATE], {
       message: `Visibility is required and must be either ${EVENT_VISIBILITY.PUBLIC} or ${EVENT_VISIBILITY.PRIVATE}`,
@@ -80,9 +82,14 @@ export const updateEventSchema = z
       .max(255, 'Description can not be longer than 255 characters!')
       .optional(),
 
-    start_time: z.iso.date('Invalid date format! Use ISO format (YYYY-MM-DD)').optional(),
+    start_time: z.iso
+      .datetime('Invalid date format! Use ISO format (YYYY-MM-DDTHH:MM:SS.MSZ)')
+      .optional(),
 
-    end_time: z.iso.date('Invalid date format! Use ISO format (YYYY-MM-DD)').nullable().optional(),
+    end_time: z.iso
+      .datetime('Invalid date format! Use ISO format (YYYY-MM-DDTHH:MM:SS.MSZ)')
+      .nullable()
+      .optional(),
 
     visibility: z
       .enum([EVENT_VISIBILITY.PUBLIC, EVENT_VISIBILITY.PRIVATE], {

@@ -1,23 +1,31 @@
 <!-- frontend/app/pages/groups/invites.vue -->
 <template>
   <div>
-    <InvitesMobile
-      v-if="isMobile"
-      :invites-list="invitesList"
-      :is-loading="isLoading"
-      :error="error"
-      :is-fetching-next-page="isFetchingNextPage"
-      @load-more="fetchNextPage"
-    />
+    <ClienOnly>
+      <template #fallback>
+        <div class="min-h-screen flex items-center justify-center">
+          <span class="opacity-50 font-medium">{{ CONST_LOADING_TEXT ?? 'Loading...' }}</span>
+        </div>
+      </template>
 
-    <InvitesDesktop
-      v-else
-      :invites-list="invitesList"
-      :is-loading="isLoading"
-      :error="error"
-      :is-fetching-next-page="isFetchingNextPage"
-      @load-more="fetchNextPage"
-    />
+      <InvitesMobile
+        v-if="isMobile"
+        :invites-list="invitesList"
+        :is-loading="isLoading"
+        :error="error"
+        :is-fetching-next-page="isFetchingNextPage"
+        @load-more="fetchNextPage"
+      />
+
+      <InvitesDesktop
+        v-else
+        :invites-list="invitesList"
+        :is-loading="isLoading"
+        :error="error"
+        :is-fetching-next-page="isFetchingNextPage"
+        @load-more="fetchNextPage"
+      />
+    </ClienOnly>
   </div>
 </template>
 
