@@ -66,22 +66,30 @@
       </div>
 
       <div :class="appConfig.calendar.mobileToolbar">
-        <USelectMenu
-          v-model="filterType"
-          :options="documentTypes"
-          value-attribute="value"
-          option-attribute="label"
-        >
-          <UButton
-            icon="i-heroicons-funnel"
-            :label="
-              filterType === 'ALL'
-                ? 'Filter'
-                : documentTypes.find((d) => d.value === filterType)?.label
-            "
-            variant="glassButton"
-          />
-        </USelectMenu>
+        <UTooltip text="Filter">
+          <UPopover>
+            <UButton icon="i-heroicons-funnel" variant="glassIconButton" />
+            <template #content="{ close }">
+              <div :class="appConfig.ui.dropdownMenu.slots.content + 'w-fit'">
+                <button
+                  v-for="type in documentTypes"
+                  :key="type.value"
+                  :class="appConfig.ui.dropdownMenu.slots.item"
+                  @click="
+                    filterType = type.value;
+                    close();
+                  "
+                >
+                  <UIcon
+                    :name="filterType === type.value ? 'i-heroicons-check' : 'i-heroicons-funnel'"
+                    :class="appConfig.ui.dropdownMenu.slots.itemLeadingIcon"
+                  />
+                  <span>{{ type.label }}</span>
+                </button>
+              </div>
+            </template>
+          </UPopover>
+        </UTooltip>
 
         <UInput
           v-model="searchQuery"
