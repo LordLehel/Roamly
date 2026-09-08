@@ -4,7 +4,10 @@
     <DocumentsDesktop
       v-if="!isMobile"
       v-model:selected-group="selectedGroupUuid"
-      :documents="groupDocuments"
+      v-model:search-query="searchQuery"
+      v-model:filter-type="filterType"
+      :documents="filteredDocuments"
+      :document-types="documentTypes"
       :groups="groupsList"
       :is-loading="isLoadingFiles"
       :is-current-user-leader="isCurrentUserLeader"
@@ -16,7 +19,10 @@
     <DocumentsMobile
       v-else
       v-model:selected-group="selectedGroupUuid"
-      :documents="groupDocuments"
+      v-model:search-query="searchQuery"
+      v-model:filter-type="filterType"
+      :documents="filteredDocuments"
+      :document-types="documentTypes"
       :groups="groupsList"
       :is-loading="isLoadingFiles"
       :is-current-user-leader="isCurrentUserLeader"
@@ -38,6 +44,7 @@ import { useGroupFilesQuery } from '~/queries/files.query';
 import { useGroupsQuery } from '~/queries/groups.query';
 import { useDocumentsStore } from '~/stores/documents.modals.store';
 import { useGroupsStore } from '~/stores/groups.modals.store';
+import { filterGroupDocuments } from '~/utils/filter.utils';
 import type { GroupFile } from '~/types/files.type';
 import type { GroupOutDto } from '~/types/groups.type';
 
@@ -47,6 +54,18 @@ const isMobile = useMediaQuery('(max-width: 768px)');
 const documentsStore = useDocumentsStore();
 const groupsStore = useGroupsStore();
 const toast = useToast();
+
+const searchQuery = ref('');
+const filterType = ref('ALL');
+
+const documentTypes = [
+  { label: 'All Types', value: 'ALL' },
+  { label: 'Ticket', value: 'TICKET' },
+  { label: 'Booking Confirmation', value: 'BOOKING_CONFIRMATION' },
+  { label: 'Hotel Voucher', value: 'HOTEL_VOUCHER' },
+  { label: 'Guest Registration Card', value: 'GUEST_REGISTRATION_CARD' },
+  { label: 'Other', value: 'OTHER' },
+];
 
 const { data: groupsData } = useGroupsQuery();
 const groupsList = computed<GroupOutDto[]>(() => groupsData.value?.items || []);
@@ -70,6 +89,7 @@ const isCurrentUserLeader = computed(() => {
   return currentGroup.value?.role?.toLowerCase() === 'leader';
 });
 
+// A query-ben a típus pontosan egyezzen a backend által várt értékkel
 const { data: filesData, isLoading: isLoadingFiles } = useGroupFilesQuery(
   () => selectedGroupUuid.value || '',
   () => 15,
@@ -77,7 +97,10 @@ const { data: filesData, isLoading: isLoadingFiles } = useGroupFilesQuery(
   () => 'document',
 );
 
-const groupDocuments = computed<GroupFile[]>(() => filesData.value?.items || []);
+const filteredDocuments = computed<GroupFile[]>(() => {
+  const docs = filesData.value?.items || [];
+  return filterGroupDocuments(docs, searchQuery.value, filterType.value);
+});
 
 const handleDelete = (file: GroupFile) => {
   if (!selectedGroupUuid.value) return;

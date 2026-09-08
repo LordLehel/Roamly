@@ -1,7 +1,6 @@
 <!-- frontend/app/components/views/mobile/files/documents/DocumentsMobile.vue -->
 <template>
   <div class="flex flex-col flex-1 gap-4 w-full p-4 pb-20">
-    <!-- NAV ACTIONS -->
     <div :class="appConfig.calendar.mobileTopActions">
       <UTooltip text="Members">
         <UButton icon="i-heroicons-users" variant="glassIconButton" to="/groups" />
@@ -23,7 +22,6 @@
     </div>
 
     <div :class="appConfig.calendar.mobileMainWrapper">
-      <!-- DROPDOWN HEADER (Mobil) -->
       <div :class="appConfig.calendar.mobileHeader">
         <UPopover v-model:open="isGroupDropdownOpen" class="w-full" :popper="{ strategy: 'fixed' }">
           <UButton block variant="ghost" :class="appConfig.calendar.mobileHeaderButton">
@@ -39,9 +37,7 @@
                 :class="{ 'rotate-180': isGroupDropdownOpen }"
               />
             </div>
-            <p :class="appConfig.typography.pageSubtitle" class="mt-0">
-              {{ CONST_GROUP_DOCUMENTS_HEADER }}
-            </p>
+            <p :class="appConfig.typography.pageSubtitle" class="mt-0">Group Documents</p>
           </UButton>
           <template #content>
             <div
@@ -69,24 +65,38 @@
         </UPopover>
       </div>
 
-      <!-- ACTION BUTTONS -->
       <div :class="appConfig.calendar.mobileToolbar">
-        <UTooltip :text="CONST_TOOLTIP_FILTER_GROUPS ?? 'Filter'">
-          <UButton icon="i-heroicons-funnel" :label="CONST_FILTER_LABEL" variant="glassButton" />
-        </UTooltip>
+        <USelectMenu
+          v-model="filterType"
+          :options="documentTypes"
+          value-attribute="value"
+          option-attribute="label"
+        >
+          <UButton
+            icon="i-heroicons-funnel"
+            :label="
+              filterType === 'ALL'
+                ? 'Filter'
+                : documentTypes.find((d) => d.value === filterType)?.label
+            "
+            variant="glassButton"
+          />
+        </USelectMenu>
+
         <UInput
+          v-model="searchQuery"
           placeholder="Search..."
           icon="i-heroicons-magnifying-glass"
           class="flex-1"
           variant="search"
         />
+
         <UTooltip text="Upload Document">
           <UButton icon="i-heroicons-plus" variant="glassIconButton" @click="emit('upload')" />
         </UTooltip>
       </div>
 
-      <!-- DOCUMENT LIST -->
-      <div :class="appConfig.calendar.mobileContentWrapper" class="px-2 pt-2">
+      <div class="px-2 pt-2">
         <div v-if="isLoading" :class="appConfig.typography.statusLoading" class="py-4 text-center">
           Loading documents...
         </div>
@@ -100,19 +110,19 @@
           >
             <div :class="appConfig.layout.documentCardHeader">
               <p class="font-bold truncate pr-2 shadow-sm text-sm">{{ doc.file_name }}</p>
-              <div class="flex items-center gap-1">
+              <div class="flex items-center gap-1 shrink-0">
                 <UTooltip text="Edit">
                   <UButton
                     icon="i-heroicons-pencil"
                     variant="ghostDangerIconButton"
-                    class="text-white w-6! h-6! p-0"
+                    class="text-surface-500 w-6! h-6! p-0"
                   />
                 </UTooltip>
-                <UTooltip text="Delete">
+                <UTooltip v-if="isCurrentUserLeader" text="Delete">
                   <UButton
                     icon="i-heroicons-trash"
                     variant="ghostDangerIconButton"
-                    class="text-white hover:text-error-500"
+                    class="text-surface-500 hover:text-error-500 w-6! h-6! p-0"
                     @click="emit('delete', doc)"
                   />
                 </UTooltip>
@@ -126,14 +136,14 @@
                   <UButton
                     icon="i-heroicons-eye"
                     variant="ghostDangerIconButton"
-                    class="text-white"
+                    class="text-surface-500"
                   />
                 </UTooltip>
                 <UTooltip text="Download">
                   <UButton
                     icon="i-heroicons-arrow-down-tray"
                     variant="ghostDangerIconButton"
-                    class="text-white"
+                    class="text-surface-500"
                     :href="doc.download_url"
                     target="_blank"
                   />
@@ -197,7 +207,11 @@
         </div>
 
         <div v-else :class="appConfig.typography.statusLoading" class="py-4 text-center">
-          No documents found for this group.
+          {{
+            searchQuery || filterType !== 'ALL'
+              ? 'No matching documents found.'
+              : 'No documents found for this group.'
+          }}
         </div>
       </div>
     </div>
@@ -212,17 +226,22 @@ import type { GroupOutDto } from '~/types/groups.type';
 
 const appConfig = useAppConfig();
 
+const searchQuery = defineModel<string>('searchQuery', { default: '' });
+const filterType = defineModel<string>('filterType', { default: 'ALL' });
+
 const props = defineProps<{
   documents: GroupFile[];
   groups: GroupOutDto[];
   selectedGroup: string | undefined;
   isLoading: boolean;
+  isCurrentUserLeader: boolean;
+  documentTypes: { label: string; value: string }[];
 }>();
 
 const emit = defineEmits<{
   (e: 'update:selectedGroup', value: string | undefined): void;
   (e: 'delete', file: GroupFile): void;
-  (e: 'upload'): void;
+  (e: 'upload' | 'delete-group' | 'leave-group'): void;
 }>();
 
 const isGroupDropdownOpen = ref(false);

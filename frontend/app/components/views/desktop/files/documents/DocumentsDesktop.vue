@@ -1,7 +1,7 @@
 <!-- frontend/app/components/views/desktop/files/documents/DocumentsDesktop.vue -->
 <template>
   <div :class="appConfig.layout.pageWrapper">
-    <!-- HEADER: Group Selector & Main Nav -->
+    <!-- ... HEADER (változatlan) ... -->
     <div :class="appConfig.layout.pageHeader">
       <div :class="appConfig.layout.actionGroup" class="flex-1 justify-start">
         <UTooltip v-if="isCurrentUserLeader" text="Delete Group">
@@ -62,9 +62,7 @@
             </div>
           </template>
         </UPopover>
-        <p :class="appConfig.typography.pageSubtitle" class="mt-0">
-          {{ CONST_GROUP_DOCUMENTS_HEADER }}
-        </p>
+        <p :class="appConfig.typography.pageSubtitle" class="mt-0">Group Documents</p>
       </div>
 
       <div :class="appConfig.layout.actionGroup" class="flex-1 justify-end">
@@ -99,9 +97,36 @@
             variant="search"
             class="w-1/3! max-w-none!"
           />
-          <UTooltip text="Filter">
-            <UButton icon="i-heroicons-funnel" label="Filter" variant="glassButton" />
-          </UTooltip>
+          <UPopover>
+            <UButton
+              icon="i-heroicons-funnel"
+              :label="
+                filterType === 'ALL'
+                  ? 'Filter'
+                  : documentTypes.find((d) => d.value === filterType)?.label
+              "
+              variant="glassButton"
+            />
+            <template #content="{ close }">
+              <div :class="appConfig.ui.dropdownMenu.slots.content + 'w-fit'">
+                <button
+                  v-for="type in documentTypes"
+                  :key="type.value"
+                  :class="appConfig.ui.dropdownMenu.slots.item"
+                  @click="
+                    filterType = type.value;
+                    close();
+                  "
+                >
+                  <UIcon
+                    :name="filterType === type.value ? 'i-heroicons-check' : 'i-heroicons-funnel'"
+                    :class="appConfig.ui.dropdownMenu.slots.itemLeadingIcon"
+                  />
+                  <span>{{ type.label }}</span>
+                </button>
+              </div>
+            </template>
+          </UPopover>
         </div>
 
         <div class="flex items-center gap-2 flex-1 justify-end shrink-0">
@@ -116,9 +141,7 @@
       </div>
 
       <!-- DOCUMENT GRID -->
-      <div v-if="isLoading" :class="appConfig.typography.statusLoading">
-        {{ CONST_LOADING_DOCUMENTS }}
-      </div>
+      <div v-if="isLoading" :class="appConfig.typography.statusLoading">Loading documents...</div>
 
       <div v-else-if="documents.length > 0" :class="appConfig.layout.documentGrid">
         <UCard v-for="doc in documents" :key="doc.file_id" variant="documentGlass" class="relative">
@@ -132,7 +155,7 @@
                   class="text-surface-500"
                 />
               </UTooltip>
-              <UTooltip text="Delete">
+              <UTooltip v-if="isCurrentUserLeader" text="Delete">
                 <UButton
                   icon="i-heroicons-trash"
                   variant="ghostDangerIconButton"
@@ -182,9 +205,7 @@
                 doc.documents?.document_type.toLocaleLowerCase() || 'N/A'
               }}</span>
             </p>
-
             <div :class="appConfig.layout.divider"></div>
-
             <div :class="appConfig.layout.flexBetween">
               <p>
                 File type:
@@ -199,9 +220,7 @@
                 >
               </p>
             </div>
-
             <div :class="appConfig.layout.divider"></div>
-
             <p>
               Issued:
               <span class="font-bold text-dark-text">{{
@@ -222,7 +241,11 @@
         </UCard>
       </div>
       <div v-else :class="appConfig.typography.statusLoading">
-        {{ CONST_NO_DOCUMENTS_FOUND }}
+        {{
+          searchQuery || filterType !== 'ALL'
+            ? 'No matching documents found.'
+            : 'No documents found for this group.'
+        }}
       </div>
     </div>
   </div>
@@ -236,12 +259,16 @@ import type { GroupOutDto } from '~/types/groups.type';
 
 const appConfig = useAppConfig();
 
+const searchQuery = defineModel<string>('searchQuery', { default: '' });
+const filterType = defineModel<string>('filterType', { default: 'ALL' });
+
 const props = defineProps<{
   documents: GroupFile[];
   groups: GroupOutDto[];
   selectedGroup: string | undefined;
   isLoading: boolean;
   isCurrentUserLeader: boolean;
+  documentTypes: { label: string; value: string }[];
 }>();
 
 const emit = defineEmits<{
@@ -250,7 +277,6 @@ const emit = defineEmits<{
   (e: 'upload' | 'delete-group' | 'leave-group'): void;
 }>();
 
-const searchQuery = ref('');
 const isGroupDropdownOpen = ref(false);
 
 const currentGroupDetails = computed(() =>
