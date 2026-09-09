@@ -1,92 +1,142 @@
 <!-- frontend/app/components/modals/UserProfileModal.vue -->
 <template>
-  <!-- USER PROFILE MODAL -->
   <UModal
     v-model:open="groupsStore.isUserProfileModalOpen"
-    title="User Profile"
-    :dismissible="false"
-    :close="false"
-    :ui="{ content: appConfig.layout.modalSizeLg }"
+    :dismissible="true"
+    :ui="{ content: 'sm:max-w-lg w-full max-h-[85vh] flex flex-col' }"
   >
     <template #default><div class="hidden"></div></template>
-    <template #body>
-      <div class="flex flex-col gap-6 py-2 max-h-[70vh] overflow-y-auto pr-2">
-        <!-- USER INFO -->
-        <div
-          class="flex items-center gap-5 p-4 bg-surface-500/40 rounded-2xl ring-1 ring-dark-text/10"
-        >
-          <div class="flex flex-col justify-center gap-1.5 overflow-hidden">
-            <h3 :class="appConfig.typography.cardTitle">
-              {{ groupsStore.selectedUserProfile?.username || 'Unknown' }}
-            </h3>
-            <p class="text-xs font-bold uppercase text-brand-500 tracking-wide">
-              {{ groupsStore.selectedUserProfile?.role }}
-            </p>
-            <p class="text-sm text-dark-text/80 truncate flex items-center gap-2">
-              <UIcon name="i-heroicons-envelope" class="w-4 h-4 text-brand-500 shrink-0" />
-              {{ groupsStore.selectedUserProfile?.email }}
-            </p>
-            <p class="text-sm text-dark-text/80 truncate flex items-center gap-2">
-              <UIcon name="i-heroicons-phone" class="w-4 h-4 text-brand-500 shrink-0" />
-              {{ /* groupsStore.selectedUserProfile?.phone || */ 'N/A' }}
-            </p>
-            <p class="text-xs text-dark-text/70 flex items-center gap-2">
-              <UIcon name="i-heroicons-calendar" class="w-4 h-4 text-brand-500 shrink-0" />
-              Joined: {{ groupsStore.selectedUserProfile?.joinedAt || 'N/A' }}
-            </p>
-          </div>
-        </div>
-
-        <!-- IMAGES SECTION -->
-        <div class="flex flex-col gap-3">
-          <h4 class="text-sm font-bold text-dark-text tracking-wide flex items-center gap-2">
-            <UIcon name="i-heroicons-photo" class="w-4 h-4 text-brand-500" />
-            Photos
-          </h4>
-          <div class="grid grid-cols-3 gap-3">
-            <div
-              v-for="i in 3"
-              :key="i"
-              class="aspect-square bg-surface-600/30 rounded-xl overflow-hidden ring-1 ring-dark-text/10 flex items-center justify-center relative group"
-            >
-              <UIcon name="i-heroicons-photo" class="w-8 h-8 text-dark-text/30" />
-            </div>
-          </div>
-        </div>
-
-        <!-- DOCUMENTS SECTION -->
-        <div v-if="groupsStore.selectedUserProfile?.canViewDocuments" class="flex flex-col gap-3">
-          <h4 class="text-sm font-bold text-dark-text tracking-wide flex items-center gap-2">
-            <UIcon name="i-heroicons-document-text" class="w-4 h-4 text-brand-500" />
-            Documents
-          </h4>
-          <div class="flex flex-col gap-2">
-            <div
-              v-for="i in 2"
-              :key="i"
-              class="flex items-center justify-between p-3 bg-surface-500/40 rounded-xl ring-1 ring-dark-text/10 hover:bg-surface-500/60 transition-colors"
-            >
-              <div class="flex items-center gap-3">
-                <UIcon name="i-heroicons-document" class="w-5 h-5 text-brand-500" />
-                <span class="text-sm font-medium text-dark-text">Document_Sample_{{ i }}.pdf</span>
-              </div>
-              <UButton
-                icon="i-heroicons-arrow-down-tray"
-                variant="ghostBrandIconButton"
-                size="xs"
-              />
-            </div>
-          </div>
+    <template #header>
+      <div class="flex items-center gap-4">
+        <UAvatar
+          :src="undefined"
+          :alt="userProfile?.username"
+          icon="i-heroicons-user"
+          size="lg"
+          class="shrink-0"
+        />
+        <div class="min-w-0">
+          <h3 class="text-lg font-bold text-dark-text truncate">
+            {{ userProfile?.username ?? '—' }}
+          </h3>
+          <p class="text-sm text-surface-400 capitalize">
+            {{ userProfile?.role ?? '' }}
+          </p>
         </div>
       </div>
     </template>
 
+    <!-- Scrollable body -->
+    <template #body>
+      <div class="flex flex-col gap-5 overflow-y-auto custom-scrollbar pr-1">
+        <!-- BASIC INFO -->
+        <div class="flex flex-col gap-2">
+          <div :class="appConfig.layout.profileDetailRow">
+            <p :class="appConfig.typography.profileLabel">Email</p>
+            <p :class="appConfig.typography.profileValue">{{ userProfile?.email ?? '—' }}</p>
+          </div>
+          <div :class="appConfig.layout.profileDetailRow">
+            <p :class="appConfig.typography.profileLabel">Role</p>
+            <p :class="[appConfig.typography.profileValue, 'capitalize']">
+              {{ userProfile?.role ?? '—' }}
+            </p>
+          </div>
+          <div :class="appConfig.layout.profileDetailRow">
+            <p :class="appConfig.typography.profileLabel">Joined</p>
+            <p :class="appConfig.typography.profileValue">{{ userProfile?.joinedAt ?? '—' }}</p>
+          </div>
+        </div>
+
+        <!-- PRIVATE DOCUMENTS — leaders only -->
+        <template v-if="userProfile?.canViewDocuments">
+          <div :class="appConfig.layout.divider" />
+
+          <div class="flex flex-col gap-3">
+            <h4 class="text-sm font-bold text-dark-text/70 uppercase tracking-wider">
+              Member Documents
+            </h4>
+
+            <!-- Loading -->
+            <div
+              v-if="isLoadingDocs"
+              :class="appConfig.typography.statusLoading"
+              class="text-sm py-2"
+            >
+              Loading documents...
+            </div>
+
+            <!-- No docs -->
+            <div
+              v-else-if="!memberDocuments || memberDocuments.length === 0"
+              class="text-sm text-surface-400 italic py-2"
+            >
+              No private documents found.
+            </div>
+
+            <!-- Doc cards -->
+            <div v-else class="flex flex-col gap-3">
+              <UCard
+                v-for="doc in memberDocuments"
+                :key="doc.file_id"
+                variant="documentGlass"
+                class="relative"
+              >
+                <div :class="appConfig.layout.documentCardHeader">
+                  <p class="font-bold truncate pr-2 shadow-sm text-sm">{{ doc.file_name }}</p>
+                  <UTooltip text="View">
+                    <UButton
+                      icon="i-heroicons-eye"
+                      variant="ghostDangerIconButton"
+                      class="text-surface-500 shrink-0"
+                      :href="doc.file_url"
+                      target="_blank"
+                    />
+                  </UTooltip>
+                </div>
+
+                <div class="flex flex-col gap-1.5 px-3 pb-3 text-sm text-dark-text/80">
+                  <p>
+                    Type:
+                    <span class="font-bold text-dark-text">
+                      {{ doc.documents?.document_type ?? 'N/A' }}
+                    </span>
+                  </p>
+                  <p>
+                    Uploaded:
+                    <span class="font-bold text-dark-text">
+                      {{ new Date(doc.created_at).toLocaleDateString() }}
+                    </span>
+                  </p>
+                  <div
+                    v-if="doc.documents?.issue_date || doc.documents?.expiry_date"
+                    class="flex gap-4"
+                  >
+                    <p v-if="doc.documents?.issue_date">
+                      Issued:
+                      <span class="font-bold text-dark-text">
+                        {{ new Date(doc.documents.issue_date).toLocaleDateString() }}
+                      </span>
+                    </p>
+                    <p v-if="doc.documents?.expiry_date">
+                      Expires:
+                      <span class="font-bold text-dark-text">
+                        {{ new Date(doc.documents.expiry_date).toLocaleDateString() }}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              </UCard>
+            </div>
+          </div>
+        </template>
+      </div>
+    </template>
+
     <template #footer>
-      <div :class="appConfig.layout.modalActions" class="justify-end">
+      <div class="flex justify-end">
         <UButton
-          :class="appConfig.typography.modalActionBtnOk"
           label="Close"
-          variant="actionOkButton"
+          variant="actionCancelButton"
           @click="groupsStore.closeUserProfileModal()"
         />
       </div>
@@ -95,11 +145,26 @@
 </template>
 
 <script setup lang="ts">
-/* --- IMPORTS --- */
-import { useGroupsStore } from '~/stores/groups.modals.store';
+import { computed } from 'vue';
 import { useAppConfig } from '#imports';
+import { useGroupsStore } from '~/stores/groups.modals.store';
+import { useGroupMemberDocumentsQuery } from '~/queries/files.query';
+import type { PrivateDocumentMetadata } from '~/types/files.type';
 
-/* --- COMPOSABLES --- */
 const appConfig = useAppConfig();
 const groupsStore = useGroupsStore();
+
+const props = defineProps<{
+  groupUuid?: string;
+}>();
+
+const userProfile = computed(() => groupsStore.selectedUserProfile);
+
+// Fetch member documents when leader opens the modal — only runs when groupUuid is provided
+const { data: memberDocsData, isLoading: isLoadingDocs } = useGroupMemberDocumentsQuery(
+  () => props.groupUuid || '',
+  () => !!(props.groupUuid && userProfile.value?.canViewDocuments),
+);
+
+const memberDocuments = computed<PrivateDocumentMetadata[]>(() => memberDocsData.value ?? []);
 </script>

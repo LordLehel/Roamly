@@ -37,6 +37,9 @@
         @open-profile="handleOpenProfile"
       />
     </ClientOnly>
+
+    <!-- User profile modal — groupUuid enables leader doc fetching -->
+    <UserProfileModal :group-uuid="groupUuid" />
   </div>
 </template>
 
@@ -52,6 +55,7 @@ import { useGroupsStore } from '~/stores/groups.modals.store';
 import type { GroupOutDto, GroupProfileDto } from '~/types/groups.type';
 import MembersMobile from '~/components/views/mobile/groups/MembersMobile.vue';
 import MembersDesktop from '~/components/views/desktop/groups/MembersDesktop.vue';
+import UserProfileModal from '~/components/modals/UserProfileModal.vue';
 
 /* --- PAGE CONFIGURATION --- */
 definePageMeta({ layout: 'general', middleware: ['auth'] });

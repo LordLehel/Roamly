@@ -37,8 +37,9 @@ export function useGroupFilesQuery(
 }
 
 /**
- * Fetches private documents shared by all members of a group.
- * Only available to group leaders — the API enforces this server-side.
+ * Fetches all private documents shared by members of a group.
+ * Only available to group leaders — enforced server-side.
+ * Endpoint: GET /files/group/:groupUuid/members/documents
  */
 export function useGroupMemberDocumentsQuery(groupUuid: () => string, enabled: () => boolean) {
   return useQuery({
