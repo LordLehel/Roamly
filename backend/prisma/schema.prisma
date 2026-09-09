@@ -136,3 +136,22 @@ model file_shares {
 
   @@id([file_id, group_id])
 }
+
+model pending_users {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique @db.VarChar(254)
+  username     String   @db.VarChar(64)
+  password     String   @db.VarChar(255)
+  phone_number String?  @db.VarChar(20)
+  otp          String   @db.VarChar(6)
+  expires_at   DateTime @db.Timestamp(6)
+  created_at   DateTime @default(now()) @db.Timestamp(6)
+}
+
+model password_resets {
+  id         Int      @id @default(autoincrement())
+  email      String   @unique @db.VarChar(254)
+  otp        String   @db.VarChar(6)
+  expires_at DateTime @db.Timestamp(6)
+  created_at DateTime @default(now()) @db.Timestamp(6)
+}

@@ -35,7 +35,27 @@ export const registerSchema = z.object({
     .optional(),
 });
 
+export const emailBodySchema = z.object({
+  email: z.email('Invalid Email Format!'),
+});
+
+export const otpBodySchema = z.object({
+  otp: z.string().trim().length(6, 'Otp code must be exactly 6 characters!'),
+});
+
 export const loginSchema = z.object({
   email: z.email(),
   password: z.string().min(1),
+});
+
+export const emailPasswordBodySchema = z.object({
+  email: z.email(),
+  newPassword: z
+    .string()
+    .trim()
+    .min(8, 'Password must be between 8-72 characters long!')
+    .max(72, 'Password must be between 8-72 characters long!')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase character!')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase character!')
+    .regex(/[0-9]/, 'Password must contain at least one number!'),
 });
