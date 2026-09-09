@@ -35,3 +35,15 @@ export function useGroupFilesQuery(
     enabled: () => !!groupUuid(),
   });
 }
+
+/**
+ * Fetches private documents shared by all members of a group.
+ * Only available to group leaders — the API enforces this server-side.
+ */
+export function useGroupMemberDocumentsQuery(groupUuid: () => string, enabled: () => boolean) {
+  return useQuery({
+    key: () => ['group-member-documents', groupUuid()],
+    query: () => filesService.getGroupMemberDocuments(groupUuid()).then((res) => res.data),
+    enabled: () => !!groupUuid() && enabled(),
+  });
+}

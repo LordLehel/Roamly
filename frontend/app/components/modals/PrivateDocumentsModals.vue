@@ -1,11 +1,11 @@
-<!-- frontend/app/components/modals/documents/GroupDocumentsModals.vue -->
+<!-- frontend/app/components/modals/documents/PrivateDocumentsModals.vue -->
 <template>
   <div>
     <!-- ==================== -->
     <!-- UPLOAD DOCUMENT MODAL -->
     <!-- ==================== -->
     <UModal
-      v-model:open="documentsStore.isUploadModalOpen"
+      v-model:open="documentsStore.isPrivateUploadModalOpen"
       :dismissible="false"
       :close="false"
       :ui="{ content: appConfig.layout.modalSizeMd }"
@@ -13,9 +13,7 @@
       <template #default><div class="hidden"></div></template>
       <template #close><div class="hidden"></div></template>
       <template #header>
-        <h3 class="text-xl font-bold text-dark-text">
-          {{ CONST_UPLOAD_DOCUMENT_HEADER ?? 'Upload Document' }}
-        </h3>
+        <h3 class="text-xl font-bold text-dark-text">Upload Private Document</h3>
       </template>
       <template #body>
         <UForm
@@ -25,7 +23,7 @@
           @submit="handleUpload"
         >
           <!-- Choose file -->
-          <UFormField :label="'Select File ' + (CONST_ACCEPTED_FILE_FORMATS ?? '')" name="file">
+          <UFormField label="Select File" name="file">
             <template #default="{ error: fieldError }">
               <UInput
                 type="file"
@@ -41,7 +39,7 @@
             <template #default>
               <USelect
                 v-model="uploadForm.documentType"
-                :items="documentTypes"
+                :items="privateDocumentTypes"
                 label-key="label"
                 value-key="value"
                 placeholder="Select a document type"
@@ -63,7 +61,7 @@
               </template>
             </UFormField>
 
-            <!-- Expire date -->
+            <!-- Expiry date -->
             <UFormField label="Expiry Date (Optional)" name="expiryDate">
               <template #default="{ error: fieldError }">
                 <UInput
@@ -105,7 +103,7 @@
     <!-- UPDATE DOCUMENT MODAL -->
     <!-- ==================== -->
     <UModal
-      v-model:open="documentsStore.isGroupUpdateModalOpen"
+      v-model:open="documentsStore.isPrivateUpdateModalOpen"
       :dismissible="false"
       :close="false"
       :ui="{ content: appConfig.layout.modalSizeMd }"
@@ -113,7 +111,7 @@
       <template #default><div class="hidden"></div></template>
       <template #close><div class="hidden"></div></template>
       <template #header>
-        <h3 class="text-xl font-bold text-dark-text">Update Group Document</h3>
+        <h3 class="text-xl font-bold text-dark-text">Update Private Document</h3>
       </template>
       <template #body>
         <UForm
@@ -124,11 +122,11 @@
         >
           <!-- Current file name -->
           <div
-            v-if="groupFileToUpdate"
+            v-if="fileToUpdate"
             class="flex items-center gap-2 px-3 py-2 rounded-lg bg-surface-100/10 border border-surface-500/20"
           >
             <UIcon name="i-heroicons-document-text" class="w-4 h-4 text-surface-400 shrink-0" />
-            <span class="text-sm text-surface-400 truncate">{{ groupFileToUpdate.fileName }}</span>
+            <span class="text-sm text-surface-400 truncate">{{ fileToUpdate.fileName }}</span>
           </div>
 
           <!-- Replace file (optional) -->
@@ -148,7 +146,7 @@
             <template #default>
               <USelect
                 v-model="updateForm.documentType"
-                :items="documentTypes"
+                :items="privateDocumentTypes"
                 label-key="label"
                 value-key="value"
                 placeholder="Select a document type"
@@ -200,7 +198,7 @@
               label="Save"
               variant="actionOkButton"
               :class="appConfig.typography.modalActionBtnOk"
-              :loading="updateMutation.isLoading.value"
+              :loading="isUpdating"
             />
           </div>
         </UForm>
@@ -211,7 +209,7 @@
     <!-- DELETE DOCUMENT MODAL -->
     <!-- ==================== -->
     <UModal
-      v-model:open="documentsStore.isDeleteModalOpen"
+      v-model:open="documentsStore.isPrivateDeleteModalOpen"
       :dismissible="false"
       :close="false"
       :ui="{ content: appConfig.layout.modalSizeMd }"
@@ -219,17 +217,15 @@
       <template #default><div class="hidden"></div></template>
       <template #close><div class="hidden"></div></template>
       <template #header>
-        <h3 class="text-xl font-bold text-dark-text">
-          {{ CONST_DELETE_DOCUMENT_HEADER ?? 'Delete Document' }}
-        </h3>
+        <h3 class="text-xl font-bold text-dark-text">Delete Document</h3>
       </template>
       <template #body>
         <p :class="appConfig.typography.modalText">
-          {{ CONST_CONFIRM_DELETE_DOCUMENT }}
+          Are you sure you want to delete
           <span :class="appConfig.typography.modalInlineHighlight">{{
-            fileToDelete?.fileName
+            privateFileToDelete?.fileName
           }}</span
-          >{{ CONST_ACTION_CANNOT_BE_UNDONE }}
+          >? This action cannot be undone.
         </p>
 
         <!-- Delete Error Display -->
@@ -243,7 +239,7 @@
             label="Cancel"
             variant="actionCancelButton"
             :class="appConfig.typography.modalActionBtnCancel"
-            @click="documentsStore.closeDeleteModal()"
+            @click="documentsStore.closePrivateDeleteModal()"
           />
           <UButton
             label="Delete"
@@ -262,28 +258,31 @@
 <script setup lang="ts">
 import { useAppConfig, useToast } from '#imports';
 import { computed, reactive, ref, watch } from 'vue';
+import { useQueryCache } from '@pinia/colada';
 import { z } from 'zod';
 import type { FormSubmitEvent } from '#ui/types';
 import { useDocumentsStore } from '~/stores/documents.modals.store';
 import {
-  useDeleteGroupFileMutation,
-  useUpdateGroupDocumentMutation,
-  useUploadGroupDocumentMutation,
+  useUploadPrivateDocumentMutation,
+  useDeletePrivateDocumentMutation,
 } from '~/queries/files.mutation';
+import { filesService } from '~/services/files.service';
 import { getErrorMessage } from '~/utils/error.utils';
 import type { ApiError } from '~/types/apiError.type';
 
 defineProps<{
-  documentTypes: { label: string; value: string }[];
+  privateDocumentTypes: { label: string; value: string }[];
 }>();
 
 const appConfig = useAppConfig();
 const documentsStore = useDocumentsStore();
+const queryCache = useQueryCache();
 const toast = useToast();
 
 const uploadError = ref<ApiError | Error | null>(null);
 const updateError = ref<ApiError | Error | null>(null);
 const deleteError = ref<ApiError | Error | null>(null);
+const isUpdating = ref(false);
 
 // -------------------------
 // UPLOAD LOGIC
@@ -312,10 +311,8 @@ const onFileChange = (e: Event) => {
   uploadForm.file = target.files?.[0] ?? null;
 };
 
-const uploadGroupUuidRef = computed(() => documentsStore.uploadGroupUuid || undefined);
-
 // Keep the full mutation object — never destructure isLoading out of it
-const uploadMutation = useUploadGroupDocumentMutation(uploadGroupUuidRef, {
+const uploadMutation = useUploadPrivateDocumentMutation({
   onSuccess: () => {
     uploadError.value = null;
     toast.add({ title: 'Success', description: 'Document uploaded successfully!' });
@@ -327,7 +324,7 @@ const uploadMutation = useUploadGroupDocumentMutation(uploadGroupUuidRef, {
 });
 
 const closeUploadModal = () => {
-  documentsStore.closeUploadModal();
+  documentsStore.closePrivateUploadModal();
   uploadForm.file = null;
   uploadForm.documentType = '';
   uploadForm.issueDate = '';
@@ -340,7 +337,6 @@ const handleUpload = (event: FormSubmitEvent<UploadFormState>) => {
 
   const formData = new FormData();
   formData.append('file', event.data.file);
-
   if (event.data.documentType) formData.append('document_type', event.data.documentType);
   if (event.data.issueDate) formData.append('issue_date', event.data.issueDate);
   if (event.data.expiryDate) formData.append('expiry_date', event.data.expiryDate);
@@ -368,13 +364,11 @@ const updateForm = reactive<UpdateFormState>({
   expiryDate: '',
 });
 
-const groupFileToUpdate = computed(() => documentsStore.groupFileToUpdate);
-
-const updateGroupUuidRef = computed(() => documentsStore.groupFileToUpdate?.groupUuid);
+const fileToUpdate = computed(() => documentsStore.privateFileToUpdate);
 
 // Pre-fill the update form when the modal opens
 watch(
-  () => documentsStore.groupFileToUpdate,
+  () => documentsStore.privateFileToUpdate,
   (file) => {
     if (file) {
       updateForm.file = null;
@@ -391,7 +385,7 @@ const onUpdateFileChange = (e: Event) => {
 };
 
 const closeUpdateModal = () => {
-  documentsStore.closeGroupUpdateModal();
+  documentsStore.closePrivateUpdateModal();
   updateForm.file = null;
   updateForm.documentType = '';
   updateForm.issueDate = '';
@@ -399,42 +393,39 @@ const closeUpdateModal = () => {
   updateError.value = null;
 };
 
-const updateMutation = useUpdateGroupDocumentMutation(updateGroupUuidRef, {
-  onSuccess: () => {
-    updateError.value = null;
+const handleUpdate = async (event: FormSubmitEvent<UpdateFormState>) => {
+  if (!fileToUpdate.value) return;
+  updateError.value = null;
+  isUpdating.value = true;
+
+  try {
+    const formData = new FormData();
+    if (event.data.file instanceof File) formData.append('file', event.data.file);
+    if (event.data.documentType) formData.append('document_type', event.data.documentType);
+    if (event.data.issueDate) formData.append('issue_date', event.data.issueDate);
+    if (event.data.expiryDate) formData.append('expiry_date', event.data.expiryDate);
+
+    await filesService.replacePrivateDocument(fileToUpdate.value.fileId, formData);
+    queryCache.invalidateQueries({ key: ['private-documents'] });
     toast.add({ title: 'Success', description: 'Document updated successfully!' });
     closeUpdateModal();
-  },
-  onError: (err: Error) => {
-    updateError.value = err;
-  },
-});
-
-const handleUpdate = (event: FormSubmitEvent<UpdateFormState>) => {
-  if (!groupFileToUpdate.value) return;
-  updateError.value = null;
-
-  const formData = new FormData();
-  if (event.data.file instanceof File) formData.append('file', event.data.file);
-  if (event.data.documentType) formData.append('document_type', event.data.documentType);
-  if (event.data.issueDate) formData.append('issue_date', event.data.issueDate);
-  if (event.data.expiryDate) formData.append('expiry_date', event.data.expiryDate);
-
-  updateMutation.mutate({ fileId: groupFileToUpdate.value.fileId, formData });
+  } catch (err) {
+    updateError.value = err as Error;
+  } finally {
+    isUpdating.value = false;
+  }
 };
 
 // -------------------------
 // DELETE LOGIC
 // -------------------------
 
-const fileToDelete = computed(() => documentsStore.fileToDelete);
+const privateFileToDelete = computed(() => documentsStore.privateFileToDelete);
 
-const deleteGroupUuidRef = computed(() => documentsStore.fileToDelete?.groupUuid);
-
-const deleteMutation = useDeleteGroupFileMutation(deleteGroupUuidRef, {
+const deleteMutation = useDeletePrivateDocumentMutation({
   onSuccess: () => {
     deleteError.value = null;
-    documentsStore.closeDeleteModal();
+    documentsStore.closePrivateDeleteModal();
     toast.add({ title: 'Success', description: 'Document deleted successfully!' });
   },
   onError: (err: Error) => {
@@ -443,8 +434,8 @@ const deleteMutation = useDeleteGroupFileMutation(deleteGroupUuidRef, {
 });
 
 const confirmDelete = () => {
-  if (!fileToDelete.value) return;
+  if (!privateFileToDelete.value) return;
   deleteError.value = null;
-  deleteMutation.mutate(fileToDelete.value.fileId);
+  deleteMutation.mutate(privateFileToDelete.value.fileId);
 };
 </script>

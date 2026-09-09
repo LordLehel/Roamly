@@ -142,4 +142,10 @@ export const filesService = {
 
     return api(`/files/group/${groupUuid}?${params.toString()}`);
   },
+
+  // --- MEMBER DOCUMENTS (leader-only) ---
+  getGroupMemberDocuments(groupUuid: string): Promise<ApiResponse<PrivateDocumentMetadata[]>> {
+    const api = useApi();
+    return api(`/files/group/${groupUuid}/members/documents`);
+  },
 };

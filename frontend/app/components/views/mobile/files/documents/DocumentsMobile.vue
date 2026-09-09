@@ -65,9 +65,9 @@
         </UPopover>
       </div>
 
-      <!-- ---------------- -->
-      <!-- MEMBER DOCUMENTS -->
-      <!-- ---------------- -->
+      <!-- ====================== -->
+      <!-- GROUP DOCUMENTS SECTION -->
+      <!-- ====================== -->
 
       <div :class="appConfig.typography.pageTitle" class="text-2xl font-bold">
         {{ CONST_GROUP_DOCUMENTS_HEADER }}
@@ -157,7 +157,6 @@
                     class="text-surface-500"
                     @click.prevent="emit('download', doc.download_url, doc.file_name)"
                   />
-                  <!-- Download needs to be fixed-->
                 </UTooltip>
               </div>
             </div>
@@ -227,90 +226,175 @@
       </div>
     </div>
 
-    <div :class="appConfig.typography.pageTitle" class="text-2xl font-bold">
-      {{ CONST_MEMBER_DOCUMENTS_HEADER }}
-    </div>
+    <!-- ========================= -->
+    <!-- MEMBER DOCUMENTS (leader) -->
+    <!-- ========================= -->
+    <template v-if="isCurrentUserLeader">
+      <div :class="appConfig.typography.pageTitle" class="text-2xl font-bold">
+        {{ CONST_MEMBER_DOCUMENTS_HEADER }}
+      </div>
 
-    <div :class="appConfig.calendar.mobileToolbar">
-      <UTooltip text="Filter">
-        <UPopover>
-          <UButton icon="i-heroicons-funnel" variant="glassIconButton" />
-          <template #content="{ close }">
-            <div :class="[appConfig.ui.dropdownMenu.slots.content, 'w-fit']">
-              <button
-                v-for="type in privateDocumentTypes"
-                :key="type.value"
-                :class="appConfig.ui.dropdownMenu.slots.item"
-                @click="
-                  memberFilterType = type.value;
-                  close();
-                "
-              >
-                <UIcon
-                  :name="
-                    memberFilterType === type.value ? 'i-heroicons-check' : 'i-heroicons-funnel'
+      <div :class="appConfig.calendar.mobileToolbar">
+        <UTooltip text="Filter">
+          <UPopover>
+            <UButton icon="i-heroicons-funnel" variant="glassIconButton" />
+            <template #content="{ close }">
+              <div :class="[appConfig.ui.dropdownMenu.slots.content, 'w-fit']">
+                <button
+                  v-for="type in privateDocumentTypes"
+                  :key="type.value"
+                  :class="appConfig.ui.dropdownMenu.slots.item"
+                  @click="
+                    memberFilterType = type.value;
+                    close();
                   "
-                  :class="appConfig.ui.dropdownMenu.slots.itemLeadingIcon"
-                />
-                <span>{{ type.label }}</span>
-              </button>
-            </div>
-          </template>
-        </UPopover>
-      </UTooltip>
+                >
+                  <UIcon
+                    :name="
+                      memberFilterType === type.value ? 'i-heroicons-check' : 'i-heroicons-funnel'
+                    "
+                    :class="appConfig.ui.dropdownMenu.slots.itemLeadingIcon"
+                  />
+                  <span>{{ type.label }}</span>
+                </button>
+              </div>
+            </template>
+          </UPopover>
+        </UTooltip>
 
-      <UInput
-        v-model="memberSearchQuery"
-        placeholder="Search private documents..."
-        icon="i-heroicons-magnifying-glass"
-        class="flex-1"
-        variant="search"
-      />
-    </div>
+        <UInput
+          v-model="memberSearchQuery"
+          placeholder="Search private documents..."
+          icon="i-heroicons-magnifying-glass"
+          class="flex-1"
+          variant="search"
+        />
+      </div>
 
-    <div class="px-2 pt-4 flex flex-col gap-6 w-full">
+      <!-- Loading -->
       <div
-        v-for="type in privateDocumentTypes.filter(
-          (t) => t.value !== 'ALL' && (memberFilterType === 'ALL' || memberFilterType === t.value),
-        )"
-        :key="type.value"
-        class="flex flex-col gap-3 w-full"
+        v-if="isLoadingMemberDocuments"
+        :class="appConfig.typography.statusLoading"
+        class="py-4 text-center"
       >
-        <h2 :class="appConfig.typography.pageTitle" class="text-xl font-bold">
-          {{ type.label }}
-        </h2>
+        Loading member documents...
+      </div>
 
-        <UCard variant="documentGlass" class="relative w-full p-6">
-          <div class="flex flex-col gap-3">
-            <div class="flex items-center justify-between">
-              <p class="font-bold text-sm text-dark-text">{{ type.label }} Category</p>
-              <span v-if="memberSearchQuery" class="text-xs text-brand-500 font-medium">
-                Active search: "{{ memberSearchQuery }}"
-              </span>
-            </div>
+      <div v-else class="px-2 pt-4 flex flex-col gap-6 w-full">
+        <div
+          v-for="type in privateDocumentTypes.filter(
+            (t) =>
+              t.value !== 'ALL' && (memberFilterType === 'ALL' || memberFilterType === t.value),
+          )"
+          :key="type.value"
+          class="flex flex-col gap-3 w-full"
+        >
+          <h2 :class="appConfig.typography.pageTitle" class="text-xl font-bold">
+            {{ type.label }}
+          </h2>
 
-            <div :class="appConfig.layout.divider"></div>
+          <!-- Documents of this type -->
+          <div
+            v-if="filteredMemberDocuments(type.value).length > 0"
+            class="flex flex-col gap-4 w-full"
+          >
+            <UCard
+              v-for="doc in filteredMemberDocuments(type.value)"
+              :key="doc.file_id"
+              variant="documentGlass"
+              class="relative w-full"
+            >
+              <div :class="appConfig.layout.documentCardHeader">
+                <p class="font-bold truncate pr-2 shadow-sm text-sm">{{ doc.file_name }}</p>
+              </div>
 
+              <div :class="appConfig.layout.documentCardImage" class="h-32!">
+                <UIcon name="i-heroicons-document-text" class="w-12 h-12 text-surface-500/50" />
+                <div class="absolute bottom-2 px-4 w-full flex justify-end">
+                  <UTooltip text="View">
+                    <UButton
+                      icon="i-heroicons-eye"
+                      variant="ghostDangerIconButton"
+                      class="text-surface-500"
+                      :href="doc.file_url"
+                      target="_blank"
+                    />
+                  </UTooltip>
+                </div>
+              </div>
+
+              <div :class="appConfig.layout.documentCardMeta">
+                <p>
+                  Uploaded at:
+                  <span class="font-bold text-dark-text">{{
+                    new Date(doc.created_at).toLocaleDateString()
+                  }}</span>
+                </p>
+                <p>
+                  Document type:
+                  <span class="font-bold text-dark-text">{{
+                    doc.documents?.document_type ?? 'N/A'
+                  }}</span>
+                </p>
+                <div :class="appConfig.layout.divider"></div>
+                <div :class="appConfig.layout.flexBetween">
+                  <p>
+                    File type:
+                    <span class="font-bold text-dark-text">{{
+                      doc.mime_type.split('/')[1] || 'Unknown'
+                    }}</span>
+                  </p>
+                  <p>
+                    File size:
+                    <span class="font-bold text-dark-text"
+                      >{{ (doc.file_size / (1024 * 1024)).toFixed(2) }} MB</span
+                    >
+                  </p>
+                </div>
+                <div :class="appConfig.layout.divider"></div>
+                <p>
+                  Issued:
+                  <span class="font-bold text-dark-text">{{
+                    doc.documents?.issue_date
+                      ? new Date(doc.documents.issue_date).toLocaleDateString()
+                      : 'N/A'
+                  }}</span>
+                </p>
+                <p>
+                  Ends:
+                  <span class="font-bold text-dark-text">{{
+                    doc.documents?.expiry_date
+                      ? new Date(doc.documents.expiry_date).toLocaleDateString()
+                      : 'N/A'
+                  }}</span>
+                </p>
+              </div>
+            </UCard>
+          </div>
+
+          <!-- Empty per-type state -->
+          <UCard v-else variant="documentGlass" class="relative w-full">
             <div class="py-6 text-center">
               <UIcon
                 name="i-heroicons-document-text"
                 class="w-12 h-12 text-surface-500/40 mx-auto mb-2"
               />
               <p class="text-surface-400 italic text-sm">
-                The documents with '{{ type.label.toLowerCase() }}' type will be listed here...
+                No {{ type.label.toLowerCase() }} documents found
+                <template v-if="memberSearchQuery"> matching "{{ memberSearchQuery }}"</template>.
               </p>
             </div>
-          </div>
-        </UCard>
+          </UCard>
+        </div>
       </div>
-    </div>
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useAppConfig } from '#imports';
-import type { GroupFile } from '~/types/files.type';
+import type { GroupFile, PrivateDocumentMetadata } from '~/types/files.type';
 import type { GroupOutDto } from '~/types/groups.type';
 
 const appConfig = useAppConfig();
@@ -323,6 +407,8 @@ const memberFilterType = defineModel<string>('memberFilterType', { default: 'ALL
 
 const props = defineProps<{
   documents: GroupFile[];
+  memberDocuments: PrivateDocumentMetadata[];
+  isLoadingMemberDocuments: boolean;
   groups: GroupOutDto[];
   isLoading: boolean;
   isCurrentUserLeader: boolean;
@@ -331,9 +417,11 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'delete', file: GroupFile): void;
-  (e: 'upload' | 'delete-group' | 'leave-group'): void;
-  (e: 'download', url: string | undefined, filename: string): void;
+  delete: [file: GroupFile];
+  upload: [];
+  'delete-group': [];
+  'leave-group': [];
+  download: [url: string | undefined, filename: string];
 }>();
 
 const isGroupDropdownOpen = ref(false);
@@ -345,5 +433,17 @@ const currentGroupDetails = computed(() =>
 const selectGroup = (uuid: string) => {
   selectedGroup.value = uuid;
   isGroupDropdownOpen.value = false;
+};
+
+/**
+ * Returns member documents filtered by type and optional search query.
+ */
+const filteredMemberDocuments = (typeValue: string): PrivateDocumentMetadata[] => {
+  const query = memberSearchQuery.value.toLowerCase().trim();
+  return props.memberDocuments.filter((doc) => {
+    const matchesType = doc.documents?.document_type === typeValue;
+    const matchesSearch = !query || doc.file_name.toLowerCase().includes(query);
+    return matchesType && matchesSearch;
+  });
 };
 </script>
