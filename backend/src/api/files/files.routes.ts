@@ -18,6 +18,7 @@ router.post(
 router.get(
   '/documents/:fileId',
   validateData(zodSchemas.fileIdValidationSchema, 'params'),
+  validateData(zodSchemas.documentUrlQuerySchema, 'query'),
   filesController.getPrivateDocumentUrl,
 );
 router.delete(

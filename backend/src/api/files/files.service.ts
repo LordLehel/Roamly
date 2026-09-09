@@ -75,6 +75,7 @@ export const uploadPrivateDocument = async (
 export const getPrivateDocumentUrl = async (
   userUuid: string,
   fileId: number,
+  type: FILE_CONSTANTS.urlType,
 ): Promise<{ url: string; file: files }> => {
   const user = await prisma.users.findUniqueOrThrow({
     where: {
@@ -117,7 +118,16 @@ export const getPrivateDocumentUrl = async (
     throw new ForbiddenError('User does not have permission to view document!');
   }
 
-  const presignedUrl = await cloudOperations.getPrivatePresignedUrl(file.file_url);
+  let presignedUrl;
+
+  if (type === FILE_CONSTANTS.URL_TYPE.DOWNLOAD) {
+    presignedUrl = await cloudOperations.generateDownloadLink(
+      file.file_url,
+      file.file_name as string,
+    );
+  } else {
+    presignedUrl = await cloudOperations.getPrivatePresignedUrl(file.file_url);
+  }
 
   return {
     url: presignedUrl,

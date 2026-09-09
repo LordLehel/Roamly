@@ -123,3 +123,11 @@ export const paginatedQuerySchema = z.object({
     .enum([FILE_CONSTANTS.GROUP_FILE_TYPE.DOCUMENT, FILE_CONSTANTS.GROUP_FILE_TYPE.MEDIA_FILE])
     .optional(),
 });
+
+export const documentUrlQuerySchema = z.object({
+  type: z
+    .enum([FILE_CONSTANTS.URL_TYPE.VIEW, FILE_CONSTANTS.URL_TYPE.DOWNLOAD], {
+      message: 'Url type must be either view or download!',
+    })
+    .default(FILE_CONSTANTS.URL_TYPE.VIEW),
+});

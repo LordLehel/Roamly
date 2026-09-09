@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { BaseController } from '../../utils/BaseController';
 import * as fileService from './files.service';
+import * as FILE_CONSTANTS from '../../constants/files.constants';
 
 class FilesController extends BaseController {
   public uploadPrivateDocument = this.handleAsync(
@@ -42,11 +43,13 @@ class FilesController extends BaseController {
 
       const fileId = parseInt(req.params.fileId as string, 10);
 
-      const result = await fileService.getPrivateDocumentUrl(user.uuid, fileId);
+      const type = req.query.type as FILE_CONSTANTS.urlType;
+
+      const result = await fileService.getPrivateDocumentUrl(user.uuid, fileId, type);
 
       res.status(200).json({
         status: 'success',
-        message: 'Temporary URL successfully generated! Link expires in 5 minutes!',
+        message: 'Temporary URL successfully generated! Link expires in 1 hour!',
         data: {
           url: result.url,
           file_name: result.file.file_name,
