@@ -14,7 +14,7 @@
           icon="i-heroicons-photo"
           variant="glassIconButton"
           class="text-brand-500"
-          to="/files/media"
+          :to="mediaRoute"
         />
       </UTooltip>
       <UTooltip text="Documents">
@@ -89,21 +89,21 @@
 
         <div v-else-if="filteredMedia.length > 0" class="flex flex-col gap-4 w-full">
           <UCard
-            v-for="media in filteredMedia"
-            :key="media.file_id"
+            v-for="mediaItem in filteredMedia"
+            :key="mediaItem.file_id"
             variant="documentGlass"
             class="relative w-full"
           >
             <!-- Title + delete -->
             <div :class="appConfig.layout.documentCardHeader">
-              <p class="font-bold truncate pr-2 shadow-sm text-sm">{{ media.file_name }}</p>
+              <p class="font-bold truncate pr-2 shadow-sm text-sm">{{ mediaItem.file_name }}</p>
               <div class="flex items-center gap-1 shrink-0">
                 <UTooltip v-if="isCurrentUserLeader" text="Delete">
                   <UButton
                     icon="i-heroicons-trash"
                     variant="ghostDangerIconButton"
                     class="text-surface-500 hover:text-error-500 w-6! h-6! p-0"
-                    @click="emit('delete', media)"
+                    @click="emit('delete', mediaItem)"
                   />
                 </UTooltip>
               </div>
@@ -112,14 +112,14 @@
             <!-- Image preview -->
             <div :class="appConfig.layout.documentCardImage" class="h-48! overflow-hidden">
               <img
-                v-if="isImage(media.mime_type)"
-                :src="media.download_url || media.file_url"
-                :alt="media.file_name"
+                v-if="isImage(mediaItem.mime_type)"
+                :src="mediaItem.download_url || mediaItem.file_url"
+                :alt="mediaItem.file_name"
                 class="w-full h-full object-cover"
               />
               <div v-else class="flex flex-col items-center justify-center gap-2">
                 <UIcon name="i-heroicons-film" class="w-12 h-12 text-surface-500/50" />
-                <span class="text-xs text-surface-400">{{ media.mime_type }}</span>
+                <span class="text-xs text-surface-400">{{ mediaItem.mime_type }}</span>
               </div>
 
               <div class="absolute bottom-2 px-4 w-full flex justify-between">
@@ -128,7 +128,7 @@
                     icon="i-heroicons-eye"
                     variant="ghostDangerIconButton"
                     class="text-surface-500"
-                    :href="media.download_url || media.file_url"
+                    :href="mediaItem.download_url || mediaItem.file_url"
                     target="_blank"
                   />
                 </UTooltip>
@@ -138,7 +138,11 @@
                     variant="ghostDangerIconButton"
                     class="text-surface-500"
                     @click.prevent="
-                      emit('download', media.download_url || media.file_url, media.file_name)
+                      emit(
+                        'download',
+                        mediaItem.download_url || mediaItem.file_url,
+                        mediaItem.file_name,
+                      )
                     "
                   />
                 </UTooltip>
@@ -150,20 +154,22 @@
               <p>
                 Uploaded by:
                 <span class="font-bold text-dark-text">{{
-                  media.creator?.username || 'Unknown'
+                  mediaItem.creator?.username || 'Unknown'
                 }}</span>
               </p>
               <p>
                 Uploaded at:
                 <span class="font-bold text-dark-text">{{
-                  new Date(media.created_at).toLocaleDateString()
+                  new Date(mediaItem.created_at).toLocaleDateString()
                 }}</span>
               </p>
-              <div v-if="media.media_files?.description">
+              <div v-if="mediaItem.media_files?.description">
                 <div :class="appConfig.layout.divider"></div>
                 <p>
                   Description:
-                  <span class="font-bold text-dark-text">{{ media.media_files.description }}</span>
+                  <span class="font-bold text-dark-text">{{
+                    mediaItem.media_files.description
+                  }}</span>
                 </p>
               </div>
               <div :class="appConfig.layout.divider"></div>
@@ -171,13 +177,13 @@
                 <p>
                   Type:
                   <span class="font-bold text-dark-text">{{
-                    media.mime_type?.split('/')[1] || 'Unknown'
+                    mediaItem.mime_type?.split('/')[1] || 'Unknown'
                   }}</span>
                 </p>
                 <p>
                   Size:
                   <span class="font-bold text-dark-text"
-                    >{{ (media.file_size / (1024 * 1024)).toFixed(2) }} MB</span
+                    >{{ (mediaItem.file_size / (1024 * 1024)).toFixed(2) }} MB</span
                   >
                 </p>
               </div>
@@ -238,8 +244,15 @@ const selectGroup = (uuid: string) => {
 const membersRoute = computed(() =>
   selectedGroup.value ? `/groups/${selectedGroup.value}/members` : '/groups',
 );
-const eventsRoute = computed(() => '/events');
-const documentsRoute = computed(() => '/files/documents');
+const eventsRoute = computed(() =>
+  selectedGroup.value ? `/events?groupId=${selectedGroup.value}` : '/events',
+);
+const mediaRoute = computed(() =>
+  selectedGroup.value ? `/files/media?groupId=${selectedGroup.value}` : '/files/media',
+);
+const documentsRoute = computed(() =>
+  selectedGroup.value ? `/files/documents?groupId=${selectedGroup.value}` : '/files/documents',
+);
 
 const isImage = (mimeType: string) => mimeType?.startsWith('image/');
 

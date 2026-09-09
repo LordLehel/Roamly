@@ -66,25 +66,27 @@
       </div>
 
       <div :class="appConfig.calendar.headerActionRight">
-        <UTooltip :text="CONST_TOOLTIP_MEMBERS ?? 'Members'"
-          ><UButton icon="i-heroicons-users" variant="glassIconButton" to="/groups"
-        /></UTooltip>
-        <UTooltip :text="CONST_TOOLTIP_CALENDAR ?? 'Calendar'"
-          ><UButton
+        <UTooltip :text="CONST_TOOLTIP_MEMBERS ?? 'Members'">
+          <UButton icon="i-heroicons-users" variant="glassIconButton" :to="membersRoute" />
+        </UTooltip>
+        <UTooltip :text="CONST_TOOLTIP_CALENDAR ?? 'Calendar'">
+          <UButton
             icon="i-heroicons-calendar"
             variant="glassIconButton"
             class="text-brand-500"
-            to="/events"
-        /></UTooltip>
-        <UTooltip :text="CONST_TOOLTIP_PHOTOS ?? 'Photos'"
-          ><UButton icon="i-heroicons-photo" variant="glassIconButton" to="/files/media"
-        /></UTooltip>
-        <UTooltip :text="CONST_TOOLTIP_DOCUMENTS ?? 'Documents'"
-          ><UButton
+            :to="eventsRoute"
+          />
+        </UTooltip>
+        <UTooltip :text="CONST_TOOLTIP_PHOTOS ?? 'Photos'">
+          <UButton icon="i-heroicons-photo" variant="glassIconButton" :to="mediaRoute" />
+        </UTooltip>
+        <UTooltip :text="CONST_TOOLTIP_DOCUMENTS ?? 'Documents'">
+          <UButton
             icon="i-heroicons-document-text"
             variant="glassIconButton"
-            to="/files/documents"
-        /></UTooltip>
+            :to="documentsRoute"
+          />
+        </UTooltip>
       </div>
     </div>
 
@@ -463,4 +465,20 @@ const clearFilters = () => {
   filterStartDate.value = '';
   filterEndDate.value = '';
 };
+
+// Contextual nav
+const membersRoute = computed(() =>
+  props.selectedGroupUuid ? `/groups/${props.selectedGroupUuid}/members` : '/groups',
+);
+const eventsRoute = computed(() =>
+  props.selectedGroupUuid ? `/events?groupId=${props.selectedGroupUuid}` : '/events',
+);
+const mediaRoute = computed(() =>
+  props.selectedGroupUuid ? `/files/media?groupId=${props.selectedGroupUuid}` : '/files/media',
+);
+const documentsRoute = computed(() =>
+  props.selectedGroupUuid
+    ? `/files/documents?groupId=${props.selectedGroupUuid}`
+    : '/files/documents',
+);
 </script>

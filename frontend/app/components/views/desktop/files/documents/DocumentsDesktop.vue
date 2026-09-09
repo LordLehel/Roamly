@@ -67,20 +67,20 @@
 
       <div :class="appConfig.layout.actionGroup" class="flex-1 justify-end">
         <UTooltip text="Members">
-          <UButton icon="i-heroicons-users" variant="glassIconButton" to="/groups" />
+          <UButton icon="i-heroicons-users" variant="glassIconButton" :to="membersRoute" />
         </UTooltip>
         <UTooltip text="Calendar">
-          <UButton icon="i-heroicons-calendar" variant="glassIconButton" to="/events" />
+          <UButton icon="i-heroicons-calendar" variant="glassIconButton" :to="eventsRoute" />
         </UTooltip>
         <UTooltip text="Photos">
-          <UButton icon="i-heroicons-photo" variant="glassIconButton" to="/files/media" />
+          <UButton icon="i-heroicons-photo" variant="glassIconButton" :to="mediaRoute" />
         </UTooltip>
         <UTooltip text="Documents">
           <UButton
             icon="i-heroicons-document-text"
             variant="glassIconButton"
             class="text-brand-500"
-            to="/files/documents"
+            :to="documentsRoute"
           />
         </UTooltip>
       </div>
@@ -465,6 +465,20 @@ const selectGroup = (uuid: string) => {
   selectedGroup.value = uuid;
   isGroupDropdownOpen.value = false;
 };
+
+// Contextual nav — route to the currently selected group
+const membersRoute = computed(() =>
+  selectedGroup.value ? `/groups/${selectedGroup.value}/members` : '/groups',
+);
+const eventsRoute = computed(() =>
+  selectedGroup.value ? `/events?groupId=${selectedGroup.value}` : '/events',
+);
+const mediaRoute = computed(() =>
+  selectedGroup.value ? `/files/media?groupId=${selectedGroup.value}` : '/files/media',
+);
+const documentsRoute = computed(() =>
+  selectedGroup.value ? `/files/documents?groupId=${selectedGroup.value}` : '/files/documents',
+);
 
 /**
  * Returns member documents filtered by type and optional search query.

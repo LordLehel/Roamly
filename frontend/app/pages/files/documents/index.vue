@@ -62,6 +62,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import { useMediaQuery } from '@vueuse/core';
 import { useToast } from '#imports';
 import DocumentsDesktop from '~/components/views/desktop/files/documents/DocumentsDesktop.vue';
@@ -82,6 +83,7 @@ const isMobile = useMediaQuery('(max-width: 768px)');
 const documentsStore = useDocumentsStore();
 const groupsStore = useGroupsStore();
 const toast = useToast();
+const route = useRoute();
 
 const searchQuery = ref('');
 const filterType = ref('ALL');
@@ -108,7 +110,7 @@ const privateDocumentTypes = [
 
 const { data: groupsData } = useGroupsQuery();
 const groupsList = computed<GroupOutDto[]>(() => groupsData.value?.items || []);
-const selectedGroupUuid = ref<string | undefined>(undefined);
+const selectedGroupUuid = ref<string | undefined>((route.query.groupId as string) || undefined);
 
 watch(
   groupsList,

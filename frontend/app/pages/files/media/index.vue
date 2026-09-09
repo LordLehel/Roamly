@@ -142,6 +142,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import { useMediaQuery } from '@vueuse/core';
 import { useToast } from '#imports';
 import MediaDesktop from '~/components/views/desktop/files/media/MediaDesktop.vue';
@@ -161,9 +162,10 @@ const isMobile = useMediaQuery('(max-width: 768px)');
 const groupsStore = useGroupsStore();
 const queryCache = useQueryCache();
 const toast = useToast();
+const route = useRoute();
 
 const searchQuery = ref('');
-const selectedGroupUuid = ref<string | undefined>(undefined);
+const selectedGroupUuid = ref<string | undefined>((route.query.groupId as string) || undefined);
 
 // ---- GROUP LIST ----
 const { data: groupsData } = useGroupsQuery();

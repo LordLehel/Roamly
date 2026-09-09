@@ -5,25 +5,27 @@
     <div class="flex flex-col gap-6">
       <!-- NAV ACTIONS (Members, Calendar, Photos, Docs) -->
       <div class="flex justify-between items-center w-full">
-        <UTooltip :text="CONST_TOOLTIP_MEMBERS ?? 'Members'"
-          ><UButton
+        <UTooltip :text="CONST_TOOLTIP_MEMBERS ?? 'Members'">
+          <UButton
             icon="i-heroicons-users"
             variant="glassIconButton"
             class="text-brand-500"
-            to="/groups"
-        /></UTooltip>
-        <UTooltip :text="CONST_TOOLTIP_CALENDAR ?? 'Calendar'"
-          ><UButton icon="i-heroicons-calendar" variant="glassIconButton" to="/events"
-        /></UTooltip>
-        <UTooltip :text="CONST_TOOLTIP_PHOTOS ?? 'Photos'"
-          ><UButton icon="i-heroicons-photo" variant="glassIconButton" to="/files/media"
-        /></UTooltip>
-        <UTooltip :text="CONST_TOOLTIP_DOCUMENTS ?? 'Documents'"
-          ><UButton
+            :to="membersRoute"
+          />
+        </UTooltip>
+        <UTooltip :text="CONST_TOOLTIP_CALENDAR ?? 'Calendar'">
+          <UButton icon="i-heroicons-calendar" variant="glassIconButton" :to="eventsRoute" />
+        </UTooltip>
+        <UTooltip :text="CONST_TOOLTIP_PHOTOS ?? 'Photos'">
+          <UButton icon="i-heroicons-photo" variant="glassIconButton" :to="mediaRoute" />
+        </UTooltip>
+        <UTooltip :text="CONST_TOOLTIP_DOCUMENTS ?? 'Documents'">
+          <UButton
             icon="i-heroicons-document-text"
             variant="glassIconButton"
-            to="/files/documents"
-        /></UTooltip>
+            :to="documentsRoute"
+          />
+        </UTooltip>
       </div>
 
       <!-- TITLE & ACTIONS -->
@@ -368,6 +370,20 @@ const todayUpcomingEvents = computed(() => {
     .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())
     .slice(0, 3); // Maximum a 3 legközelebbi
 });
+
+// Contextual nav
+const membersRoute = computed(() =>
+  groupUuid.value ? `/groups/${groupUuid.value}/members` : '/groups',
+);
+const eventsRoute = computed(() =>
+  groupUuid.value ? `/events?groupId=${groupUuid.value}` : '/events',
+);
+const mediaRoute = computed(() =>
+  groupUuid.value ? `/files/media?groupId=${groupUuid.value}` : '/files/media',
+);
+const documentsRoute = computed(() =>
+  groupUuid.value ? `/files/documents?groupId=${groupUuid.value}` : '/files/documents',
+);
 
 /* --- HELPERS --- */
 const isCurrentUser = (email: string) => {
