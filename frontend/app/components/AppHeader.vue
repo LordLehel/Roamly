@@ -43,7 +43,11 @@
                 variant="ghost"
                 class="p-0 m-0 rounded-full hover:bg-transparent focus-visible:ring-2 focus-visible:ring-brand-500 transition-transform hover:scale-105 cursor-pointer"
               >
-                <UAvatar :alt="userProfile?.username || 'User'" icon="i-heroicons-user" />
+                <UAvatar
+                  :src="userProfile?.profile_image_url || undefined"
+                  :alt="userProfile?.username || 'User'"
+                  icon="i-heroicons-user"
+                />
               </UButton>
             </UDropdownMenu>
             <!-- mobile menu button -->

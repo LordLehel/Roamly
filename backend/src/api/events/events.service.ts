@@ -640,6 +640,7 @@ export const listEvents = async (
               uuid: true,
               username: true,
               email: true,
+              profile_image_url: true,
             },
           },
         },

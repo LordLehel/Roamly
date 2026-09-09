@@ -77,7 +77,7 @@
           <div class="mt-2 flex items-center justify-between">
             <UCheckbox
               v-model="formState.is_private"
-              variant="glass"
+              icon="i-heroicons-check"
               :label="CONTS_MARK_EVENT_AS_PRIVATE"
               :ui="{ base: 'w-5 h-5 cursor-pointer border-2 border-dark-text/30' }"
             />

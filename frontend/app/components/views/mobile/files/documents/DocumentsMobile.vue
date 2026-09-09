@@ -101,9 +101,10 @@
 
         <UInput
           v-model="searchQuery"
-          placeholder="Search..."
+          placeholder="Search documents..."
           icon="i-heroicons-magnifying-glass"
           class="flex-1"
+          :ui="{ leading: 'pl-3' }"
           variant="search"
         />
 
@@ -267,6 +268,7 @@
           placeholder="Search private documents..."
           icon="i-heroicons-magnifying-glass"
           class="flex-1"
+          :ui="{ leading: 'pl-3' }"
           variant="search"
         />
       </div>

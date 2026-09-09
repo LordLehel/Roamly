@@ -489,6 +489,7 @@ export const listAllInfosOfOneGroup = async (
             select: {
               email: true,
               username: true,
+              profile_image_url: true,
             },
           },
 

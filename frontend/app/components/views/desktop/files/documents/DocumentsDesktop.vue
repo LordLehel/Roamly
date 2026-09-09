@@ -21,7 +21,7 @@
       </div>
 
       <!-- DROPDOWN HEADER -->
-      <div class="flex flex-col items-center justify-center shrink-0">
+      <div class="flex flex-col items-start justify-center shrink-0">
         <UPopover v-model:open="isGroupDropdownOpen">
           <UButton
             variant="ghost"
@@ -97,7 +97,8 @@
             icon="i-heroicons-magnifying-glass"
             placeholder="Search documents..."
             variant="search"
-            class="w-1/3! max-w-none!"
+            class="w-1/2! max-w-none!"
+            :ui="{ leading: 'pl-3' }"
           />
           <UPopover>
             <UButton
@@ -261,7 +262,8 @@
           icon="i-heroicons-magnifying-glass"
           placeholder="Search private documents..."
           variant="search"
-          class="w-1/3! max-w-none!"
+          class="w-1/2! max-w-none!"
+          :ui="{ leading: 'pl-3' }"
         />
         <UPopover>
           <UButton

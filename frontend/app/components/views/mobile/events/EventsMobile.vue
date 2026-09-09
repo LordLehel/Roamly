@@ -123,9 +123,11 @@
         </UPopover>
         <UInput
           v-model="searchQuery"
+          icon="i-heroicons-magnifying-glass"
           :placeholder="CONST_SEARCH_EVENTS_PLACEHOLDER"
           variant="search"
           class="flex-1"
+          :ui="{ leading: 'pl-3' }"
         />
         <UTooltip text="Add Event">
           <UButton

@@ -105,6 +105,7 @@
             <div :class="appConfig.layout.memberCardInner">
               <div class="shrink-0 pt-1">
                 <UAvatar
+                  :src="profile.users.profile_image_url || undefined"
                   :alt="profile.users.username"
                   size="profileLg"
                   icon="i-heroicons-user"
@@ -113,9 +114,11 @@
               </div>
 
               <div :class="appConfig.layout.memberCardContent">
-                <div :class="appConfig.layout.flexBetween">
-                  <div>
-                    <h3 :class="appConfig.typography.cardTitle">{{ profile.users.username }}</h3>
+                <div :class="[appConfig.layout.flexBetween, 'min-w-0']">
+                  <div class="min-w-0 flex-1 pr-2">
+                    <h3 :class="appConfig.typography.cardTitle" :title="profile.users.username">
+                      {{ profile.users.username }}
+                    </h3>
                     <p
                       v-if="isCurrentUser(profile.users.email)"
                       class="text-sm text-left font-bold text-brand-500 mt-0.5"
@@ -126,6 +129,7 @@
                   <UTooltip
                     v-if="isCurrentUserLeader && profile.roles.type.toLowerCase() === 'member'"
                     :text="CONST_TOOLTIP_PROMOTE_USER ?? 'Promote'"
+                    class="shrink-0"
                   >
                     <UButton
                       icon="i-heroicons-arrow-up-circle"

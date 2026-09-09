@@ -95,6 +95,7 @@
           icon="i-heroicons-magnifying-glass"
           :placeholder="CONST_SEARCH_EVENTS_PLACEHOLDER"
           variant="search"
+          :ui="{ leading: 'pl-3' }"
           class="w-full max-w-xs"
         />
         <UPopover v-model:open="isFilterOpen">
@@ -360,7 +361,6 @@
                         :alt="p.username"
                         :src="p.profile_image_url || undefined"
                         icon="i-heroicons-user"
-                        size="sm"
                         :class="appConfig.calendar.participantAvatar"
                         @click="$emit('open-user-profile', p)"
                       />
