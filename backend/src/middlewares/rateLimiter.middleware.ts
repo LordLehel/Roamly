@@ -1,4 +1,4 @@
-import rateLimit from 'express-rate-limit';
+import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 import { Request } from 'express';
 
 export const otpLimiter = rateLimit({
@@ -14,7 +14,7 @@ export const otpLimiter = rateLimit({
     }
 
     // if somehow there is no email address in the body we use ip address
-    return req.ip || 'unknown_ip';
+    return req.ip ? ipKeyGenerator(req.ip) : 'unknown_ip';
   },
 
   message: {

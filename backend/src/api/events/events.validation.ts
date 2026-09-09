@@ -25,6 +25,20 @@ export const createEventSchema = z
       message: `Visibility is required and must be either ${EVENT_VISIBILITY.PUBLIC} or ${EVENT_VISIBILITY.PRIVATE}`,
     }),
 
+    latitude: z
+      .number()
+      .min(-90, 'Latitude must be between -90 and 90')
+      .max(90, 'Latitude must be between -90 and 90')
+      .optional(),
+
+    longitude: z
+      .number()
+      .min(-180, 'Longitude must be between -180 and 180')
+      .max(180, 'Longitude must be between -180 and 180')
+      .optional(),
+
+    address: z.string().max(255).optional(),
+
     participant_emails: z
       .array(z.email('One or more email addresses does not have a valid format!'))
       .refine((emails: string[]) => new Set(emails).size === emails.length, {
@@ -61,6 +75,24 @@ export const createEventSchema = z
         'Public events can not have specified participants, every user in the group will be a participant!',
       path: ['participant_emails'],
     },
+  )
+  .refine(
+    (data: { latitude?: number; longitude?: number; address?: string }) => {
+      const hasLat = data.latitude !== undefined && data.latitude !== null;
+      const hasLng = data.longitude !== undefined && data.longitude !== null;
+      const hasAddress =
+        data.address !== undefined && data.address !== null && data.address.trim() !== '';
+
+      if (hasLat || hasLng || hasAddress) {
+        return hasLat && hasLng && hasAddress;
+      }
+
+      return true;
+    },
+    {
+      message: 'Latitude, longitude and address must all be provided together, or all left empty!',
+      path: ['address'],
+    },
   );
 
 export const groupUuidParamSchema = z.object({
@@ -96,6 +128,22 @@ export const updateEventSchema = z
         message: `Visibility is required and must be either ${EVENT_VISIBILITY.PUBLIC} or ${EVENT_VISIBILITY.PRIVATE}`,
       })
       .optional(),
+
+    latitude: z
+      .number()
+      .min(-90, 'Latitude must be between -90 and 90')
+      .max(90, 'Latitude must be between -90 and 90')
+      .nullable()
+      .optional(),
+
+    longitude: z
+      .number()
+      .min(-180, 'Longitude must be between -180 and 180')
+      .max(180, 'Longitude must be between -180 and 180')
+      .nullable()
+      .optional(),
+
+    address: z.string().max(255).nullable().optional(),
   })
   .refine(
     (data: { start_time?: string; end_time?: string | null }) => {
@@ -108,6 +156,24 @@ export const updateEventSchema = z
     {
       message: 'End time must be after the start time, or the exact same!',
       path: ['end_time'],
+    },
+  )
+  .refine(
+    (data: { latitude?: number | null; longitude?: number | null; address?: string | null }) => {
+      const hasLat = data.latitude !== undefined && data.latitude !== null;
+      const hasLng = data.longitude !== undefined && data.longitude !== null;
+      const hasAddress =
+        data.address !== undefined && data.address !== null && data.address.trim() !== '';
+
+      if (hasLat || hasLng || hasAddress) {
+        return hasLat && hasLng && hasAddress;
+      }
+
+      return true;
+    },
+    {
+      message: 'Latitude, longitude and address must all be provided together, or all left empty!',
+      path: ['address'],
     },
   );
 

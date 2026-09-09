@@ -404,6 +404,26 @@
               <span :class="appConfig.calendar.metaLabel">{{ CONST_DESC_LBL }}</span>
               <span :class="appConfig.calendar.metaValue">{{ selectedEvent.description }}</span>
             </div>
+            <div
+              v-if="selectedEvent.address || selectedEvent.latitude"
+              :class="[appConfig.calendar.metaRowItem, 'mt-4', 'flex-col', 'items-start', 'gap-2']"
+            >
+              <span :class="appConfig.calendar.metaLabel">{{  CONST_LOC_LBL  }}</span>
+              <span v-if="selectedEvent.address" :class="appConfig.calendar.metaValue">
+                {{ selectedEvent.address }}
+              </span>
+              <div
+                v-if="selectedEvent.latitude && selectedEvent.longitude"
+                class="w-full h-48 rounded-lg overflow-hidden border border-gray-200 mt-1 relative z-0"
+              >
+                <ClientOnly>
+                  <EventMapPreview
+                    :latitude="selectedEvent.latitude"
+                    :longitude="selectedEvent.longitude"  
+                  />
+                </ClientOnly>
+              </div>
+            </div>
           </div>
         </div>
         <div v-else :class="appConfig.calendar.emptyPreview">{{ CONST_SELECT_EVENT_PROMPT }}</div>
@@ -416,6 +436,8 @@
 import { useAppConfig } from '#imports';
 import type { GroupOutDto } from '~/types/groups.type';
 import type { EventCreatorDto, UiDay, UiEvent } from '~/types/events.type';
+import { CONST_LOC_LBL } from '~/utils/constants/events.constants';
+import EventMapPreview from '~/components/map/EventMapPreview.vue';
 
 const props = defineProps<{
   userGroupsList: GroupOutDto[];

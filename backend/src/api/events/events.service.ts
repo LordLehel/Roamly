@@ -14,6 +14,9 @@ export const createEvent = async (
     start_time: string;
     end_time?: string;
     visibility: string;
+    latitude?: number;
+    longitude?: number;
+    address?: string;
     participant_emails?: string[];
   },
 ): Promise<events> => {
@@ -80,6 +83,10 @@ export const createEvent = async (
       // if end_time is not provided, it will be the start_time by default,
       // this way the user is able to create events that have no predetermined ending time
       end_time: data.end_time ? new Date(data.end_time) : new Date(data.start_time),
+      // location data
+      latitude: data.latitude,
+      longitude: data.longitude,
+      address: data.address,
 
       groups: {
         connect: {
@@ -194,6 +201,9 @@ export const updateEvent = async (
     start_time?: string;
     end_time?: string | null;
     visibility?: string;
+    latitude?: number | null;
+    longitude?: number | null;
+    address?: string | null;
   },
 ): Promise<events> => {
   const userGroupInfo = await prisma.group_profiles.findFirst({
@@ -288,6 +298,10 @@ export const updateEvent = async (
         : undefined,
 
       event_participants: participantOperations,
+
+      latitude: data.latitude,
+      longitude: data.longitude,
+      address: data.address,
     },
 
     include: {
