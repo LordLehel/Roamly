@@ -10,16 +10,16 @@
 
       <RegisterMobile
         v-if="isMobile"
-        :is-loading="isLoading"
-        :error="error"
-        :status="status"
+        :is-loading="registerMutation.isLoading.value"
+        :error="registerMutation.error.value"
+        :status="registerMutation.status.value"
         @submit="handleRegister"
       />
       <RegisterDesktop
         v-else
-        :is-loading="isLoading"
-        :error="error"
-        :status="status"
+        :is-loading="registerMutation.isLoading.value"
+        :error="registerMutation.error.value"
+        :status="registerMutation.status.value"
         @submit="handleRegister"
       />
     </ClientOnly>
@@ -38,23 +38,26 @@ import RegisterMobile from '~/components/views/mobile/auth/RegisterMobile.vue';
 /* --- PAGE CONFIGURATION --- */
 definePageMeta({ layout: 'auth', middleware: ['guest'] });
 
-/* --- COMPOSABLES & STORES --- */
+/* --- COMPOSABLES --- */
 const { isMobile } = useScreenSize();
 const router = useRouter();
 
+/* --- STATE: track the submitted email so we can forward it to the verification page --- */
+let pendingEmail = '';
+
 /* --- API MUTATIONS --- */
-const {
-  mutate: registerUser,
-  isLoading,
-  error,
-  status,
-} = useCreateUserMutation({
-  onSuccess: () => router.push('/login'),
+// Keep the whole mutation object — never destructure isLoading/error out of it
+const registerMutation = useCreateUserMutation({
+  onSuccess: () => {
+    // Redirect to the OTP verification page, carrying the email in the query string
+    router.push({ path: '/verify-email', query: { email: pendingEmail } });
+  },
 });
 
 /* --- EVENT HANDLERS --- */
 const handleRegister = (data: RegisterFormState) => {
-  registerUser({
+  pendingEmail = data.email;
+  registerMutation.mutate({
     email: data.email,
     username: data.username,
     phone_number: data.phone_number,
