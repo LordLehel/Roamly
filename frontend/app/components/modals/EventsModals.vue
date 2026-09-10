@@ -12,105 +12,122 @@
       <template #close><div class="hidden"></div></template>
       <template #header><h3 class="text-xl font-bold text-dark-text">Add Event</h3></template>
       <template #body>
-        <UForm
-          :schema="createEventSchema"
-          :state="formState"
-          :class="appConfig.layout.modalForm"
-          @submit="onSubmit"
+        <div
+          v-if="true"
+          class="[ appConfig.calendar.previewWrapper, eventsStore.previewEvent.isExpired ? 'opacity-70' : '', 'p-2! pr-3! gap-4! md:overflow-visible md:max-h-none overflow-y-auto max-h-[70vh] overscroll-contain custom-scrollbar', ]"
         >
-          <UFormField name="title" label="Event Title"
-            ><template #default="{ error }"
-              ><UInput
-                v-model="formState.title"
-                placeholder="e.g., Morning Standup"
-                :variant="error ? 'glassError' : 'glass'" /></template
-          ></UFormField>
-          <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
-            <UFormField name="start_time" label="Start Date & Time">
-              <template #default="{ error }">
-                <div class="flex gap-2 w-full">
-                  <UInput
-                    v-model="formState.startDate"
-                    type="date"
-                    class="w-full"
-                    :variant="error ? 'glassError' : 'glass'"
-                  />
-                  <UInput
-                    v-model="formState.startTime"
-                    type="time"
-                    class="w-full"
-                    :variant="error ? 'glassError' : 'glass'"
-                  />
-                </div>
-              </template>
-            </UFormField>
-          </div>
-          <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
-            <UFormField name="end_time" label="End Date & Time">
-              <template #default="{ error }">
-                <div class="flex gap-2 w-full">
-                  <UInput
-                    v-model="formState.endDate"
-                    type="date"
-                    class="w-full"
-                    :variant="error ? 'glassError' : 'glass'"
-                  />
-                  <UInput
-                    v-model="formState.endTime"
-                    type="time"
-                    class="w-full"
-                    :variant="error ? 'glassError' : 'glass'"
-                  />
-                </div>
-              </template>
-            </UFormField>
-          </div>
-          <UFormField name="description" label="Description">
-            <template #default="{ error }">
-              <UTextarea
-                v-model="formState.description"
-                placeholder="Event details..."
-                :variant="error ? 'glassError' : 'glass'"
-              />
-            </template>
-          </UFormField>
-
-          <!-- location selector button -->
-          <div class="mt-4 flex flex-col gap-2">
-            <span class="text-sm font-medium text-dark-text">Location (optional)</span>
-            <UButton
-              icon="i-heroicons-map"
-              label="Choose Location on map"
-              variant="glassOutlineButton"
-              @click="isMapSelectorOpen = true"  
-            />
-            <div v-if="formState.address" class="flex items-start justify-between gap-2 p-2 bg-surface-50 border border-surface-200 rounded-md">
-              <span class="text-sm text-dark-text/80">{{ formState.address }}</span>
-              <UButton icon="i-heroicons-x-mark" variant="ghostDangerIconButton" size="xs" class="p-0" @click="clearLocation" />
+          <UForm
+            :schema="createEventSchema"
+            :state="formState"
+            :class="appConfig.layout.modalForm"
+            @submit="onSubmit"
+          >
+            <UFormField name="title" label="Event Title"
+              ><template #default="{ error }"
+                ><UInput
+                  v-model="formState.title"
+                  placeholder="e.g., Morning Standup"
+                  :variant="error ? 'glassError' : 'glass'" /></template
+            ></UFormField>
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+              <UFormField name="start_time" label="Start Date & Time">
+                <template #default="{ error }">
+                  <div class="flex gap-2 w-full">
+                    <UInput
+                      v-model="formState.startDate"
+                      type="date"
+                      class="w-full"
+                      :variant="error ? 'glassError' : 'glass'"
+                    />
+                    <UInput
+                      v-model="formState.startTime"
+                      type="time"
+                      class="w-full"
+                      :variant="error ? 'glassError' : 'glass'"
+                    />
+                  </div>
+                </template>
+              </UFormField>
             </div>
-          </div>
-          <div class="mt-2 flex items-center justify-between">
-            <UCheckbox
-              v-model="formState.is_private"
-              icon="i-heroicons-check"
-              :label="CONTS_MARK_EVENT_AS_PRIVATE"
-              :ui="{ base: 'w-5 h-5 cursor-pointer border-2 border-dark-text/30' }"
-            />
-          </div>
-          <div :class="[appConfig.layout.flexBetween, 'mt-4']">
-            <UButton
-              :label="CONST_CANCEL_BTN_TEXT ?? 'Cancel'"
-              variant="actionCancelButton"
-              @click="closeAndResetForm"
-            />
-            <UButton
-              type="submit"
-              :label="CONST_ADD_BTN ?? 'Save'"
-              variant="actionOkButton"
-              :loading="createEventMutation.isLoading.value"
-            />
-          </div>
-        </UForm>
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+              <UFormField name="end_time" label="End Date & Time">
+                <template #default="{ error }">
+                  <div class="flex gap-2 w-full">
+                    <UInput
+                      v-model="formState.endDate"
+                      type="date"
+                      class="w-full"
+                      :variant="error ? 'glassError' : 'glass'"
+                    />
+                    <UInput
+                      v-model="formState.endTime"
+                      type="time"
+                      class="w-full"
+                      :variant="error ? 'glassError' : 'glass'"
+                    />
+                  </div>
+                </template>
+              </UFormField>
+            </div>
+            <UFormField name="description" label="Description">
+              <template #default="{ error }">
+                <UTextarea
+                  v-model="formState.description"
+                  placeholder="Event details..."
+                  :variant="error ? 'glassError' : 'glass'"
+                />
+              </template>
+            </UFormField>
+
+            <!-- location selector button -->
+            <div class="mt-4 flex flex-col gap-2">
+              <span class="text-sm font-medium text-dark-text">Location (optional)</span>
+              <UButton
+                icon="i-heroicons-map"
+                label="Choose Location on map"
+                variant="glassOutlineButton"
+                @click="isMapSelectorOpen = true"
+              />
+              <div
+                v-if="formState.address"
+                class="flex items-start justify-between gap-2 p-2 bg-surface-50 border border-surface-200 rounded-md w-full overflow-hidden box-border"
+              >
+                <span
+                  class="text-sm text-dark-text/80 break-words whitespace-normal min-w-0 flex-1"
+                  >{{ formState.address }}</span
+                >
+                <UButton
+                  icon="i-heroicons-x-mark"
+                  variant="ghostDangerIconButton"
+                  size="xs"
+                  class="p-0 shrink-0 self-center"
+                  @click="clearLocation"
+                />
+              </div>
+            </div>
+            <div class="mt-2 flex items-center justify-between">
+              <UCheckbox
+                v-model="formState.is_private"
+                variant="glass"
+                :label="CONTS_MARK_EVENT_AS_PRIVATE"
+                :ui="{ base: 'w-5 h-5 cursor-pointer border-2 border-dark-text/30' }"
+              />
+            </div>
+            <div :class="[appConfig.layout.flexBetween, 'mt-4']">
+              <UButton
+                :label="CONST_CANCEL_BTN_TEXT ?? 'Cancel'"
+                variant="actionCancelButton"
+                @click="closeAndResetForm"
+              />
+              <UButton
+                type="submit"
+                :label="CONST_ADD_BTN ?? 'Save'"
+                variant="actionOkButton"
+                :loading="createEventMutation.isLoading.value"
+              />
+            </div>
+          </UForm>
+        </div>
       </template>
     </UModal>
 
@@ -121,7 +138,12 @@
       <template #header>
         <div class="flex justify-between items-center w-full">
           <h3 class="text-xl font-bold text-dark-text">Select Location</h3>
-          <UButton icon="i-heroicons-x-mark" variant="ghost" class="hover:bg-error-50 hover:text-error-500 rounded-full transition-all duration-200" @click="isMapSelectorOpen = false" />
+          <UButton
+            icon="i-heroicons-x-mark"
+            variant="ghost"
+            class="hover:bg-error-50 hover:text-error-500 rounded-full transition-all duration-200"
+            @click="isMapSelectorOpen = false"
+          />
         </div>
       </template>
       <template #body>
@@ -299,7 +321,7 @@
           :class="[
             appConfig.calendar.previewWrapper,
             eventsStore.previewEvent.isExpired ? 'opacity-70' : '',
-            'p-2! gap-4!',
+            'p-2! gap-4! overflow-y-auto max-h-[65vh] overscroll-contain custom-scrollbar',
           ]"
         >
           <div :class="appConfig.calendar.previewTitleRow" class="mb-2 justify-between">
@@ -462,8 +484,21 @@
               <span v-if="eventsStore.previewEvent.address" :class="appConfig.calendar.metaValue">
                 {{ eventsStore.previewEvent.address }}
               </span>
-              <div>
-                
+              <div
+                v-if="
+                  eventsStore.previewEvent.latitude !== null &&
+                  eventsStore.previewEvent.latitude !== undefined &&
+                  eventsStore.previewEvent.longitude !== null &&
+                  eventsStore.previewEvent.longitude !== undefined
+                "
+                class="w-full h-48 rounded-lg overflow-hidden border border-gray-200 mt-1 relative z-0 shrink-0"
+              >
+                <ClientOnly>
+                  <MapEventMapPreview
+                    :latitude="eventsStore.previewEvent.latitude"
+                    :longitude="eventsStore.previewEvent.longitude"
+                  />
+                </ClientOnly>
               </div>
             </div>
           </div>
@@ -790,6 +825,7 @@ const handleOpenUserProfile = (user: EventCreatorDto) => {
   eventsStore.closePreviewModal();
 
   groupsStore.selectedUserProfile = {
+    userUuid: user.uuid || '',
     username: user.username,
     email: user.email || 'N/A',
     role: getGroupRole(user),
@@ -919,7 +955,11 @@ const submitNewMembers = () => {
 };
 
 // map
-const handleLocationSelected = (location: { latitude: number; longitude: number; address: string }) => {
+const handleLocationSelected = (location: {
+  latitude: number;
+  longitude: number;
+  address: string;
+}) => {
   formState.latitude = location.latitude;
   formState.longitude = location.longitude;
   formState.address = location.address;

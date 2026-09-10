@@ -18,8 +18,18 @@ export const createEventSchema = z
     is_private: z.boolean(),
 
     // map
-    latitude: z.number().min(-90, 'Latitude must be between -90 and 90').max(90, 'Latitude must be between -90 and 90').nullable().optional(),
-    longitude: z.number().min(-180, 'Longitude must be between -180 and 180').max(180, 'Longitude must be between -180 and 180').nullable().optional(),
+    latitude: z
+      .number()
+      .min(-90, 'Latitude must be between -90 and 90')
+      .max(90, 'Latitude must be between -90 and 90')
+      .nullable()
+      .optional(),
+    longitude: z
+      .number()
+      .min(-180, 'Longitude must be between -180 and 180')
+      .max(180, 'Longitude must be between -180 and 180')
+      .nullable()
+      .optional(),
     address: z.string().max(255).nullable().optional(),
   })
   .refine(
@@ -35,10 +45,11 @@ export const createEventSchema = z
     },
   )
   .refine(
-    (data: { latitude?: number | null; longitude?: number | null; address?: string | null; }) => {
+    (data: { latitude?: number | null; longitude?: number | null; address?: string | null }) => {
       const hasLat = data.latitude !== undefined && data.latitude !== null;
       const hasLng = data.longitude !== undefined && data.longitude !== null;
-      const hasAddress = data.address !== undefined && data.address !== null && data.address.trim() !== '';
+      const hasAddress =
+        data.address !== undefined && data.address !== null && data.address.trim() !== '';
 
       if (hasLat || hasLng || hasAddress) {
         return hasLat && hasLng && hasAddress;
@@ -49,5 +60,5 @@ export const createEventSchema = z
     {
       message: 'Latitude, longitude and address must all be provided together, or all left empty!',
       path: ['address'],
-    }
+    },
   );

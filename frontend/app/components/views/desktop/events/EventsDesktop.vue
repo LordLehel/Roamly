@@ -408,12 +408,17 @@
               v-if="selectedEvent.address || selectedEvent.latitude"
               :class="[appConfig.calendar.metaRowItem, 'mt-4', 'flex-col', 'items-start', 'gap-2']"
             >
-              <span :class="appConfig.calendar.metaLabel">{{  CONST_LOC_LBL  }}</span>
+              <span :class="appConfig.calendar.metaLabel">{{ CONST_LOC_LBL }}</span>
               <span v-if="selectedEvent.address" :class="appConfig.calendar.metaValue">
                 {{ selectedEvent.address }}
               </span>
               <div
-                v-if="selectedEvent.latitude !== null && selectedEvent.latitude !== undefined && selectedEvent.longitude !== null && selectedEvent.longitude !== undefined"
+                v-if="
+                  selectedEvent.latitude !== null &&
+                  selectedEvent.latitude !== undefined &&
+                  selectedEvent.longitude !== null &&
+                  selectedEvent.longitude !== undefined
+                "
                 class="w-full h-48 rounded-lg overflow-hidden border border-gray-200 mt-1 relative z-0"
               >
                 <ClientOnly>
