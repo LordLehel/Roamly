@@ -21,7 +21,7 @@
       </div>
 
       <!-- DROPDOWN HEADER -->
-      <div class="flex flex-col items-start justify-center shrink-0">
+      <div class="flex flex-col items-center justify-center shrink-0">
         <UPopover v-model:open="isGroupDropdownOpen">
           <UButton
             variant="ghost"

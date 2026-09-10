@@ -451,7 +451,7 @@ export default defineAppConfig({
     participantAvatar: 'ring-2 ring-surface-500 cursor-pointer w-5 h-5',
     participantAvatarHover: 'hover:z-10 transition-transform relative',
     participantMoreBadge:
-      'flex items-center justify-center w-4 h-4 rounded-full bg-surface-600/80 text-xs font-bold text-dark-text ring-2 ring-surface-500 relative z-10 hover:bg-surface-500 transition-colors cursor-pointer',
+      'flex items-center justify-center w-5 h-5 rounded-full bg-surface-600/80 text-xs font-bold text-dark-text ring-2 ring-surface-500 relative z-10 hover:bg-surface-500 transition-colors cursor-pointer',
     participantViewAll:
       'text-xs text-brand-600 hover:text-brand-500 cursor-pointer font-medium underline underline-offset-2',
 

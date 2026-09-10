@@ -100,6 +100,7 @@
             placeholder="Search photos..."
             variant="search"
             class="w-1/3! max-w-none!"
+            :ui="{ leading: 'pl-3' }"
           />
         </div>
 

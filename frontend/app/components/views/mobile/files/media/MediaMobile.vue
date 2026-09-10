@@ -75,6 +75,7 @@
           icon="i-heroicons-magnifying-glass"
           class="flex-1"
           variant="search"
+          :ui="{ leading: 'pl-3' }"
         />
         <UTooltip text="Upload Photo">
           <UButton icon="i-heroicons-plus" variant="glassIconButton" @click="emit('upload')" />

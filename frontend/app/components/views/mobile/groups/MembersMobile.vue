@@ -53,9 +53,10 @@
           <UInput
             :model-value="searchQuery"
             icon="i-heroicons-magnifying-glass"
-            placeholder="Filter members..."
+            placeholder="Search members..."
             variant="search"
             class="w-full! max-w-none!"
+            :ui="{ leading: 'pl-3' }"
             @update:model-value="emit('update:searchQuery', $event)"
           />
         </div>
