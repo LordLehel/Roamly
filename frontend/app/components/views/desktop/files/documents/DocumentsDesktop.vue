@@ -405,13 +405,13 @@
         </div>
 
         <!-- Empty per-type state -->
-        <UCard v-else variant="documentGlass" class="relative">
+        <UCard v-else class="relative">
           <div class="py-6 text-center">
             <UIcon
               name="i-heroicons-document-text"
-              class="w-12 h-12 text-surface-500/40 mx-auto mb-2"
+              class="w-12 h-12 text-surface-500 mx-auto mb-2"
             />
-            <p class="text-surface-400 italic text-sm">
+            <p class="text-surface-500 italic text-sm">
               No {{ type.label.toLowerCase() }} documents found
               <template v-if="memberSearchQuery"> matching "{{ memberSearchQuery }}"</template>.
             </p>

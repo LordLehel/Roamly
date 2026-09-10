@@ -22,5 +22,5 @@ export const CONST_LOADING_DOCUMENTS = 'Loading documents...';
 export const CONST_YOUR_DOCUMENTS = 'Your documents:';
 export const CONST_GROUP_DOCUMENTS_HEADER = 'Group documents';
 export const CONST_NO_DOCUMENTS_FOUND = 'No documents found for this group.';
-export const CONST_ACCEPTED_FILE_FORMATS = '(jpg, png, webp, pdf)';
+export const CONST_ACCEPTED_FILE_FORMATS = '(Images & PDFs only)';
 export const CONST_MEMBER_DOCUMENTS_HEADER = 'Member documents';

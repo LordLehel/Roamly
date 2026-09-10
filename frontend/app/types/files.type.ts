@@ -34,6 +34,14 @@ export interface FileDto {
 
 export interface PrivateDocumentMetadata extends FileDto {
   documents: DocumentDto | null;
+  // Present when fetched via the leader-only group endpoint
+  // (getAllPrivateDocumentsMetadataOfAllUsersInAGroup).
+  owner?: {
+    uuid: string;
+    username: string;
+    email: string;
+    profile_image_url: string | null;
+  };
 }
 
 export interface GroupFile extends FileDto {

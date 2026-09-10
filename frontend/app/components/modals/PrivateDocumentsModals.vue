@@ -317,7 +317,7 @@
         <div class="flex justify-end w-full">
           <UButton
             label="Close"
-            variant="actionCancelButton"
+            variant="actionOkButton"
             :class="appConfig.typography.modalActionBtnCancel"
             @click="documentsStore.closePrivateShareModal()"
           />
@@ -387,7 +387,7 @@
         <div class="flex justify-end w-full">
           <UButton
             label="Close"
-            variant="actionCancelButton"
+            variant="actionOkButton"
             :class="appConfig.typography.modalActionBtnCancel"
             @click="documentsStore.closePrivateAccessModal()"
           />

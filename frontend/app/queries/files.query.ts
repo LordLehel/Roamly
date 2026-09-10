@@ -37,14 +37,24 @@ export function useGroupFilesQuery(
 }
 
 /**
- * Fetches all private documents shared by members of a group.
- * Only available to group leaders — enforced server-side.
- * Endpoint: GET /files/group/:groupUuid/members/documents
+ * Fetches private documents shared with a group — leaders only.
+ * Backend: GET /files/documents/group/:groupUuid?targetUserUuid=&documentType=
+ *
+ * targetUserUuid scopes the results to a single member (used by the
+ * UserProfileModal). When omitted, all members' shared docs are returned
+ * (used by the Documents page member section).
  */
-export function useGroupMemberDocumentsQuery(groupUuid: () => string, enabled: () => boolean) {
+export function useGroupMemberDocumentsQuery(
+  groupUuid: () => string,
+  enabled: () => boolean,
+  targetUserUuid?: () => string | undefined,
+) {
   return useQuery({
-    key: () => ['group-member-documents', groupUuid()],
-    query: () => filesService.getGroupMemberDocuments(groupUuid()).then((res) => res.data),
+    // Include targetUserUuid in the cache key so that fetching "all members"
+    // and fetching "one member" are stored as separate cache entries.
+    key: () => ['group-member-documents', groupUuid(), targetUserUuid?.() ?? null],
+    query: () =>
+      filesService.getGroupMemberDocuments(groupUuid(), targetUserUuid?.()).then((res) => res.data),
     enabled: () => !!groupUuid() && enabled(),
   });
 }

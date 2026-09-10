@@ -38,7 +38,7 @@
       />
     </ClientOnly>
 
-    <!-- User profile modal — groupUuid enables leader doc fetching -->
+    <!-- User profile modal — groupUuid enables per-user doc fetching for leaders -->
     <UserProfileModal :group-uuid="groupUuid" />
   </div>
 </template>
@@ -132,6 +132,7 @@ const handleDeleteCurrentGroup = () => {
 
 const handleOpenProfile = (profile: GroupProfileDto) => {
   groupsStore.openUserProfileModal({
+    userUuid: profile.users.uuid,
     username: profile.users.username,
     email: profile.users.email,
     role: profile.roles.type,

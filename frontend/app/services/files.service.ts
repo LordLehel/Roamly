@@ -144,8 +144,17 @@ export const filesService = {
   },
 
   // --- MEMBER DOCUMENTS (leader-only) ---
-  getGroupMemberDocuments(groupUuid: string): Promise<ApiResponse<PrivateDocumentMetadata[]>> {
+  // Backend route: GET /files/documents/group/:groupUuid?targetUserUuid=&documentType=
+  getGroupMemberDocuments(
+    groupUuid: string,
+    targetUserUuid?: string,
+    documentType?: string,
+  ): Promise<ApiResponse<PrivateDocumentMetadata[]>> {
     const api = useApi();
-    return api(`/files/group/${groupUuid}/members/documents`);
+    const params = new URLSearchParams();
+    if (targetUserUuid) params.append('targetUserUuid', targetUserUuid);
+    if (documentType) params.append('documentType', documentType);
+    const qs = params.toString() ? `?${params.toString()}` : '';
+    return api(`/files/documents/group/${groupUuid}${qs}`);
   },
 };
