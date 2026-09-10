@@ -1,6 +1,6 @@
 // frontend/app/utils/constants/global.constants.ts
 export const CONST_BRAND_NAME = 'ROAMLY';
-export const CONST_COPYRIGHT_LABEL = '© Copyright - Roamly Co. 2026 | All rights reserved.';
+export const CONST_COPYRIGHT_LABEL = '© Copyright - Roamly Co. 2026 | No rights reserved.';
 export const CONST_CANCEL_BTN_TEXT = 'Cancel';
 export const CONST_LOADING_TEXT = 'Loading...';
 export const CONST_YOU_LABEL = 'You';

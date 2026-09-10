@@ -284,7 +284,10 @@
             </div>
             <div class="flex items-center gap-1">
               <UTooltip
-                v-if="eventsStore.previewEvent.creator?.email === currentUserEmail"
+                v-if="
+                  eventsStore.previewEvent.creator?.email === currentUserEmail &&
+                  eventsStore.previewEvent.is_private
+                "
                 text="Invite Members"
               >
                 <UButton

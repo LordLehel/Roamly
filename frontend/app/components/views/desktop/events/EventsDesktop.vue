@@ -273,7 +273,10 @@
               }}</span>
             </div>
             <div class="flex items-center gap-1">
-              <UTooltip v-if="selectedEvent.creator?.email === currentUserEmail" text="Add Members">
+              <UTooltip
+                v-if="selectedEvent.creator?.email === currentUserEmail && selectedEvent.is_private"
+                text="Add Members"
+              >
                 <UButton
                   icon="i-heroicons-user-plus"
                   variant="ghostBrandIconButton"

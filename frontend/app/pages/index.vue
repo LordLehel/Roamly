@@ -11,12 +11,14 @@
       <HomeMobile
         v-if="isMobile"
         :feature-cards="featureCards"
+        :contact-links="contactLinks"
         :active-card="activeCard"
         @toggle-card="toggleCard"
       />
       <HomeDesktop
         v-else
         :feature-cards="featureCards"
+        :contact-links="contactLinks"
         :active-card="activeCard"
         @toggle-card="toggleCard"
       />
@@ -70,5 +72,13 @@ const featureCards = [
     desc: CONST_GROUP_GALLERY_DESCRIPTION,
     extendedDesc: CONST_GROUP_GALLERY_EXTENDED,
   },
+];
+
+const contactLinks = [
+  { name: 'Discord', icon: 'i-mdi-discord', url: 'https://discord.com', target: '_blank' },
+  { name: 'Instagram', icon: 'i-mdi-instagram', url: 'https://instagram.com', target: '_blank' },
+  { name: 'Facebook', icon: 'i-mdi-facebook', url: 'https://facebook.com', target: '_blank' },
+  { name: 'Email', icon: 'i-mdi-envelope', url: 'mailto:support@roamly.com', target: '_self' },
+  { name: 'Phone', icon: 'i-mdi-phone', url: 'tel:+1234567890', target: '_self' },
 ];
 </script>
