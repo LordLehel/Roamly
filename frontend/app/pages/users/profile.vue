@@ -16,6 +16,8 @@
       @delete="handleDelete"
       @view="handleView"
       @download="handleDownload"
+      @share="handleShare"
+      @access="handleAccess"
     />
 
     <ProfileDesktop
@@ -33,10 +35,17 @@
       @delete="handleDelete"
       @view="handleView"
       @download="handleDownload"
+      @share="handleShare"
+      @access="handleAccess"
     />
 
     <!-- Private Document Modals (rendered once at page level) -->
-    <PrivateDocumentsModals :private-document-types="privateDocumentTypes" />
+    <PrivateDocumentsModals
+      :private-document-types="privateDocumentTypes"
+      :shared-groups="sharedWithGroups"
+      :unshared-groups="notSharedWithGroups"
+      :all-groups="groupsList"
+    />
   </div>
 </template>
 
@@ -46,7 +55,8 @@ import { computed } from 'vue';
 import { useScreenSize } from '~/composables/useScreenSize';
 import { useProtectedPage } from '~/composables/useProtectedPage';
 import { useCurrentUserQuery } from '~/queries/user.query';
-import { usePrivateDocumentsQuery } from '~/queries/files.query';
+import { usePrivateDocumentsQuery, useDocumentSharesQuery } from '~/queries/files.query';
+import { useGroupsQuery } from '~/queries/groups.query';
 import { useProfileStore } from '~/stores/profile.modals.store';
 import { useDocumentsStore } from '~/stores/documents.modals.store';
 import ProfileDesktop from '~/components/views/desktop/users/ProfileDesktop.vue';
@@ -78,10 +88,38 @@ const privateDocumentTypes = [
 /* --- API QUERIES --- */
 const { data: currentUser, isLoading, error } = useCurrentUserQuery();
 const { data: privateDocumentsData, isLoading: isLoadingDocuments } = usePrivateDocumentsQuery();
+const { data: groupsData } = useGroupsQuery();
 
 const privateDocuments = computed<PrivateDocumentMetadata[]>(
   () => privateDocumentsData.value ?? [],
 );
+
+/* --- SHARING LOGIC --- */
+// Reactively track the file ID currently selected for sharing
+const shareTargetFileId = computed(
+  () =>
+    documentsStore.privateFileToShare?.fileId ??
+    documentsStore.privateFileToViewAccess?.fileId ??
+    null,
+);
+
+// Fetch the existing shares for the targeted file
+const { data: documentSharesData } = useDocumentSharesQuery(() => shareTargetFileId.value);
+
+// Computed: Returns the list of groups the file IS currently shared with
+const sharedWithGroups = computed(() => documentSharesData.value ?? []);
+
+const groupsList = computed(() => groupsData.value?.items || []);
+// Composable: Returns the list of user groups the file IS NOT YET shared with
+const useUnsharedGroups = () => {
+  return computed(() => {
+    const allGroups = groupsList.value;
+    const sharedGroupNames = sharedWithGroups.value.map((share) => share.groups.name);
+    return allGroups.filter((group) => !sharedGroupNames.includes(group.name));
+  });
+};
+
+const notSharedWithGroups = useUnsharedGroups();
 
 /* --- HANDLERS --- */
 const handleEdit = (doc: PrivateDocumentMetadata) => {
@@ -100,6 +138,20 @@ const handleEdit = (doc: PrivateDocumentMetadata) => {
 
 const handleDelete = (doc: PrivateDocumentMetadata) => {
   documentsStore.openPrivateDeleteModal({
+    fileId: doc.file_id,
+    fileName: doc.file_name,
+  });
+};
+
+const handleShare = (doc: PrivateDocumentMetadata) => {
+  documentsStore.openPrivateShareModal({
+    fileId: doc.file_id,
+    fileName: doc.file_name,
+  });
+};
+
+const handleAccess = (doc: PrivateDocumentMetadata) => {
+  documentsStore.openPrivateAccessModal({
     fileId: doc.file_id,
     fileName: doc.file_name,
   });

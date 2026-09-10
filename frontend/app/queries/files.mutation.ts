@@ -131,6 +131,25 @@ export const useShareDocumentMutation = (options?: MutationOptions) => {
       filesService.shareDocument(params.fileId, params.groupUuid, params.accessLevel),
     onSuccess: () => {
       queryCache.invalidateQueries({ key: ['group-files'] });
+      queryCache.invalidateQueries({ key: ['document-shares'] });
+      options?.onSuccess?.();
+    },
+    onError: (error: Error) => {
+      options?.onError?.(error);
+    },
+  });
+
+  return mutation;
+};
+
+export const useDeleteSharingMutation = (options?: MutationOptions) => {
+  const queryCache = useQueryCache();
+
+  const mutation = useMutation({
+    mutation: (params: { fileId: number; groupUuid: string }) =>
+      filesService.deleteSharing(params.fileId, params.groupUuid),
+    onSuccess: () => {
+      queryCache.invalidateQueries({ key: ['document-shares'] });
       options?.onSuccess?.();
     },
     onError: (error: Error) => {

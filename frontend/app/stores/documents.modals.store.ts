@@ -69,6 +69,8 @@ export const useDocumentsStore = defineStore('documentsModals', () => {
   const isPrivateUploadModalOpen = ref(false);
   const isPrivateUpdateModalOpen = ref(false);
   const isPrivateDeleteModalOpen = ref(false);
+  const isPrivateShareModalOpen = ref(false);
+  const isPrivateAccessModalOpen = ref(false);
 
   const privateFileToDelete = ref<{ fileId: number; fileName: string } | null>(null);
   const privateFileToUpdate = ref<{
@@ -78,9 +80,20 @@ export const useDocumentsStore = defineStore('documentsModals', () => {
     issueDate?: string;
     expiryDate?: string;
   } | null>(null);
+  const privateFileToShare = ref<{ fileId: number; fileName: string } | null>(null);
+  const privateFileToViewAccess = ref<{ fileId: number; fileName: string } | null>(null);
+
+  const closeAllPrivateModals = () => {
+    isPrivateUploadModalOpen.value = false;
+    isPrivateUpdateModalOpen.value = false;
+    isPrivateDeleteModalOpen.value = false;
+    isPrivateShareModalOpen.value = false;
+    isPrivateAccessModalOpen.value = false;
+  };
 
   // Private — Upload modal
   const openPrivateUploadModal = () => {
+    closeAllPrivateModals();
     isPrivateUploadModalOpen.value = true;
   };
 
@@ -96,6 +109,7 @@ export const useDocumentsStore = defineStore('documentsModals', () => {
     issueDate?: string;
     expiryDate?: string;
   }) => {
+    closeAllPrivateModals();
     privateFileToUpdate.value = file;
     isPrivateUpdateModalOpen.value = true;
   };
@@ -107,6 +121,7 @@ export const useDocumentsStore = defineStore('documentsModals', () => {
 
   // Private — Delete modal
   const openPrivateDeleteModal = (file: { fileId: number; fileName: string }) => {
+    closeAllPrivateModals();
     privateFileToDelete.value = file;
     isPrivateDeleteModalOpen.value = true;
   };
@@ -114,6 +129,30 @@ export const useDocumentsStore = defineStore('documentsModals', () => {
   const closePrivateDeleteModal = () => {
     isPrivateDeleteModalOpen.value = false;
     privateFileToDelete.value = null;
+  };
+
+  // Private — Share modal
+  const openPrivateShareModal = (file: { fileId: number; fileName: string }) => {
+    closeAllPrivateModals();
+    privateFileToShare.value = file;
+    isPrivateShareModalOpen.value = true;
+  };
+
+  const closePrivateShareModal = () => {
+    isPrivateShareModalOpen.value = false;
+    privateFileToShare.value = null;
+  };
+
+  // Private — Access modal
+  const openPrivateAccessModal = (file: { fileId: number; fileName: string }) => {
+    closeAllPrivateModals();
+    privateFileToViewAccess.value = file;
+    isPrivateAccessModalOpen.value = true;
+  };
+
+  const closePrivateAccessModal = () => {
+    isPrivateAccessModalOpen.value = false;
+    privateFileToViewAccess.value = null;
   };
 
   return {
@@ -135,13 +174,21 @@ export const useDocumentsStore = defineStore('documentsModals', () => {
     isPrivateUploadModalOpen,
     isPrivateUpdateModalOpen,
     isPrivateDeleteModalOpen,
+    isPrivateShareModalOpen,
+    isPrivateAccessModalOpen,
     privateFileToDelete,
     privateFileToUpdate,
+    privateFileToShare,
+    privateFileToViewAccess,
     openPrivateUploadModal,
     closePrivateUploadModal,
     openPrivateUpdateModal,
     closePrivateUpdateModal,
     openPrivateDeleteModal,
     closePrivateDeleteModal,
+    openPrivateShareModal,
+    closePrivateShareModal,
+    openPrivateAccessModal,
+    closePrivateAccessModal,
   };
 });

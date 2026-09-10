@@ -217,6 +217,22 @@
               <div :class="appConfig.layout.documentCardHeader">
                 <p class="font-bold truncate pr-2 shadow-sm">{{ doc.file_name }}</p>
                 <div class="flex items-center gap-1">
+                  <UTooltip text="Access Details">
+                    <UButton
+                      icon="i-heroicons-key"
+                      variant="ghostBrandIconButton"
+                      class="text-surface-500"
+                      @click="emit('access', doc)"
+                    />
+                  </UTooltip>
+                  <UTooltip text="Share">
+                    <UButton
+                      icon="i-heroicons-share"
+                      variant="ghostBrandIconButton"
+                      class="text-surface-500"
+                      @click.prevent="emit('share', doc)"
+                    />
+                  </UTooltip>
                   <UTooltip :text="CONST_TOOLTIP_EDIT_DOC ?? 'Edit'">
                     <UButton
                       icon="i-heroicons-pencil"
@@ -363,6 +379,8 @@ const emit = defineEmits<{
   delete: [doc: PrivateDocumentMetadata];
   view: [doc: PrivateDocumentMetadata];
   download: [doc: PrivateDocumentMetadata];
+  share: [doc: PrivateDocumentMetadata];
+  access: [doc: PrivateDocumentMetadata];
 }>();
 
 /* --- LOCAL STATE --- */

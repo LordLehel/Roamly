@@ -48,3 +48,15 @@ export function useGroupMemberDocumentsQuery(groupUuid: () => string, enabled: (
     enabled: () => !!groupUuid() && enabled(),
   });
 }
+
+export function useDocumentSharesQuery(fileId: () => number | null) {
+  return useQuery({
+    key: () => ['document-shares', fileId()],
+    query: () => {
+      const id = fileId();
+      if (!id) throw new Error('File ID is required');
+      return filesService.listDocumentShares(id).then((res) => res.data);
+    },
+    enabled: () => !!fileId(),
+  });
+}
