@@ -74,6 +74,21 @@
               />
             </template>
           </UFormField>
+
+          <!-- location selector button -->
+          <div class="mt-4 flex flex-col gap-2">
+            <span class="text-sm font-medium text-dark-text">Location (optional)</span>
+            <UButton
+              icon="i-heroicons-map"
+              label="Choose Location on map"
+              variant="glassOutlineButton"
+              @click="isMapSelectorOpen = true"  
+            />
+            <div v-if="formState.address" class="flex items-start justify-between gap-2 p-2 bg-surface-50 border border-surface-200 rounded-md">
+              <span class="text-sm text-dark-text/80">{{ formState.address }}</span>
+              <UButton icon="i-heroicons-x-mark" variant="ghostDangerIconButton" size="xs" class="p-0" @click="clearLocation" />
+            </div>
+          </div>
           <div class="mt-2 flex items-center justify-between">
             <UCheckbox
               v-model="formState.is_private"
@@ -96,6 +111,25 @@
             />
           </div>
         </UForm>
+      </template>
+    </UModal>
+
+    <!-- map selector modal -->
+    <UModal v-model:open="isMapSelectorOpen" :ui="{ content: appConfig.layout.modalSizeLg }">
+      <template #default><div class="hidden"></div></template>
+      <template #close><div class="hidden"></div></template>
+      <template #header>
+        <div class="flex justify-between items-center w-full">
+          <h3 class="text-xl font-bold text-dark-text">Select Location</h3>
+          <UButton icon="i-heroicons-x-mark" variant="ghost" class="hover:bg-error-50 hover:text-error-500 rounded-full transition-all duration-200" @click="isMapSelectorOpen = false" />
+        </div>
+      </template>
+      <template #body>
+        <div class="h-[60vh] w-full">
+          <ClientOnly>
+            <MapEventMapSelector @confirm-location="handleLocationSelected" />
+          </ClientOnly>
+        </div>
       </template>
     </UModal>
 
@@ -418,6 +452,20 @@
                 eventsStore.previewEvent.description
               }}</span>
             </div>
+
+            <!-- map -->
+            <div
+              v-if="eventsStore.previewEvent.address || eventsStore.previewEvent.latitude"
+              :class="[appConfig.calendar.metaRowItem, 'mt-4 flex-col gap-2! items-start']"
+            >
+              <span :class="appConfig.calendar.metaLabel">Location:</span>
+              <span v-if="eventsStore.previewEvent.address" :class="appConfig.calendar.metaValue">
+                {{ eventsStore.previewEvent.address }}
+              </span>
+              <div>
+                
+              </div>
+            </div>
           </div>
         </div>
         <div v-else :class="appConfig.calendar.emptyPreview">Select an event to view details.</div>
@@ -575,6 +623,9 @@ const toast = useToast();
 const eventsStore = useEventsStore();
 const groupsStore = useGroupsStore();
 
+// map
+const isMapSelectorOpen = ref(false);
+
 const { data: currentUser } = useCurrentUserQuery();
 const { data: groupsData } = useGroupsQuery();
 const { data: groupInfosData } = useGroupInfosQuery(
@@ -656,6 +707,11 @@ const formState = reactive({
   startTime: '',
   endDate: '',
   endTime: '',
+
+  // map
+  latitude: null as number | null,
+  longitude: null as number | null,
+  address: null as string | null,
 });
 type FormSchemaType = z.output<typeof createEventSchema>;
 
@@ -679,6 +735,10 @@ const closeAndResetForm = () => {
     startTime: '',
     endDate: '',
     endTime: '',
+    // map
+    latitude: null,
+    longitude: null,
+    address: null,
   });
 };
 
@@ -694,6 +754,10 @@ const onSubmit = (event: FormSubmitEvent<FormSchemaType>) => {
       : new Date(event.data.start_time).toISOString(),
     visibility: formState.is_private ? 'private' : 'public',
     participant_emails: [],
+    // map
+    latitude: formState.latitude ?? null,
+    longitude: formState.longitude ?? null,
+    address: formState.address ?? null,
   };
   createEventMutation.mutate(payload);
 };
@@ -852,6 +916,20 @@ const submitNewMembers = () => {
     eventUuid: eventsStore.previewEvent.uuid,
     participant_emails: selectedEmailsToAdd.value,
   });
+};
+
+// map
+const handleLocationSelected = (location: { latitude: number; longitude: number; address: string }) => {
+  formState.latitude = location.latitude;
+  formState.longitude = location.longitude;
+  formState.address = location.address;
+  isMapSelectorOpen.value = false;
+};
+
+const clearLocation = () => {
+  formState.latitude = null;
+  formState.longitude = null;
+  formState.address = null;
 };
 </script>
 

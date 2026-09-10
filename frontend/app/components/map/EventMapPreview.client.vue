@@ -11,6 +11,9 @@
     import iconUrl from 'leaflet/dist/images/marker-icon.png';
     import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
 
+    const defaultIconPrototype = L.Icon.Default.prototype as L.Icon & { _getIconUrl?: () => string };
+    delete defaultIconPrototype._getIconUrl;
+
     const props = defineProps<{ latitude: number; longitude: number }>();
     const mapContainer = ref<HTMLElement | null>(null);
     let map: L.Map | null = null;
@@ -28,8 +31,12 @@
         }
         map = L.map(mapContainer.value).setView([props.latitude, props.longitude], 15);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            attribution: '&copy; <a href=https://leafletjs.com/>Leaflet</a> | <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
+
+        map.attributionControl.setPrefix(false);
+
+        marker = L.marker([props.latitude, props.longitude]).addTo(map);
     };
 
     onMounted(() => {
@@ -38,7 +45,7 @@
 
     watch(() => [props.latitude, props.longitude], ([newLat, newLng]) => {
         if (map && marker) {
-            const latLng = new L.LatLng(newLat, newLng);
+            const latLng = new L.LatLng(newLat as number, newLng as number);
             map.setView(latLng, 15);
             marker.setLatLng(latLng);
         }

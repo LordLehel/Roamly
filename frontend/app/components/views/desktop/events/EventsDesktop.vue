@@ -413,13 +413,13 @@
                 {{ selectedEvent.address }}
               </span>
               <div
-                v-if="selectedEvent.latitude && selectedEvent.longitude"
+                v-if="selectedEvent.latitude !== null && selectedEvent.latitude !== undefined && selectedEvent.longitude !== null && selectedEvent.longitude !== undefined"
                 class="w-full h-48 rounded-lg overflow-hidden border border-gray-200 mt-1 relative z-0"
               >
                 <ClientOnly>
-                  <EventMapPreview
+                  <MapEventMapPreview
                     :latitude="selectedEvent.latitude"
-                    :longitude="selectedEvent.longitude"  
+                    :longitude="selectedEvent.longitude"
                   />
                 </ClientOnly>
               </div>
@@ -437,7 +437,6 @@ import { useAppConfig } from '#imports';
 import type { GroupOutDto } from '~/types/groups.type';
 import type { EventCreatorDto, UiDay, UiEvent } from '~/types/events.type';
 import { CONST_LOC_LBL } from '~/utils/constants/events.constants';
-import EventMapPreview from '~/components/map/EventMapPreview.vue';
 
 const props = defineProps<{
   userGroupsList: GroupOutDto[];
