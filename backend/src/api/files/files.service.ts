@@ -313,6 +313,11 @@ export const shareDocumentsWithGroup = async (
     where: {
       user_id: user.user_id,
       group_id: group.group_id,
+      roles: {
+        type: {
+          in: [ROLES.LEADER, ROLES.MEMBER],
+        },
+      },
     },
   });
 
@@ -992,4 +997,77 @@ export const getGroupFiles = async (
       count: groupFiles.length,
     },
   };
+};
+
+export const getAllPrivateDocumentsMetadataOfAllUsersInAGroup = async (
+  userUuid: string,
+  groupUuid: string,
+  filters: {
+    documentType?: string;
+    targetUserUuid?: string;
+  },
+): Promise<privateDocumentMetadata[]> => {
+  const userGroupInfo = await prisma.group_profiles.findFirst({
+    where: {
+      users: {
+        uuid: userUuid,
+      },
+      groups: {
+        uuid: groupUuid,
+      },
+    },
+    select: {
+      users: true,
+      groups: true,
+      roles: true,
+    },
+  });
+
+  if (!userGroupInfo) {
+    throw new ForbiddenError(
+      'User either is not part of the group, or the group or the user does not exist!',
+    );
+  }
+
+  if (userGroupInfo.roles.type !== ROLES.LEADER) {
+    throw new ForbiddenError('Only leaders can list all private documents of the group!');
+  }
+
+  const privateDocumentsList = await prisma.files.findMany({
+    where: {
+      file_shares: {
+        some: {
+          group_id: userGroupInfo.groups.group_id,
+        },
+      },
+
+      ownership_type: FILE_CONSTANTS.OWNERSHIP.PRIVATE,
+
+      owner: filters.targetUserUuid ? { uuid: filters.targetUserUuid } : undefined,
+
+      documents: filters.documentType ? { document_type: filters.documentType } : { isNot: null },
+    },
+
+    include: {
+      owner: {
+        select: {
+          uuid: true,
+          username: true,
+          email: true,
+          profile_image_url: true,
+        },
+      },
+      documents: true,
+
+      file_shares: {
+        where: { group_id: userGroupInfo.groups.group_id },
+      },
+    },
+
+    orderBy: {
+      created_at: 'desc',
+    },
+  });
+
+  return privateDocumentsList;
 };

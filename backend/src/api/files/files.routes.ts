@@ -65,6 +65,12 @@ router.get(
   validateData(zodSchemas.fileIdValidationSchema, 'params'),
   filesController.listAllGroupsADocumentIsSharedWith,
 );
+router.get(
+  '/documents/group/:groupUuid',
+  validateData(zodSchemas.groupUuidValidationSchema, 'params'),
+  validateData(zodSchemas.getAllFilterQuerySchema, 'query'),
+  filesController.getAllPrivateDocumentsMetadataOfAllUsersInAGroup,
+);
 
 // group files
 router.post(

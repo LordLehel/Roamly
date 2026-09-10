@@ -363,6 +363,32 @@ class FilesController extends BaseController {
       data: paginatedFiles,
     });
   });
+
+  public getAllPrivateDocumentsMetadataOfAllUsersInAGroup = this.handleAsync(
+    async (req: Request, res: Response): Promise<void> => {
+      const user = res.locals.user!;
+
+      const groupUuid = req.params.groupUuid as string;
+
+      const filters = {
+        documentType: req.query.documentType as string | undefined,
+        targetUserUuid: req.query.targetUserUuid as string | undefined,
+      };
+
+      const listOfAllPrivateDocuments =
+        await fileService.getAllPrivateDocumentsMetadataOfAllUsersInAGroup(
+          user.uuid,
+          groupUuid,
+          filters,
+        );
+
+      res.status(200).json({
+        status: 'success',
+        message: 'List of all private documents retrieved successfully!',
+        data: listOfAllPrivateDocuments,
+      });
+    },
+  );
 }
 
 export default new FilesController();

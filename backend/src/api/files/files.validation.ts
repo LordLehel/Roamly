@@ -131,3 +131,14 @@ export const documentUrlQuerySchema = z.object({
     })
     .default(FILE_CONSTANTS.URL_TYPE.VIEW),
 });
+
+export const getAllFilterQuerySchema = z.object({
+  documentType: z
+    .enum(['ID', 'PASSPORT', 'DRIVING_LICENSE', 'OTHER'], {
+      message:
+        'Invalid document type!, Must be TICKET, BOOKING_CONFIRMATION, HOTEL_VOUCHER, GUEST_REGISTRATION_CARD, or OTHER',
+    })
+    .optional(),
+
+  targetUserUuid: z.uuid('Target user query param must be a valid uuid!').optional(),
+});
