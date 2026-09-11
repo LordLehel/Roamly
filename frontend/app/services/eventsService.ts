@@ -12,6 +12,11 @@ const mapRawEventToDto = (raw: RawEventDto): EventOutDto => ({
   description: raw.description,
   creator: raw.creator,
   members: raw.event_participants?.map((ep) => ep.users) || [],
+
+  // map
+  latitude: raw.latitude ?? null,
+  longitude: raw.longitude ?? null,
+  address: raw.address ?? null,
 });
 
 /* --- SERVICE --- */

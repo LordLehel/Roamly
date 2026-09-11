@@ -24,6 +24,9 @@ export interface RawEventDto {
     profile_image_url?: string | null;
   };
   event_participants?: RawEventParticipant[];
+  latitude?: number | null;
+  longitude?: number | null;
+  address?: string | null;
 }
 
 export interface EventCreatorDto {
@@ -42,6 +45,9 @@ export interface EventOutDto {
   description: string | null;
   creator: EventCreatorDto;
   members: EventCreatorDto[];
+  latitude?: number | null;
+  longitude?: number | null;
+  address?: string | null;
 }
 
 export interface EventInDto {
@@ -51,6 +57,9 @@ export interface EventInDto {
   end_time?: string;
   description?: string;
   participant_emails?: string[];
+  latitude?: number | null;
+  longitude?: number | null;
+  address?: string | null;
 }
 
 export interface EventsResponseDto {

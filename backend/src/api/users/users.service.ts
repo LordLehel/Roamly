@@ -3,6 +3,8 @@ import { hashPassword, validatePassword } from '../../utils/password.utils';
 import { userProfileInfo } from '../../types/users.types';
 import { BadRequestError } from '../../utils/ServerError';
 import { deletePublicFileFromCloud, uploadPublicFileToCloud } from '../../utils/storage.util';
+import { ROLES } from '../../constants/roles.constants';
+import { Prisma } from '@prisma/client';
 
 export const getProfile = async (uuid: string): Promise<userProfileInfo> => {
   const user = await prisma.users.findFirstOrThrow({
@@ -42,11 +44,86 @@ export const updateProfile = async (
 };
 
 export const deleteProfile = async (userUuid: string): Promise<void> => {
-  await prisma.users.delete({
+  const user = await prisma.users.findFirstOrThrow({
     where: {
       uuid: userUuid,
     },
   });
+
+  const usersAllProfiles = await prisma.group_profiles.findMany({
+    where: {
+      user_id: user.user_id,
+    },
+    include: {
+      groups: true,
+      roles: true,
+    },
+  });
+
+  const singleMemberGroupsToDelete: number[] = [];
+  const multiMemberGroupsToDecrement: number[] = [];
+
+  for (const profile of usersAllProfiles) {
+    const group = profile.groups;
+
+    if (group.current_size > 1) {
+      if (profile.roles.type === ROLES.LEADER) {
+        const numberOfLeaders = await prisma.group_profiles.count({
+          where: {
+            group_id: group.group_id,
+            roles: {
+              type: ROLES.LEADER,
+            },
+          },
+        });
+
+        if (numberOfLeaders === 1) {
+          throw new BadRequestError(
+            `Cannot delete profile. You are the only leader of the group "${group.name}". Please promote another member to leader or delete the group first.`,
+          );
+        }
+      }
+
+      multiMemberGroupsToDecrement.push(group.group_id);
+    } else {
+      singleMemberGroupsToDelete.push(group.group_id);
+    }
+  }
+
+  const transactionOperations: Prisma.PrismaPromise<unknown>[] = [];
+
+  if (singleMemberGroupsToDelete.length > 0) {
+    transactionOperations.push(
+      prisma.groups.deleteMany({
+        where: {
+          group_id: { in: singleMemberGroupsToDelete },
+        },
+      }),
+    );
+  }
+
+  if (multiMemberGroupsToDecrement.length > 0) {
+    transactionOperations.push(
+      prisma.groups.updateMany({
+        where: {
+          group_id: { in: multiMemberGroupsToDecrement },
+        },
+        data: {
+          current_size: { decrement: 1 },
+        },
+      }),
+    );
+  }
+
+  transactionOperations.push(
+    prisma.users.delete({
+      where: {
+        uuid: userUuid,
+      },
+    }),
+  );
+
+  await prisma.$transaction(transactionOperations);
 };
 
 export const changePassword = async (
