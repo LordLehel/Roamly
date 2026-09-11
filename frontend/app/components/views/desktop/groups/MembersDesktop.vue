@@ -39,22 +39,27 @@
         </div>
 
         <div :class="appConfig.layout.actionGroup" class="flex-1 justify-end">
-          <UTooltip :text="CONST_TOOLTIP_MEMBERS ?? 'Members'"
-            ><UButton
+          <UTooltip :text="CONST_TOOLTIP_MEMBERS ?? 'Members'">
+            <UButton
               icon="i-heroicons-users"
               variant="glassIconButton"
               class="text-brand-500"
-              to="/groups"
-          /></UTooltip>
-          <UTooltip :text="CONST_TOOLTIP_CALENDAR ?? 'Calendar'"
-            ><UButton icon="i-heroicons-calendar" variant="glassIconButton" to="/events"
-          /></UTooltip>
-          <UTooltip :text="CONST_TOOLTIP_PHOTOS ?? 'Photos'"
-            ><UButton icon="i-heroicons-photo" variant="glassIconButton" to="/media"
-          /></UTooltip>
-          <UTooltip :text="CONST_TOOLTIP_DOCUMENTS ?? 'Documents'"
-            ><UButton icon="i-heroicons-document-text" variant="glassIconButton" to="/documents"
-          /></UTooltip>
+              :to="membersRoute"
+            />
+          </UTooltip>
+          <UTooltip :text="CONST_TOOLTIP_CALENDAR ?? 'Calendar'">
+            <UButton icon="i-heroicons-calendar" variant="glassIconButton" :to="eventsRoute" />
+          </UTooltip>
+          <UTooltip :text="CONST_TOOLTIP_PHOTOS ?? 'Photos'">
+            <UButton icon="i-heroicons-photo" variant="glassIconButton" :to="mediaRoute" />
+          </UTooltip>
+          <UTooltip :text="CONST_TOOLTIP_DOCUMENTS ?? 'Documents'">
+            <UButton
+              icon="i-heroicons-document-text"
+              variant="glassIconButton"
+              :to="documentsRoute"
+            />
+          </UTooltip>
         </div>
       </div>
 
@@ -63,8 +68,9 @@
           <UInput
             :model-value="searchQuery"
             icon="i-heroicons-magnifying-glass"
-            placeholder="Filter members..."
+            placeholder="Search members..."
             variant="search"
+            :ui="{ leading: 'pl-3' }"
             class="w-1/5! max-w-none!"
             @update:model-value="emit('update:searchQuery', $event)"
           />
@@ -102,6 +108,7 @@
             <div :class="appConfig.layout.memberCardInner">
               <div class="shrink-0 pt-1">
                 <UAvatar
+                  :src="profile.users.profile_image_url || undefined"
                   :alt="profile.users.username"
                   size="profileLg"
                   icon="i-heroicons-user"
@@ -110,9 +117,11 @@
               </div>
 
               <div :class="appConfig.layout.memberCardContent">
-                <div :class="appConfig.layout.flexBetween">
-                  <div>
-                    <h3 :class="appConfig.typography.cardTitle">{{ profile.users.username }}</h3>
+                <div :class="[appConfig.layout.flexBetween, 'min-w-0']">
+                  <div class="min-w-0 flex-1 pr-2">
+                    <h3 :class="appConfig.typography.cardTitle" :title="profile.users.username">
+                      {{ profile.users.username }}
+                    </h3>
                     <p
                       v-if="isCurrentUser(profile.users.email)"
                       class="text-sm text-left font-bold text-brand-500 mt-0.5"
@@ -123,6 +132,7 @@
                   <UTooltip
                     v-if="isCurrentUserLeader && profile.roles.type.toLowerCase() === 'member'"
                     :text="CONST_TOOLTIP_PROMOTE_USER ?? 'Promote'"
+                    class="shrink-0"
                   >
                     <UButton
                       icon="i-heroicons-arrow-up-circle"
@@ -357,6 +367,20 @@ const todayUpcomingEvents = computed(() => {
     .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())
     .slice(0, 3); // Maximum a 3 legközelebbi
 });
+
+// Contextual nav
+const membersRoute = computed(() =>
+  groupUuid.value ? `/groups/${groupUuid.value}/members` : '/groups',
+);
+const eventsRoute = computed(() =>
+  groupUuid.value ? `/events?groupId=${groupUuid.value}` : '/events',
+);
+const mediaRoute = computed(() =>
+  groupUuid.value ? `/files/media?groupId=${groupUuid.value}` : '/files/media',
+);
+const documentsRoute = computed(() =>
+  groupUuid.value ? `/files/documents?groupId=${groupUuid.value}` : '/files/documents',
+);
 
 /* --- HELPERS --- */
 const isCurrentUser = (email: string) => {

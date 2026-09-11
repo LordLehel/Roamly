@@ -123,3 +123,22 @@ export const paginatedQuerySchema = z.object({
     .enum([FILE_CONSTANTS.GROUP_FILE_TYPE.DOCUMENT, FILE_CONSTANTS.GROUP_FILE_TYPE.MEDIA_FILE])
     .optional(),
 });
+
+export const documentUrlQuerySchema = z.object({
+  type: z
+    .enum([FILE_CONSTANTS.URL_TYPE.VIEW, FILE_CONSTANTS.URL_TYPE.DOWNLOAD], {
+      message: 'Url type must be either view or download!',
+    })
+    .default(FILE_CONSTANTS.URL_TYPE.VIEW),
+});
+
+export const getAllFilterQuerySchema = z.object({
+  documentType: z
+    .enum(['ID', 'PASSPORT', 'DRIVING_LICENSE', 'OTHER'], {
+      message:
+        'Invalid document type!, Must be TICKET, BOOKING_CONFIRMATION, HOTEL_VOUCHER, GUEST_REGISTRATION_CARD, or OTHER',
+    })
+    .optional(),
+
+  targetUserUuid: z.uuid('Target user query param must be a valid uuid!').optional(),
+});

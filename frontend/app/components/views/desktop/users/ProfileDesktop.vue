@@ -135,44 +135,110 @@
         <div :class="appConfig.layout.sectionWrapper">
           <div :class="appConfig.layout.pageHeader">
             <div :class="appConfig.layout.actionGroup">
-              <UTooltip :text="CONST_TOOLTIP_FILTER_DOCS ?? 'Filter'">
-                <UButton
-                  icon="i-heroicons-funnel"
-                  :label="CONST_FILTER_LABEL"
-                  variant="glassButton"
-                />
-              </UTooltip>
+              <!-- Filter popover -->
+              <UPopover>
+                <UTooltip :text="CONST_TOOLTIP_FILTER_DOCS ?? 'Filter'">
+                  <UButton
+                    icon="i-heroicons-funnel"
+                    :label="
+                      filterType === 'ALL'
+                        ? (CONST_FILTER_LABEL ?? 'Filter')
+                        : privateDocumentTypes.find((d) => d.value === filterType)?.label
+                    "
+                    variant="glassButton"
+                  />
+                </UTooltip>
+                <template #content="{ close }">
+                  <div :class="[appConfig.ui.dropdownMenu.slots.content, 'w-fit']">
+                    <button
+                      :class="appConfig.ui.dropdownMenu.slots.item"
+                      @click="
+                        filterType = 'ALL';
+                        close();
+                      "
+                    >
+                      <UIcon
+                        :name="filterType === 'ALL' ? 'i-heroicons-check' : 'i-heroicons-funnel'"
+                        :class="appConfig.ui.dropdownMenu.slots.itemLeadingIcon"
+                      />
+                      <span>All Types</span>
+                    </button>
+                    <button
+                      v-for="type in privateDocumentTypes"
+                      :key="type.value"
+                      :class="appConfig.ui.dropdownMenu.slots.item"
+                      @click="
+                        filterType = type.value;
+                        close();
+                      "
+                    >
+                      <UIcon
+                        :name="
+                          filterType === type.value ? 'i-heroicons-check' : 'i-heroicons-funnel'
+                        "
+                        :class="appConfig.ui.dropdownMenu.slots.itemLeadingIcon"
+                      />
+                      <span>{{ type.label }}</span>
+                    </button>
+                  </div>
+                </template>
+              </UPopover>
+
+              <!-- Upload button -->
               <UTooltip :text="CONST_TOOLTIP_UPLOAD_DOC ?? 'Upload Document'">
                 <UButton
                   icon="i-heroicons-plus"
                   variant="glassIconButton"
-                  @click="profileStore.openUploadDocumentModal()"
+                  @click="emit('upload')"
                 />
               </UTooltip>
             </div>
+
             <h2 :class="appConfig.typography.sectionTitleTransparent">
               {{ CONST_DOCUMENTS_HEADING }}
             </h2>
             <div class="w-30 hidden md:block"></div>
           </div>
 
-          <!-- Dummy Document List -->
-          <div :class="appConfig.layout.documentGrid">
+          <!-- Loading state -->
+          <div v-if="isLoadingDocuments" :class="appConfig.typography.statusLoading">
+            Loading documents...
+          </div>
+
+          <!-- Document Grid -->
+          <div v-else-if="filteredDocuments.length > 0" :class="appConfig.layout.documentGrid">
             <UCard
-              v-for="doc in dummyDocuments"
-              :key="doc.id"
+              v-for="doc in filteredDocuments"
+              :key="doc.file_id"
               variant="documentGlass"
               class="relative"
             >
               <!-- Title and action buttons -->
               <div :class="appConfig.layout.documentCardHeader">
-                <p class="font-bold truncate pr-2 shadow-sm">{{ doc.title }}</p>
+                <p class="font-bold truncate pr-2 shadow-sm">{{ doc.file_name }}</p>
                 <div class="flex items-center gap-1">
+                  <UTooltip text="Access Details">
+                    <UButton
+                      icon="i-heroicons-key"
+                      variant="ghostBrandIconButton"
+                      class="text-surface-500"
+                      @click="emit('access', doc)"
+                    />
+                  </UTooltip>
+                  <UTooltip text="Share">
+                    <UButton
+                      icon="i-heroicons-share"
+                      variant="ghostBrandIconButton"
+                      class="text-surface-500"
+                      @click.prevent="emit('share', doc)"
+                    />
+                  </UTooltip>
                   <UTooltip :text="CONST_TOOLTIP_EDIT_DOC ?? 'Edit'">
                     <UButton
                       icon="i-heroicons-pencil"
-                      variant="ghostDangerIconButton"
+                      variant="ghostBrandIconButton"
                       class="text-surface-500"
+                      @click="emit('edit', doc)"
                     />
                   </UTooltip>
                   <UTooltip :text="CONST_TOOLTIP_DELETE_DOC ?? 'Delete'">
@@ -180,20 +246,31 @@
                       icon="i-heroicons-trash"
                       variant="ghostDangerIconButton"
                       class="text-surface-500"
+                      @click="emit('delete', doc)"
                     />
                   </UTooltip>
                 </div>
               </div>
 
-              <!-- File Preview (Proxy) -->
+              <!-- File Preview -->
               <div :class="appConfig.layout.documentCardImage">
-                <UIcon name="i-heroicons-photo" class="w-16 h-16 text-surface-500/50" />
+                <UIcon name="i-heroicons-document-text" class="w-16 h-16 text-surface-500/50" />
                 <div class="absolute bottom-2 px-4 w-full flex justify-between">
                   <UTooltip :text="CONST_TOOLTIP_VIEW_DOC ?? 'View'">
-                    <UButton icon="i-heroicons-eye" variant="ghostDangerIconButton" />
+                    <UButton
+                      icon="i-heroicons-eye"
+                      variant="ghostBrandIconButton"
+                      class="text-dark-text/70"
+                      @click.prevent="emit('view', doc)"
+                    />
                   </UTooltip>
                   <UTooltip :text="CONST_TOOLTIP_DOWNLOAD_DOC ?? 'Download'">
-                    <UButton icon="i-heroicons-arrow-down-tray" variant="ghostDangerIconButton" />
+                    <UButton
+                      icon="i-heroicons-arrow-down-tray"
+                      variant="ghostBrandIconButton"
+                      class="text-dark-text/70"
+                      @click.prevent="emit('download', doc)"
+                    />
                   </UTooltip>
                 </div>
               </div>
@@ -201,33 +278,68 @@
               <!-- Metadata -->
               <div :class="appConfig.layout.documentCardMeta">
                 <p>
-                  Uploaded at: <span class="font-bold text-dark-text">{{ doc.uploadedAt }}</span>
+                  Uploaded at:
+                  <span class="font-bold text-dark-text">
+                    {{ new Date(doc.created_at).toLocaleDateString() }}
+                  </span>
                 </p>
                 <p>
-                  Document type: <span class="font-bold text-dark-text">{{ doc.type }}</span>
+                  Document type:
+                  <span class="font-bold text-dark-text">
+                    {{ doc.documents?.document_type ?? 'N/A' }}
+                  </span>
                 </p>
 
                 <div :class="appConfig.layout.divider"></div>
 
                 <div :class="appConfig.layout.flexBetween">
                   <p>
-                    File type: <span class="font-bold text-dark-text">{{ doc.fileType }}</span>
+                    File type:
+                    <span class="font-bold text-dark-text">
+                      {{ doc.mime_type?.split('/')[1] ?? 'Unknown' }}
+                    </span>
                   </p>
                   <p>
-                    File size: <span class="font-bold text-dark-text">{{ doc.fileSize }}</span>
+                    File size:
+                    <span class="font-bold text-dark-text">
+                      {{ (doc.file_size / (1024 * 1024)).toFixed(2) }} MB
+                    </span>
                   </p>
                 </div>
 
                 <div :class="appConfig.layout.divider"></div>
 
                 <p>
-                  Issued: <span class="font-bold text-dark-text">{{ doc.issued }}</span>
+                  Issued:
+                  <span class="font-bold text-dark-text">
+                    {{
+                      doc.documents?.issue_date
+                        ? new Date(doc.documents.issue_date).toLocaleDateString()
+                        : 'N/A'
+                    }}
+                  </span>
                 </p>
                 <p>
-                  Ends: <span class="font-bold text-dark-text">{{ doc.ends }}</span>
+                  Ends:
+                  <span class="font-bold text-dark-text">
+                    {{
+                      doc.documents?.expiry_date
+                        ? new Date(doc.documents.expiry_date).toLocaleDateString()
+                        : 'N/A'
+                    }}
+                  </span>
                 </p>
               </div>
             </UCard>
+          </div>
+
+          <!-- Empty state -->
+          <div v-else :class="appConfig.typography.statusLoading">
+            {{
+              filterType !== 'ALL'
+                ? 'No documents match the selected filter.'
+                : 'No private documents yet. Upload one to get started.'
+            }}
           </div>
         </div>
       </div>
@@ -237,32 +349,46 @@
 
 <script setup lang="ts">
 /* --- IMPORTS --- */
+import { computed, ref } from 'vue';
 import { useAppConfig } from '#imports';
 import type { useProfileStore } from '~/stores/profile.modals.store';
+import type { useDocumentsStore } from '~/stores/documents.modals.store';
 import type { UserOutDto } from '~/types/user.type';
 import type { ApiError } from '~/types/apiError.type';
-
-/* --- INTERFACES --- */
-interface DummyDocument {
-  id: number;
-  title: string;
-  uploadedAt: string;
-  type: string;
-  fileType: string;
-  fileSize: string;
-  issued: string;
-  ends: string;
-}
+import type { PrivateDocumentMetadata } from '~/types/files.type';
 
 /* --- COMPOSABLES --- */
 const appConfig = useAppConfig();
 
 /* --- PROPS --- */
-defineProps<{
+const props = defineProps<{
   currentUser: UserOutDto | null | undefined;
   isLoading: boolean;
   error: ApiError | Error | null | undefined;
-  dummyDocuments: DummyDocument[];
+  privateDocuments: PrivateDocumentMetadata[];
+  isLoadingDocuments: boolean;
+  privateDocumentTypes: { label: string; value: string }[];
   profileStore: ReturnType<typeof useProfileStore>;
+  documentsStore: ReturnType<typeof useDocumentsStore>;
 }>();
+
+/* --- EMITS --- */
+const emit = defineEmits<{
+  upload: [];
+  edit: [doc: PrivateDocumentMetadata];
+  delete: [doc: PrivateDocumentMetadata];
+  view: [doc: PrivateDocumentMetadata];
+  download: [doc: PrivateDocumentMetadata];
+  share: [doc: PrivateDocumentMetadata];
+  access: [doc: PrivateDocumentMetadata];
+}>();
+
+/* --- LOCAL STATE --- */
+const filterType = ref('ALL');
+
+/* --- COMPUTED --- */
+const filteredDocuments = computed<PrivateDocumentMetadata[]>(() => {
+  if (filterType.value === 'ALL') return props.privateDocuments;
+  return props.privateDocuments.filter((doc) => doc.documents?.document_type === filterType.value);
+});
 </script>

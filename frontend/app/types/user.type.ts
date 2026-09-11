@@ -16,6 +16,7 @@ export interface UserInDto {
 }
 
 export interface UserProfileModalDto {
+  userUuid: string;
   username: string;
   email: string;
   role: string;

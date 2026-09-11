@@ -66,22 +66,27 @@
       </div>
 
       <div :class="appConfig.calendar.headerActionRight">
-        <UTooltip :text="CONST_TOOLTIP_MEMBERS ?? 'Members'"
-          ><UButton icon="i-heroicons-users" variant="glassIconButton" to="/groups"
-        /></UTooltip>
-        <UTooltip :text="CONST_TOOLTIP_CALENDAR ?? 'Calendar'"
-          ><UButton
+        <UTooltip :text="CONST_TOOLTIP_MEMBERS ?? 'Members'">
+          <UButton icon="i-heroicons-users" variant="glassIconButton" :to="membersRoute" />
+        </UTooltip>
+        <UTooltip :text="CONST_TOOLTIP_CALENDAR ?? 'Calendar'">
+          <UButton
             icon="i-heroicons-calendar"
             variant="glassIconButton"
             class="text-brand-500"
-            to="/events"
-        /></UTooltip>
-        <UTooltip :text="CONST_TOOLTIP_PHOTOS ?? 'Photos'"
-          ><UButton icon="i-heroicons-photo" variant="glassIconButton" to="/media"
-        /></UTooltip>
-        <UTooltip :text="CONST_TOOLTIP_DOCUMENTS ?? 'Documents'"
-          ><UButton icon="i-heroicons-document-text" variant="glassIconButton" to="/documents"
-        /></UTooltip>
+            :to="eventsRoute"
+          />
+        </UTooltip>
+        <UTooltip :text="CONST_TOOLTIP_PHOTOS ?? 'Photos'">
+          <UButton icon="i-heroicons-photo" variant="glassIconButton" :to="mediaRoute" />
+        </UTooltip>
+        <UTooltip :text="CONST_TOOLTIP_DOCUMENTS ?? 'Documents'">
+          <UButton
+            icon="i-heroicons-document-text"
+            variant="glassIconButton"
+            :to="documentsRoute"
+          />
+        </UTooltip>
       </div>
     </div>
 
@@ -92,6 +97,7 @@
           icon="i-heroicons-magnifying-glass"
           :placeholder="CONST_SEARCH_EVENTS_PLACEHOLDER"
           variant="search"
+          :ui="{ leading: 'pl-3' }"
           class="w-full max-w-xs"
         />
         <UPopover v-model:open="isFilterOpen">
@@ -267,7 +273,10 @@
               }}</span>
             </div>
             <div class="flex items-center gap-1">
-              <UTooltip v-if="selectedEvent.creator?.email === currentUserEmail" text="Add Members">
+              <UTooltip
+                v-if="selectedEvent.creator?.email === currentUserEmail && selectedEvent.is_private"
+                text="Add Members"
+              >
                 <UButton
                   icon="i-heroicons-user-plus"
                   variant="ghostBrandIconButton"
@@ -357,7 +366,6 @@
                         :alt="p.username"
                         :src="p.profile_image_url || undefined"
                         icon="i-heroicons-user"
-                        size="sm"
                         :class="appConfig.calendar.participantAvatar"
                         @click="$emit('open-user-profile', p)"
                       />
@@ -460,4 +468,20 @@ const clearFilters = () => {
   filterStartDate.value = '';
   filterEndDate.value = '';
 };
+
+// Contextual nav
+const membersRoute = computed(() =>
+  props.selectedGroupUuid ? `/groups/${props.selectedGroupUuid}/members` : '/groups',
+);
+const eventsRoute = computed(() =>
+  props.selectedGroupUuid ? `/events?groupId=${props.selectedGroupUuid}` : '/events',
+);
+const mediaRoute = computed(() =>
+  props.selectedGroupUuid ? `/files/media?groupId=${props.selectedGroupUuid}` : '/files/media',
+);
+const documentsRoute = computed(() =>
+  props.selectedGroupUuid
+    ? `/files/documents?groupId=${props.selectedGroupUuid}`
+    : '/files/documents',
+);
 </script>

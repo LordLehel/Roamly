@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { BaseController } from '../../utils/BaseController';
 import * as fileService from './files.service';
+import * as FILE_CONSTANTS from '../../constants/files.constants';
 
 class FilesController extends BaseController {
   public uploadPrivateDocument = this.handleAsync(
@@ -42,11 +43,13 @@ class FilesController extends BaseController {
 
       const fileId = parseInt(req.params.fileId as string, 10);
 
-      const result = await fileService.getPrivateDocumentUrl(user.uuid, fileId);
+      const type = req.query.type as FILE_CONSTANTS.urlType;
+
+      const result = await fileService.getPrivateDocumentUrl(user.uuid, fileId, type);
 
       res.status(200).json({
         status: 'success',
-        message: 'Temporary URL successfully generated! Link expires in 5 minutes!',
+        message: 'Temporary URL successfully generated! Link expires in 1 hour!',
         data: {
           url: result.url,
           file_name: result.file.file_name,
@@ -360,6 +363,32 @@ class FilesController extends BaseController {
       data: paginatedFiles,
     });
   });
+
+  public getAllPrivateDocumentsMetadataOfAllUsersInAGroup = this.handleAsync(
+    async (req: Request, res: Response): Promise<void> => {
+      const user = res.locals.user!;
+
+      const groupUuid = req.params.groupUuid as string;
+
+      const filters = {
+        documentType: req.query.documentType as string | undefined,
+        targetUserUuid: req.query.targetUserUuid as string | undefined,
+      };
+
+      const listOfAllPrivateDocuments =
+        await fileService.getAllPrivateDocumentsMetadataOfAllUsersInAGroup(
+          user.uuid,
+          groupUuid,
+          filters,
+        );
+
+      res.status(200).json({
+        status: 'success',
+        message: 'List of all private documents retrieved successfully!',
+        data: listOfAllPrivateDocuments,
+      });
+    },
+  );
 }
 
 export default new FilesController();

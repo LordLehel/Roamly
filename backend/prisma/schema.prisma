@@ -17,7 +17,6 @@ model event_participants {
 
 model events {
   event_id           Int                  @id @default(autoincrement())
-  uuid               String               @unique @default(uuid()) @db.Uuid
   group_id           Int
   creator_id         Int
   visibility_id      Int
@@ -27,10 +26,11 @@ model events {
   end_time           DateTime             @db.Timestamp(6)
   created_at         DateTime             @default(now()) @db.Timestamp(6)
   updated_at         DateTime             @updatedAt @db.Timestamp(6)
-  visibility         visibilities         @relation(fields: [visibility_id], references: [visibility_id], onDelete: Restrict, onUpdate: Cascade)
+  uuid               String               @unique @default(uuid()) @db.Uuid
   event_participants event_participants[]
   creator            users                @relation(fields: [creator_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
   groups             groups               @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: NoAction)
+  visibility         visibilities         @relation(fields: [visibility_id], references: [visibility_id])
 }
 
 model visibilities {
@@ -60,9 +60,9 @@ model groups {
   created_at     DateTime         @default(now()) @db.Timestamp(6)
   updated_at     DateTime         @updatedAt @db.Timestamp(6)
   events         events[]
+  file_shares    file_shares[]
   files          files[]
   group_profiles group_profiles[]
-  file_shares    file_shares[]
 }
 
 model media_files {
@@ -82,24 +82,24 @@ model users {
   uuid               String               @unique @default(uuid()) @db.Uuid
   username           String               @db.VarChar(64)
   email              String               @unique @db.VarChar(254)
-  phone_number       String?              @unique @db.VarChar(20)
   password           String               @db.VarChar(255)
   profile_image_url  String?
   created_at         DateTime             @default(now()) @db.Timestamp(6)
   updated_at         DateTime             @updatedAt @db.Timestamp(6)
+  phone_number       String?              @unique @db.VarChar(20)
   event_participants event_participants[]
   events             events[]
+  file_shares        file_shares[]
   uploaded_files     files[]              @relation("FilesUploadedByUser")
   owned_files        files[]              @relation("FilesOwnedByUser")
   group_profiles     group_profiles[]
-  file_shares        file_shares[]
 }
 
 model documents {
   file_id       Int       @id
-  document_type String?   @db.VarChar(64)
   issue_date    DateTime? @db.Date
   expiry_date   DateTime? @db.Date
+  document_type String?   @db.VarChar(64)
   files         files     @relation(fields: [file_id], references: [file_id], onDelete: Cascade, onUpdate: NoAction)
 }
 
@@ -117,11 +117,11 @@ model files {
   created_at      DateTime      @default(now()) @db.Timestamp(6)
   updated_at      DateTime      @updatedAt @db.Timestamp(6)
   documents       documents?
+  file_shares     file_shares[]
   groups          groups?       @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: NoAction)
   creator         users?        @relation("FilesUploadedByUser", fields: [uploaded_by], references: [user_id], onUpdate: NoAction)
   owner           users?        @relation("FilesOwnedByUser", fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
   media_files     media_files?
-  file_shares     file_shares[]
 }
 
 model file_shares {
@@ -132,9 +132,17 @@ model file_shares {
   access_level String   @default("ALL") @db.VarChar(32)
   files        files    @relation(fields: [file_id], references: [file_id], onDelete: Cascade, onUpdate: NoAction)
   groups       groups   @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: NoAction)
-  users        users?   @relation(fields: [shared_by], references: [user_id], onDelete: SetNull, onUpdate: NoAction)
+  users        users?   @relation(fields: [shared_by], references: [user_id], onUpdate: NoAction)
 
   @@id([file_id, group_id])
+}
+
+model password_resets {
+  id         Int      @id @default(autoincrement())
+  email      String   @unique @db.VarChar(254)
+  otp        String   @db.VarChar(6)
+  expires_at DateTime @db.Timestamp(6)
+  created_at DateTime @default(now()) @db.Timestamp(6)
 }
 
 model pending_users {

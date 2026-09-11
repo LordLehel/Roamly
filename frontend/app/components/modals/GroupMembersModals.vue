@@ -79,7 +79,8 @@
               :items="roleOptions"
               label-key="label"
               value-key="value"
-              class="min-w-40"
+              :popper="{ strategy: 'fixed', placement: 'bottom-start' }"
+              :ui="{ content: 'z-[9999]' }"
             />
           </div>
           <p v-if="inviteError" :class="appConfig.typography.modalErrorBox">{{ inviteError }}</p>

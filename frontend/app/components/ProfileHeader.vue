@@ -40,28 +40,22 @@
                 variant="ghost"
                 class="p-0 m-0 rounded-full hover:bg-transparent focus-visible:ring-2 focus-visible:ring-brand-500 transition-transform hover:scale-105 cursor-pointer"
               >
-                <UAvatar :alt="userProfile?.username || 'User'" icon="i-heroicons-user" />
+                <UAvatar
+                  :src="userProfile?.profile_image_url || undefined"
+                  :alt="userProfile?.username || 'User'"
+                  icon="i-heroicons-user"
+                />
               </UButton>
             </UDropdownMenu>
 
             <!-- Mobile menu -->
-            <UDropdownMenu
-              :items="logOutItem"
-              :content="{ align: 'start', side: 'left', alignOffset: -18 }"
-              :ui="{
-                content:
-                  'w-36 bg-surface-500/90 backdrop-blur-md rounded-full ring-1 ring-brand-500/30 shadow-xl',
-                itemLeadingIcon: 'w-10 h-10 text-brand-500 shrink-0',
-                item: 'text-md font-semibold',
-              }"
-            >
-              <UButton
-                variant="ghost"
-                class="md:hidden p-0 m-0 rounded-full hover:bg-transparent focus-visible:ring-2 focus-visible:ring-brand-500 transition-transform hover:scale-105 cursor-pointer"
-              >
-                <UAvatar :alt="userProfile?.username || 'User'" icon="i-heroicons-user" />
-              </UButton>
-            </UDropdownMenu>
+
+            <UAvatar
+              v-if="isMobile"
+              :src="userProfile?.profile_image_url || undefined"
+              :alt="userProfile?.username || 'User'"
+              icon="i-heroicons-user"
+            />
 
             <UDropdownMenu
               :items="profileDropdownItems"
@@ -106,13 +100,11 @@ const profileDropdownItems = ref<DropdownMenuItem[]>([
   { label: 'Profile', icon: 'i-heroicons-user-circle', to: '/users/profile' },
   { label: 'Groups', icon: 'i-heroicons-user-group', to: '/groups' },
   { label: 'Events', icon: 'i-heroicons-calendar-days', to: '/events' },
-]);
-
-const logOutItem = ref([
   {
-    label: CONST_LOGOUT_TITLE,
+    label: 'Logout',
     icon: 'i-heroicons-arrow-left-on-rectangle',
     onSelect: () => handleLogout(),
+    class: 'text-red-500 font-semibold',
   },
 ]);
 

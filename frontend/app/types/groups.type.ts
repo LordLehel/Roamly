@@ -26,8 +26,10 @@ export interface RawGroupDto {
 
 export interface GroupProfileDto {
   users: {
+    uuid: string;
     email: string;
     username: string;
+    profile_image_url?: string | null;
   };
   roles: {
     type: string;
@@ -52,6 +54,7 @@ export interface RawGroupInvitesDto {
     users?: {
       username: string;
       email: string;
+      profile_image_url?: string | null;
     };
     roles?: {
       type: string;

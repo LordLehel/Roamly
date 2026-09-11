@@ -68,11 +68,16 @@
               {{ activeCard === card.id ? CONST_SHOW_LESS : CONST_LEARN_MORE }}
             </UButton>
           </div>
+
           <div
             v-if="activeCard === card.id"
-            class="flex-1 p-4 md:border-l border-white/20 text-white/90 leading-relaxed flex items-center text-left"
+            class="w-full mt-6 pt-6 border-t border-white/20 text-white/90 leading-relaxed text-left animate-fade-in"
           >
-            {{ card.extendedDesc }}
+            <ul class="list-disc pl-5 space-y-2">
+              <li v-for="(item, index) in card.extendedDesc" :key="index">
+                {{ item }}
+              </li>
+            </ul>
           </div>
         </div>
       </UCard>
@@ -89,6 +94,22 @@
       <h2 :class="appConfig.typography.homeSectionTitle">{{ CONST_SUPPORT_HERO }}</h2>
       <p :class="appConfig.typography.homeSectionText">{{ CONST_SUPPORT_DESCRIPTION }}</p>
     </section>
+
+    <section id="contact" :class="appConfig.layout.homeContentSection" class="mb-12">
+      <h2 :class="appConfig.typography.homeSectionTitle">Contact Us</h2>
+      <div class="flex gap-8 mt-6 items-center justify-between">
+        <UButton
+          v-for="link in contactLinks"
+          :key="link.name"
+          :icon="link.icon"
+          :to="link.url"
+          :target="link.target"
+          variant="glassIconButton"
+          size="xl"
+          class="justify-center hover:text-brand-500 transition-colors"
+        />
+      </div>
+    </section>
   </div>
 </template>
 
@@ -102,7 +123,14 @@ interface FeatureCard {
   title: string;
   icon: string;
   desc: string;
-  extendedDesc: string;
+  extendedDesc: string[];
+}
+
+interface ContactLink {
+  name: string;
+  icon: string;
+  url: string;
+  target: string;
 }
 
 /* --- COMPOSABLES --- */
@@ -111,6 +139,7 @@ const appConfig = useAppConfig();
 /* --- PROPS & EMITS --- */
 defineProps<{
   featureCards: FeatureCard[];
+  contactLinks: ContactLink[];
   activeCard: string | null;
 }>();
 

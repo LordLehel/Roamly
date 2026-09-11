@@ -59,5 +59,6 @@ export default defineNuxtConfig({
       },
     },
     fallbackToApi: false,
+    localApiEndpoint: '/_icons',
   },
 });

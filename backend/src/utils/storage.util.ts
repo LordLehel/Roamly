@@ -113,6 +113,22 @@ export const getPrivatePresignedUrl = async (fileKey: string): Promise<string> =
   return await getSignedUrl(privateS3Client, command, { expiresIn: 60 * 60 * 24 });
 };
 
+// download URL
+export const generateDownloadLink = async (
+  fileKey: string,
+  originalFileName: string,
+): Promise<string> => {
+  const command = new GetObjectCommand({
+    Bucket: config.r2.privateBucketName,
+    Key: fileKey,
+    // tell the browser to download this
+    ResponseContentDisposition: `attachment; filename="${originalFileName}"`,
+  });
+
+  // URL lives for 5 minutes
+  return await getSignedUrl(privateS3Client, command, { expiresIn: 300 });
+};
+
 // delete file from cloud
 export const deletePrivateFilesFromCloud = async (fileKeys: string[]): Promise<void> => {
   if (fileKeys.length === 0) {

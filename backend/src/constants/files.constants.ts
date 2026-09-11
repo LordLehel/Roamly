@@ -18,3 +18,10 @@ export const GROUP_FILE_TYPE = {
 } as const;
 
 export type GroupFileType = (typeof GROUP_FILE_TYPE)[keyof typeof GROUP_FILE_TYPE];
+
+export const URL_TYPE = {
+  VIEW: 'view',
+  DOWNLOAD: 'download',
+} as const;
+
+export type urlType = (typeof URL_TYPE)[keyof typeof URL_TYPE];

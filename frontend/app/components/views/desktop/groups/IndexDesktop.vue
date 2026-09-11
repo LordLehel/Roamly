@@ -6,9 +6,14 @@
 
     <!-- ACTION BUTTONS -->
     <div :class="appConfig.layout.actionGroup">
-      <UTooltip :text="CONST_TOOLTIP_FILTER_GROUPS ?? 'Filter'">
-        <UButton icon="i-heroicons-funnel" :label="CONST_FILTER_LABEL" variant="glassButton" />
-      </UTooltip>
+      <UInput
+        v-model="searchQuery"
+        icon="i-heroicons-magnifying-glass"
+        :placeholder="CONST_SEARCH_EVENTS_PLACEHOLDER"
+        variant="search"
+        :ui="{ leading: 'pl-3' }"
+        class="w-full max-w-xs"
+      />
       <UTooltip :text="CONST_TOOLTIP_CREATE_GROUP ?? 'Create Group'">
         <UButton
           icon="i-heroicons-plus"
@@ -40,7 +45,10 @@
             @click="router.push(`/groups/${group.uuid}/members`)"
           >
             <div class="absolute top-4 left-4 z-10">
-              <UTooltip :text="CONST_TOOLTIP_LEAVE_GROUP ?? 'Leave Group'">
+              <UTooltip
+                v-if="filteredGroups.length > 0"
+                :text="CONST_TOOLTIP_LEAVE_GROUP ?? 'Leave Group'"
+              >
                 <UButton
                   icon="i-heroicons-arrow-right-on-rectangle"
                   variant="ghostDangerIconButton"
@@ -109,8 +117,10 @@ const appConfig = useAppConfig();
 const router = useRouter();
 const groupsStore = useGroupsStore();
 
+const searchQuery = defineModel<string>('searchQuery', { default: '' });
+
 /* --- PROPS & EMITS --- */
-defineProps<{
+const props = defineProps<{
   groupsList: GroupOutDto[];
   isLoading: boolean;
   error: ApiError | Error | null | undefined;
@@ -120,6 +130,13 @@ defineProps<{
 const emit = defineEmits<{
   (e: 'loadMore'): void;
 }>();
+
+// Local filter logic
+const filteredGroups = computed(() => {
+  const query = searchQuery.value.toLowerCase().trim();
+  if (!query) return props.groupsList;
+  return props.groupsList.filter((group) => group.name.toLowerCase().includes(query));
+});
 
 /* --- DOM OBSERVERS (INFINITE SCROLL) --- */
 const loadMoreTrigger = ref<HTMLElement | null>(null);

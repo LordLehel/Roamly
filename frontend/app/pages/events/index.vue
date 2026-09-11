@@ -82,6 +82,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import { useScreenSize } from '~/composables/useScreenSize';
 import { useCurrentUserQuery } from '~/queries/user.query';
 import { useGroupsQuery, useGroupInfosQuery } from '~/queries/groups.query';
@@ -93,7 +94,6 @@ import type { GroupOutDto } from '~/types/groups.type';
 import type { UiDay, UiEvent, EventCreatorDto } from '~/types/events.type';
 import { processAvailableDates, processAndSortEvents } from '~/utils/sort.utils';
 import { filterEventsByQuery } from '~/utils/filter.utils';
-import { useRoute, useRouter } from 'vue-router';
 
 import EventsDesktop from '~/components/views/desktop/events/EventsDesktop.vue';
 import EventsMobile from '~/components/views/mobile/events/EventsMobile.vue';
@@ -107,7 +107,7 @@ const eventsStore = useEventsStore();
 const groupsStore = useGroupsStore();
 const { data: currentUser } = useCurrentUserQuery();
 
-const selectedGroupUuid = ref<string | undefined>(undefined);
+const selectedGroupUuid = ref<string | undefined>((route.query.groupId as string) || undefined);
 const selectedDayId = ref<string | undefined>(undefined);
 const selectedEvent = ref<UiEvent | null | undefined>(null);
 
@@ -132,16 +132,7 @@ watch(
   userGroupsList,
   (newGroups) => {
     if (newGroups.length > 0 && !selectedGroupUuid.value) {
-      let initialUuid = newGroups[0]?.uuid;
-
-      if (typeof window !== 'undefined') {
-        const savedUuid = localStorage.getItem('roamly_last_group_uuid');
-        if (savedUuid && newGroups.some((g) => g.uuid === savedUuid)) {
-          initialUuid = savedUuid;
-        }
-      }
-
-      selectedGroupUuid.value = initialUuid;
+      selectedGroupUuid.value = newGroups[0]?.uuid;
     }
   },
   { immediate: true },

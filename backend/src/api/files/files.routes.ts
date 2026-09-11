@@ -18,6 +18,7 @@ router.post(
 router.get(
   '/documents/:fileId',
   validateData(zodSchemas.fileIdValidationSchema, 'params'),
+  validateData(zodSchemas.documentUrlQuerySchema, 'query'),
   filesController.getPrivateDocumentUrl,
 );
 router.delete(
@@ -63,6 +64,12 @@ router.get(
   '/documents/:fileId/shares',
   validateData(zodSchemas.fileIdValidationSchema, 'params'),
   filesController.listAllGroupsADocumentIsSharedWith,
+);
+router.get(
+  '/documents/group/:groupUuid',
+  validateData(zodSchemas.groupUuidValidationSchema, 'params'),
+  validateData(zodSchemas.getAllFilterQuerySchema, 'query'),
+  filesController.getAllPrivateDocumentsMetadataOfAllUsersInAGroup,
 );
 
 // group files

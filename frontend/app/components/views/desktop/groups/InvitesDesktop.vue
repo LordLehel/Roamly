@@ -4,13 +4,6 @@
     <!-- PAGE TITLE -->
     <h1 :class="appConfig.typography.pageTitle">{{ CONST_INVITES_HEADING }}</h1>
 
-    <!-- ACTION BUTTONS -->
-    <div :class="appConfig.layout.actionGroup">
-      <UTooltip :text="CONST_TOOLTIP_FILTER_INVITES ?? 'Filter'">
-        <UButton icon="i-heroicons-funnel" :label="CONST_FILTER_LABEL" variant="glassButton" />
-      </UTooltip>
-    </div>
-
     <!-- CONTENT SECTION -->
     <ClientOnly>
       <!-- LOADING / ERROR STATES -->

@@ -73,8 +73,8 @@ export default defineAppConfig({
             root: 'bg-surface-500/70 backdrop-blur-xl rounded-[25px] shadow-[0_15px_40px_rgba(47,62,50,0.15)] border-0 ring-1 ring-surface-500/50 text-dark-text max-w-md mx-auto w-full',
           },
           interactiveGlass: {
-            root: 'bg-surface-500/70 backdrop-blur-xl rounded-[25px] shadow-[0_15px_40px_rgba(47,62,50,0.15)] border-0 ring-1 ring-surface-500/50 text-dark-text transition-transform hover:-translate-y-1',
-            body: 'flex flex-col items-center justify-center h-full text-center p-8',
+            root: 'bg-surface-500/70 backdrop-blur-xl rounded-[25px] shadow-[0_15px_40px_rgba(47,62,50,0.15)] border-0 ring-1 ring-surface-500/50 text-dark-text transition-transform hover:-translate-y-1 overflow-hidden min-w-0',
+            body: 'flex flex-col items-center justify-center h-full text-center p-8 overflow-hidden',
           },
           outlineGlass: {
             root: 'bg-surface-600/10 backdrop-blur-xl rounded-[25px] shadow-[0_20px_50px_rgba(0,0,0,0.2)] border-0 ring-2 ring-white/60 text-white transition-all duration-500 ease-in-out',
@@ -104,7 +104,7 @@ export default defineAppConfig({
             base: 'bg-error-50 text-error-900 rounded-xl ring-1 ring-error-500 placeholder:text-error-300 focus:ring-2 focus:ring-error-500 transition-colors h-11 !px-5 shadow-none',
           },
           search: {
-            base: 'bg-input-bg text-dark-text rounded-full ring-1 ring-input-border placeholder:text-text-muted focus:ring-2 focus:ring-brand-500 transition-colors h-10 !px-5 shadow-none w-full',
+            base: 'bg-input-bg text-dark-text rounded-full ring-1 ring-input-border placeholder:text-text-muted focus:ring-2 focus:ring-brand-500 transition-colors h-10 !pl-9 !pr-5 shadow-none w-full',
           },
         },
       },
@@ -168,7 +168,7 @@ export default defineAppConfig({
       slots: {
         content:
           'z-[100] bg-surface-500/90 backdrop-blur-md rounded-2xl ring-1 ring-brand-500/30 shadow-xl p-1.5 min-w- sm:min-w-64',
-        item: 'flex items-center gap-3 w-full justify-center text-left cursor-pointer px-4 py-2.5 text-md font-medium text-dark-text/80 hover:text-dark-text hover:bg-brand-500/20 data-[highlighted]:bg-brand-500/20 data-[highlighted]:text-dark-text rounded-xl transition-colors',
+        item: 'flex items-start gap-3 w-full justify-start text-left cursor-pointer px-4 py-2.5 text-md font-medium text-dark-text/80 hover:text-dark-text hover:bg-brand-500/20 data-[highlighted]:bg-brand-500/20 data-[highlighted]:text-dark-text rounded-xl transition-colors',
         itemLeadingIcon: '!w-6 !h-6 !text-brand-500 shrink-0',
       },
     },
@@ -252,8 +252,8 @@ export default defineAppConfig({
     cardFooter:
       'flex items-end justify-between w-full pt-4 border-t border-dark-text/10 text-xs text-dark-text/70',
 
-    memberCardInner: 'flex items-start gap-4 w-full h-full',
-    memberCardContent: 'flex-1 flex flex-col justify-between h-full min-h-16',
+    memberCardInner: 'flex items-start gap-4 w-full h-full min-w-0',
+    memberCardContent: 'flex-1 flex flex-col justify-between h-full min-h-16 min-w-0',
 
     // ------------------- PROFILE & DOCUMENTS VIEWS -------------------
     sectionWrapper: 'mt-12 flex flex-col gap-6',
@@ -297,7 +297,7 @@ export default defineAppConfig({
     pageSubtitle: 'text-sm opacity-80 capitalize text-surface-500 font-semibold mt-1',
     sectionTitleTransparent: 'text-2xl font-bold text-surface-500 tracking-wide text-center flex-1',
 
-    cardTitle: 'text-xl font-bold tracking-wide text-dark-text truncate pr-2',
+    cardTitle: 'text-xl font-bold tracking-wide text-dark-text truncate block w-full',
     cardTitleCenter: 'text-xl font-bold text-center tracking-wide text-dark-text truncate pr-2',
 
     // ------------------- STATUS & ERRORS -------------------
@@ -448,10 +448,10 @@ export default defineAppConfig({
     participantsAvatars: 'flex items-center',
     participantsOverlap: '-space-x-2',
     participantsGap: 'gap-2',
-    participantAvatar: 'ring-2 ring-surface-500 cursor-pointer',
+    participantAvatar: 'ring-2 ring-surface-500 cursor-pointer w-5 h-5',
     participantAvatarHover: 'hover:z-10 transition-transform relative',
     participantMoreBadge:
-      'flex items-center justify-center w-4 h-4 rounded-full bg-surface-600/80 text-xs font-bold text-dark-text ring-2 ring-surface-500 relative z-10 hover:bg-surface-500 transition-colors cursor-pointer',
+      'flex items-center justify-center w-5 h-5 rounded-full bg-surface-600/80 text-xs font-bold text-dark-text ring-2 ring-surface-500 relative z-10 hover:bg-surface-500 transition-colors cursor-pointer',
     participantViewAll:
       'text-xs text-brand-600 hover:text-brand-500 cursor-pointer font-medium underline underline-offset-2',
 
