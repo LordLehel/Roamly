@@ -10,7 +10,7 @@
     >
       <div class="flex-1 min-w-0">
         <p class="text-sm font-bold text-dark-text">Selected Location:</p>
-        <p class="text-sm text-dark-text/80 truncate">
+        <p class="text-sm text-dark-text/80 break-words whitespace-normal w-full mt-1">
           <span v-if="isLoadingAddress" class="opacity-60 animate-pulse">Loading address...</span>
           <span v-else-if="currentSelection">{{ currentSelection.address }}</span>
           <span v-else class="opacity-60">Click on the map or search to select a location.</span>
@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
 import L from 'leaflet';
@@ -40,6 +40,11 @@ import 'leaflet-control-geocoder';
 import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
 import iconUrl from 'leaflet/dist/images/marker-icon.png';
 import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
+
+const props = defineProps<{
+  initialLocation?: { latitude: number; longitude: number; address: string } | null;
+  isOpen?: boolean;
+}>();
 
 const defaultIconPrototype = L.Icon.Default.prototype as L.Icon & { _getIconUrl?: () => string };
 delete defaultIconPrototype._getIconUrl;
@@ -73,7 +78,11 @@ const initmap = () => {
   }
 
   // default location the map is showing
-  map = L.map(mapContainer.value).setView([44.111979, 24.347248], 13);
+  const initialLat = props.initialLocation?.latitude ?? 44.111979;
+  const initialLng = props.initialLocation?.longitude ?? 24.347248;
+  const initialZoom = props.initialLocation ? 17 : 13;
+
+  map = L.map(mapContainer.value).setView([initialLat, initialLng], initialZoom);
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution:
@@ -81,6 +90,12 @@ const initmap = () => {
   }).addTo(map);
 
   map.attributionControl.setPrefix(false);
+
+  // if there is an initial location, place the marker immediately
+  if (props.initialLocation) {
+    updateMarker(initialLat, initialLng);
+    currentSelection.value = { ...props.initialLocation };
+  }
 
   // search bar with Geocoder plugin
   const LControl = L.Control as unknown as {
@@ -163,6 +178,19 @@ const confirmSelection = () => {
     emit('confirm-location', currentSelection.value);
   }
 };
+
+watch(
+  () => props.isOpen,
+  async (isOpen) => {
+    if (isOpen && map) {
+      await nextTick();
+      // Wait for Nuxt UI modal transition (usually 200-250ms) before invalidating
+      setTimeout(() => {
+        map?.invalidateSize();
+      }, 250);
+    }
+  },
+);
 
 onMounted(() => {
   initmap();

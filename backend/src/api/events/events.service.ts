@@ -14,9 +14,9 @@ export const createEvent = async (
     start_time: string;
     end_time?: string;
     visibility: string;
-    latitude?: number;
-    longitude?: number;
-    address?: string;
+    latitude?: number | null;
+    longitude?: number | null;
+    address?: string | null;
     participant_emails?: string[];
   },
 ): Promise<events> => {
@@ -84,9 +84,9 @@ export const createEvent = async (
       // this way the user is able to create events that have no predetermined ending time
       end_time: data.end_time ? new Date(data.end_time) : new Date(data.start_time),
       // location data
-      latitude: data.latitude,
-      longitude: data.longitude,
-      address: data.address,
+      latitude: data.latitude ?? undefined,
+      longitude: data.longitude ?? undefined,
+      address: data.address ?? undefined,
 
       groups: {
         connect: {

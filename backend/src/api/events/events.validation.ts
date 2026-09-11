@@ -29,15 +29,17 @@ export const createEventSchema = z
       .number()
       .min(-90, 'Latitude must be between -90 and 90')
       .max(90, 'Latitude must be between -90 and 90')
+      .nullable()
       .optional(),
 
     longitude: z
       .number()
       .min(-180, 'Longitude must be between -180 and 180')
       .max(180, 'Longitude must be between -180 and 180')
+      .nullable()
       .optional(),
 
-    address: z.string().max(255).optional(),
+    address: z.string().trim().max(255).nullable().optional(),
 
     participant_emails: z
       .array(z.email('One or more email addresses does not have a valid format!'))
@@ -77,7 +79,7 @@ export const createEventSchema = z
     },
   )
   .refine(
-    (data: { latitude?: number; longitude?: number; address?: string }) => {
+    (data: { latitude?: number | null; longitude?: number | null; address?: string | null }) => {
       const hasLat = data.latitude !== undefined && data.latitude !== null;
       const hasLng = data.longitude !== undefined && data.longitude !== null;
       const hasAddress =
@@ -143,7 +145,7 @@ export const updateEventSchema = z
       .nullable()
       .optional(),
 
-    address: z.string().max(255).nullable().optional(),
+    address: z.string().trim().max(255).nullable().optional(),
   })
   .refine(
     (data: { start_time?: string; end_time?: string | null }) => {

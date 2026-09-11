@@ -13,8 +13,10 @@
       <template #header><h3 class="text-xl font-bold text-dark-text">Add Event</h3></template>
       <template #body>
         <div
-          v-if="true"
-          class="[ appConfig.calendar.previewWrapper, eventsStore.previewEvent.isExpired ? 'opacity-70' : '', 'p-2! pr-3! gap-4! md:overflow-visible md:max-h-none overflow-y-auto max-h-[70vh] overscroll-contain custom-scrollbar', ]"
+          :class="[
+            appConfig.calendar.previewWrapper,
+            'p-2! pr-3! gap-4! md:overflow-visible md:max-h-none overflow-y-auto max-h-[70vh] overscroll-contain custom-scrollbar flex flex-col',
+          ]"
         >
           <UForm
             :schema="createEventSchema"
@@ -147,10 +149,26 @@
         </div>
       </template>
       <template #body>
-        <div class="h-[60vh] w-full">
-          <ClientOnly>
-            <MapEventMapSelector @confirm-location="handleLocationSelected" />
-          </ClientOnly>
+        <div class="max-h-[70vh] overflow-y-auto custom-scrollbar flex flex-col gap-4 p-1">
+          <div class="h-[45vh] w-full shrink-0">
+            <ClientOnly>
+              <MapEventMapSelector
+                :is-open="isMapSelectorOpen"
+                :initial-location="
+                  formState.latitude !== null &&
+                  formState.longitude !== null &&
+                  formState.address !== null
+                    ? {
+                        latitude: formState.latitude,
+                        longitude: formState.longitude,
+                        address: formState.address,
+                      }
+                    : null
+                "
+                @confirm-location="handleLocationSelected"
+              />
+            </ClientOnly>
+          </div>
         </div>
       </template>
     </UModal>
@@ -477,7 +495,7 @@
 
             <!-- map -->
             <div
-              v-if="eventsStore.previewEvent.address || eventsStore.previewEvent.latitude"
+              v-if="eventsStore.previewEvent.address || eventsStore.previewEvent.latitude !== null"
               :class="[appConfig.calendar.metaRowItem, 'mt-4 flex-col gap-2! items-start']"
             >
               <span :class="appConfig.calendar.metaLabel">Location:</span>

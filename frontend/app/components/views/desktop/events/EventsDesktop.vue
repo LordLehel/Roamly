@@ -405,7 +405,7 @@
               <span :class="appConfig.calendar.metaValue">{{ selectedEvent.description }}</span>
             </div>
             <div
-              v-if="selectedEvent.address || selectedEvent.latitude"
+              v-if="selectedEvent.address || selectedEvent.latitude !== null"
               :class="[appConfig.calendar.metaRowItem, 'mt-4', 'flex-col', 'items-start', 'gap-2']"
             >
               <span :class="appConfig.calendar.metaLabel">{{ CONST_LOC_LBL }}</span>
